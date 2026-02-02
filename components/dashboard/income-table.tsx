@@ -29,9 +29,11 @@ import {
     Trash2,
     TrendingUp,
     TrendingDown,
-    Clock,
-    CheckCircle2,
+    Hourglass,
+    CheckCircle,
     Pencil,
+    ArrowUp,
+    ArrowDown,
 } from "lucide-react";
 import { IncomeForm } from "./income-form";
 
@@ -396,7 +398,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                             Total Year Pending
                         </p>
                         <div className="flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-amber-400" />
+                            <Hourglass className="h-4 w-4 text-amber-400" />
                             <p className="text-xl font-bold text-amber-400">
                                 {formatCurrency(yearTotals.pending)}
                             </p>
@@ -408,7 +410,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                             Total Year Received
                         </p>
                         <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                            <CheckCircle className="h-4 w-4 text-emerald-400" />
                             <p className="text-xl font-bold text-emerald-400">
                                 {formatCurrency(yearTotals.received)}
                             </p>
@@ -421,8 +423,28 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                     <Table>
                         <TableHeader>
                             <TableRow className="border-white/5 hover:bg-transparent">
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
-                                    Date
+                                <TableHead
+                                    className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em] cursor-pointer hover:text-white transition-colors group/head"
+                                    onClick={() =>
+                                        setSortConfig((prev) => ({
+                                            key: "date",
+                                            direction:
+                                                prev.key === "date" &&
+                                                prev.direction === "desc"
+                                                    ? "asc"
+                                                    : "desc",
+                                        }))
+                                    }
+                                >
+                                    <div className="flex items-center gap-1">
+                                        Date
+                                        {sortConfig.key === "date" &&
+                                            (sortConfig.direction === "asc" ? (
+                                                <ArrowUp className="h-3 w-3 text-cyan-400" />
+                                            ) : (
+                                                <ArrowDown className="h-3 w-3 text-cyan-400" />
+                                            ))}
+                                    </div>
                                 </TableHead>
                                 <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Amount
@@ -522,12 +544,6 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    {entry.status ===
-                                                    "received" ? (
-                                                        <CheckCircle2 className="h-3 w-3" />
-                                                    ) : (
-                                                        <Clock className="h-3 w-3" />
-                                                    )}
                                                     <SelectValue placeholder="Status" />
                                                 </div>
                                             </SelectTrigger>
@@ -537,7 +553,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                     className="text-[10px] font-bold uppercase tracking-wider focus:bg-amber-500/20 focus:text-amber-400"
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <Clock className="h-3 w-3" />
+                                                        <Hourglass className="h-3 w-3" />
                                                         <span>Pending</span>
                                                     </div>
                                                 </SelectItem>
@@ -546,7 +562,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                     className="text-[10px] font-bold uppercase tracking-wider focus:bg-emerald-500/20 focus:text-emerald-400"
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <CheckCircle2 className="h-3 w-3" />
+                                                        <CheckCircle className="h-3 w-3" />
                                                         <span>Received</span>
                                                     </div>
                                                 </SelectItem>

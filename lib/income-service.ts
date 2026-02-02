@@ -11,7 +11,7 @@ import {
   Timestamp,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import { IncomeEntry, MonthlyStats, YearlyStats } from '@/types/income'
+import { IncomeEntry, MonthlyStats, YearlyStats, AllTimeStats, AnnualStats } from '@/types/income'
 import { MONTHS } from './utils'
 import { incomeCache } from './income-cache'
 
@@ -141,11 +141,11 @@ export async function getIncomeByYear(year: number, userId: string): Promise<Inc
 export async function getMonthlyStats(year: number, userId: string): Promise<MonthlyStats[]> {
   const entries = await getIncomeByYear(year, userId)
   
-  const monthlyData: Record<string, { primary: number; secondary: number; credits: number; debits: number }> = {}
+  const monthlyData: Record<string, { primary: number; secondary: number; credits: number; debits: number; pending: number; received: number }> = {}
   
   // Initialize all months
   MONTHS.forEach(month => {
-    monthlyData[month] = { primary: 0, secondary: 0, credits: 0, debits: 0 }
+    monthlyData[month] = { primary: 0, secondary: 0, credits: 0, debits: 0, pending: 0, received: 0 }
   })
   
   // Aggregate data
@@ -158,6 +158,14 @@ export async function getMonthlyStats(year: number, userId: string): Promise<Mon
           monthData.primary += entry.amount
         } else {
           monthData.secondary += entry.amount
+        }
+        
+        // Calculate pending vs received
+        const status = entry.status || 'received'
+        if (status === 'pending') {
+          monthData.pending += entry.amount
+        } else {
+          monthData.received += entry.amount
         }
       } else {
         monthData.debits += entry.amount
@@ -174,8 +182,52 @@ export async function getMonthlyStats(year: number, userId: string): Promise<Mon
       secondary: data.secondary,
       total: data.primary + data.secondary,
       net: data.credits - data.debits,
+      pending: data.pending,
+      received: data.received,
     }
   })
+}
+
+export async function getAnnualStats(userId: string): Promise<AnnualStats[]> {
+  try {
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('userId', '==', userId)
+    )
+    const querySnapshot = await getDocs(q)
+    const entries = querySnapshot.docs.map(doc => doc.data() as IncomeEntry)
+    
+    const annualData: Record<number, { total: number; pending: number; received: number }> = {}
+    
+    entries.forEach(entry => {
+      if (!annualData[entry.year]) {
+        annualData[entry.year] = { total: 0, pending: 0, received: 0 }
+      }
+      
+      const yearData = annualData[entry.year]
+      if (entry.type === 'credit') { // Only count income
+        yearData.total += entry.amount
+        
+        const status = entry.status || 'received'
+        if (status === 'pending') {
+          yearData.pending += entry.amount
+        } else {
+          yearData.received += entry.amount
+        }
+      }
+    })
+    
+    return Object.entries(annualData).map(([year, data]) => ({
+      year: parseInt(year),
+      total: data.total,
+      pending: data.pending,
+      received: data.received
+    })).sort((a, b) => a.year - b.year) // Sort by year ascending
+    
+  } catch (error) {
+    console.error('Error fetching annual stats:', error)
+    return []
+  }
 }
 
 export async function getYearlyStats(year: number, userId: string): Promise<YearlyStats> {
@@ -198,5 +250,36 @@ export async function getYearlyStats(year: number, userId: string): Promise<Year
     totalSecondary,
     monthlyAverage,
     highestMonth,
+  }
+}
+
+export async function getAllTimeStats(userId: string): Promise<AllTimeStats> {
+  try {
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('userId', '==', userId)
+    )
+    const querySnapshot = await getDocs(q)
+    const entries = querySnapshot.docs.map(doc => doc.data() as IncomeEntry)
+
+    const stats = entries.reduce(
+      (acc, entry) => {
+        // Default to received if no status (backward compatibility)
+        const status = entry.status || 'received'
+        
+        if (status === 'pending') {
+          acc.totalPending += entry.amount
+        } else {
+          acc.totalReceived += entry.amount
+        }
+        return acc
+      },
+      { totalPending: 0, totalReceived: 0 }
+    )
+
+    return stats
+  } catch (error) {
+    console.error('Error fetching all-time stats:', error)
+    return { totalPending: 0, totalReceived: 0 }
   }
 }

@@ -17,6 +17,15 @@ export interface MonthlyStats {
   secondary: number
   total: number
   net: number
+  pending: number
+  received: number
+}
+
+export interface AnnualStats {
+  year: number
+  total: number
+  pending: number
+  received: number
 }
 
 export interface YearlyStats {
@@ -28,4 +37,9 @@ export interface YearlyStats {
     month: string
     amount: number
   }
+}
+
+export interface AllTimeStats {
+  totalPending: number
+  totalReceived: number
 }

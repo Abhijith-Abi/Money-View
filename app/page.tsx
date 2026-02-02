@@ -7,9 +7,16 @@ import {
     getIncomeByYear,
     getMonthlyStats,
     getYearlyStats,
+    getAllTimeStats,
+    getAnnualStats,
 } from "@/lib/income-service";
 import { incomeCache } from "@/lib/income-cache";
-import { IncomeEntry, MonthlyStats, YearlyStats } from "@/types/income";
+import {
+    IncomeEntry,
+    MonthlyStats,
+    YearlyStats,
+    AnnualStats,
+} from "@/types/income";
 import { StatsCards } from "@/components/dashboard/stats-cards";
 import { IncomeCharts } from "@/components/dashboard/income-charts";
 import { IncomeTable } from "@/components/dashboard/income-table";
@@ -34,6 +41,10 @@ export default function Home() {
     const [entries, setEntries] = useState<IncomeEntry[]>([]);
     const [monthlyStats, setMonthlyStats] = useState<MonthlyStats[]>([]);
     const [yearlyStats, setYearlyStats] = useState<YearlyStats | null>(null);
+    const [annualStats, setAnnualStats] = useState<AnnualStats[]>([]);
+    const [allTimeStats, setAllTimeStats] = useState<
+        import("@/types/income").AllTimeStats | null
+    >(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -52,12 +63,23 @@ export default function Home() {
             const cachedEntries = incomeCache.getEntries(cacheKey);
             const cachedMonthly = incomeCache.getMonthlyStats(cacheKey);
             const cachedYearly = incomeCache.getYearlyStats(cacheKey);
+            const cachedAllTime = incomeCache.getAllTimeStats(user.uid);
 
-            if (cachedEntries && cachedMonthly && cachedYearly) {
+            if (
+                cachedEntries &&
+                cachedMonthly &&
+                cachedYearly &&
+                cachedAllTime
+            ) {
                 // Use cached data instantly
                 setEntries(cachedEntries);
                 setMonthlyStats(cachedMonthly);
                 setYearlyStats(cachedYearly);
+                setAllTimeStats(cachedAllTime);
+                // Note: annualStats not cached yet, we can fetch it or just not cache for now as it's small
+                const annual = await getAnnualStats(user.uid);
+                setAnnualStats(annual);
+
                 setLoading(false);
                 return;
             }
@@ -65,10 +87,18 @@ export default function Home() {
 
         setLoading(true);
         try {
-            const [entriesData, monthlyData, yearlyData] = await Promise.all([
+            const [
+                entriesData,
+                monthlyData,
+                yearlyData,
+                allTimeData,
+                annualData,
+            ] = await Promise.all([
                 getIncomeByYear(selectedYear, user.uid),
                 getMonthlyStats(selectedYear, user.uid),
                 getYearlyStats(selectedYear, user.uid),
+                getAllTimeStats(user.uid),
+                getAnnualStats(user.uid),
             ]);
 
             // Add backward compatibility: default status to 'received' for existing entries
@@ -80,11 +110,14 @@ export default function Home() {
             setEntries(normalizedEntries);
             setMonthlyStats(monthlyData);
             setYearlyStats(yearlyData);
+            setAllTimeStats(allTimeData);
+            setAnnualStats(annualData);
 
             // Cache the results
             incomeCache.setEntries(cacheKey, normalizedEntries);
             incomeCache.setMonthlyStats(cacheKey, monthlyData);
             incomeCache.setYearlyStats(cacheKey, yearlyData);
+            incomeCache.setAllTimeStats(user.uid, allTimeData);
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
@@ -240,6 +273,13 @@ export default function Home() {
                         </motion.div>
                     </motion.div>
 
+                    {/* Stats Cards */}
+                    <StatsCards
+                        stats={yearlyStats}
+                        allTimeStats={allTimeStats}
+                        loading={loading}
+                    />
+
                     {/* Table */}
                     <IncomeTable
                         entries={entries}
@@ -247,12 +287,10 @@ export default function Home() {
                         onDelete={() => fetchData(true)}
                     />
 
-                    {/* Stats Cards */}
-                    <StatsCards stats={yearlyStats} loading={loading} />
-
                     {/* Charts */}
                     <IncomeCharts
                         monthlyStats={monthlyStats}
+                        annualStats={annualStats}
                         loading={loading}
                     />
 

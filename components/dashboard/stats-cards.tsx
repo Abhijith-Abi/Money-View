@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { YearlyStats } from "@/types/income";
 import { formatCurrency } from "@/lib/utils";
@@ -9,46 +8,11 @@ import { TrendingUp, Wallet, PiggyBank, BarChart3, Trophy } from "lucide-react";
 
 interface StatsCardsProps {
     stats: YearlyStats | null;
+    allTimeStats: import("@/types/income").AllTimeStats | null;
     loading: boolean;
 }
 
-function AnimatedNumber({
-    value,
-    prefix = "",
-}: {
-    value: number;
-    prefix?: string;
-}) {
-    const [displayValue, setDisplayValue] = useState(0);
-
-    useEffect(() => {
-        const duration = 1000;
-        const steps = 60;
-        const increment = value / steps;
-        let current = 0;
-
-        const timer = setInterval(() => {
-            current += increment;
-            if (current >= value) {
-                setDisplayValue(value);
-                clearInterval(timer);
-            } else {
-                setDisplayValue(Math.floor(current));
-            }
-        }, duration / steps);
-
-        return () => clearInterval(timer);
-    }, [value]);
-
-    return (
-        <span className="animate-count">
-            {prefix}
-            {displayValue.toLocaleString("en-IN")}
-        </span>
-    );
-}
-
-export function StatsCards({ stats, loading }: StatsCardsProps) {
+export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
     const cards = [
         {
             title: "Total Income",
@@ -74,12 +38,28 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
             glowColor: "rgba(6, 182, 212, 0.4)",
             iconBg: "bg-cyan-500/20",
         },
+        {
+            title: "Total Pending (All Time)",
+            value: allTimeStats?.totalPending || 0,
+            icon: BarChart3,
+            gradient: "from-orange-500 to-red-600",
+            glowColor: "rgba(249, 115, 22, 0.4)",
+            iconBg: "bg-orange-500/20",
+        },
+        {
+            title: "Total Received (All Time)",
+            value: allTimeStats?.totalReceived || 0,
+            icon: Trophy,
+            gradient: "from-green-500 to-emerald-600",
+            glowColor: "rgba(34, 197, 94, 0.4)",
+            iconBg: "bg-green-500/20",
+        },
     ];
 
     if (loading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(3)].map((_, i) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                {[...Array(5)].map((_, i) => (
                     <Card key={i} className="glass animate-pulse">
                         <CardContent className="p-6">
                             <div className="h-20 bg-slate-700 rounded"></div>
@@ -91,7 +71,7 @@ export function StatsCards({ stats, loading }: StatsCardsProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
             {cards.map((card, index) => (
                 <motion.div
                     key={card.title}
