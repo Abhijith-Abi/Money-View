@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 222.2 84% 2%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 3%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 2%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 262.1 83.3% 57.8%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 188.7 94.5% 42.7%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 222.2 47.4% 11.2%;
+        --muted-foreground: 215.4 16.3% 56.9%;
+        --accent: 316.6 70.3% 50.4%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 262.1 83.3% 57.8%;
+        --radius: 0.75rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1;
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    .glass {
+        @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+    }
+
+    .glass-hover {
+        @apply transition-all duration-500 hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)];
+    }
+
+    .gradient-primary {
+        @apply bg-gradient-to-r from-blue-500 to-indigo-600;
+    }
+
+    .gradient-secondary {
+        @apply bg-gradient-to-r from-emerald-500 to-teal-600;
+    }
+
+    .gradient-accent {
+        @apply bg-gradient-to-r from-amber-400 to-yellow-500;
+    }
+
+    .gradient-text {
+        @apply bg-clip-text text-transparent;
+    }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-slate-900/50;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-slate-600;
+}
+
+/* Number animation */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-count {
+    animation: countUp 0.5s ease-out;
+}
+
+/* Modern gradient background animation */
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Floating particles animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) translateX(0px);
+    }
+    33% {
+        transform: translateY(-20px) translateX(10px);
+    }
+    66% {
+        transform: translateY(-10px) translateX(-10px);
+    }
+}
+
+@keyframes floatSlow {
+    0%, 100% {
+        transform: translateY(0px) translateX(0px) scale(1);
+    }
+    50% {
+        transform: translateY(-30px) translateX(20px) scale(1.1);
+    }
+}
+
+/* Glow pulse animation */
+@keyframes glowPulse {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 
+                    0 0 40px rgba(59, 130, 246, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 
+                    0 0 60px rgba(59, 130, 246, 0.4);
+    }
+}
+
+/* Enhanced fade in with scale */
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Gradient border animation */
+@keyframes rotateBorder {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Icon rotate on load */
+@keyframes iconSpin {
+    from {
+        transform: rotate(0deg) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: rotate(360deg) scale(1);
+        opacity: 1;
+    }
+}
