@@ -34,7 +34,7 @@ export function IncomeCharts({
             <div className="grid grid-cols-1 gap-6">
                 <Card className="glass animate-pulse">
                     <CardContent className="p-6">
-                        <div className="h-96 bg-slate-700 rounded"></div>
+                        <div className="h-96 bg-gray-200 dark:bg-gray-800 rounded"></div>
                     </CardContent>
                 </Card>
             </div>
@@ -59,27 +59,27 @@ export function IncomeCharts({
 
                 <Card className="relative glass backdrop-blur-2xl border-white/10 shadow-xl transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 gradient-text">
+                        <CardTitle className="text-xl font-bold gradient-text bg-gradient-to-r from-foreground to-muted-foreground">
                             Income Trends
                         </CardTitle>
-                        <div className="flex bg-slate-900/50 p-1 rounded-lg border border-white/10">
+                        <div className="flex bg-muted p-1 rounded-lg">
                             <Button
                                 variant={
-                                    viewMode === "month" ? "secondary" : "ghost"
+                                    viewMode === "month" ? "default" : "ghost"
                                 }
                                 size="sm"
                                 onClick={() => setViewMode("month")}
-                                className="text-xs h-8"
+                                className={`text-xs h-8 transition-all ${viewMode === "month" ? "shadow-md" : "text-muted-foreground hover:text-foreground"}`}
                             >
                                 Monthly
                             </Button>
                             <Button
                                 variant={
-                                    viewMode === "year" ? "secondary" : "ghost"
+                                    viewMode === "year" ? "default" : "ghost"
                                 }
                                 size="sm"
                                 onClick={() => setViewMode("year")}
-                                className="text-xs h-8"
+                                className={`text-xs h-8 transition-all ${viewMode === "year" ? "shadow-md" : "text-muted-foreground hover:text-foreground"}`}
                             >
                                 Yearly
                             </Button>
@@ -139,15 +139,15 @@ export function IncomeCharts({
                                         </defs>
                                         <CartesianGrid
                                             strokeDasharray="3 3"
-                                            stroke="#334155"
+                                            stroke="var(--border)"
                                             vertical={false}
                                             opacity={0.1}
                                         />
                                         <XAxis
                                             dataKey="month"
-                                            stroke="#94a3b8"
+                                            stroke="var(--muted-foreground)"
                                             tick={{
-                                                fill: "#94a3b8",
+                                                fill: "var(--muted-foreground)",
                                                 fontSize: 12,
                                                 fontWeight: 500,
                                             }}
@@ -159,9 +159,9 @@ export function IncomeCharts({
                                             dy={10}
                                         />
                                         <YAxis
-                                            stroke="#94a3b8"
+                                            stroke="var(--muted-foreground)"
                                             tick={{
-                                                fill: "#94a3b8",
+                                                fill: "var(--muted-foreground)",
                                                 fontSize: 12,
                                                 fontWeight: 500,
                                             }}
@@ -175,8 +175,8 @@ export function IncomeCharts({
                                         <Tooltip
                                             contentStyle={{
                                                 backgroundColor:
-                                                    "rgba(15, 23, 42, 0.9)",
-                                                border: "1px solid rgba(255, 255, 255, 0.1)",
+                                                    "hsl(var(--popover))",
+                                                border: "1px solid hsl(var(--border))",
                                                 borderRadius: "12px",
                                                 backdropFilter: "blur(12px)",
                                                 boxShadow:
@@ -191,7 +191,7 @@ export function IncomeCharts({
                                                 fontWeight: 500,
                                             }}
                                             labelStyle={{
-                                                color: "#f8fafc",
+                                                color: "hsl(var(--popover-foreground))",
                                                 marginBottom: "8px",
                                                 fontWeight: 600,
                                             }}
@@ -274,15 +274,15 @@ export function IncomeCharts({
                                         </defs>
                                         <CartesianGrid
                                             strokeDasharray="3 3"
-                                            stroke="#334155"
+                                            stroke="var(--border)"
                                             vertical={false}
                                             opacity={0.1}
                                         />
                                         <XAxis
                                             dataKey="year"
-                                            stroke="#94a3b8"
+                                            stroke="var(--muted-foreground)"
                                             tick={{
-                                                fill: "#94a3b8",
+                                                fill: "var(--muted-foreground)",
                                                 fontSize: 12,
                                                 fontWeight: 500,
                                             }}
@@ -291,9 +291,9 @@ export function IncomeCharts({
                                             dy={10}
                                         />
                                         <YAxis
-                                            stroke="#94a3b8"
+                                            stroke="var(--muted-foreground)"
                                             tick={{
-                                                fill: "#94a3b8",
+                                                fill: "var(--muted-foreground)",
                                                 fontSize: 12,
                                                 fontWeight: 500,
                                             }}
@@ -307,8 +307,8 @@ export function IncomeCharts({
                                         <Tooltip
                                             contentStyle={{
                                                 backgroundColor:
-                                                    "rgba(15, 23, 42, 0.9)",
-                                                border: "1px solid rgba(255, 255, 255, 0.1)",
+                                                    "hsl(var(--popover))",
+                                                border: "1px solid hsl(var(--border))",
                                                 borderRadius: "12px",
                                                 backdropFilter: "blur(12px)",
                                                 boxShadow:
@@ -323,7 +323,7 @@ export function IncomeCharts({
                                                 fontWeight: 500,
                                             }}
                                             labelStyle={{
-                                                color: "#f8fafc",
+                                                color: "hsl(var(--popover-foreground))",
                                                 marginBottom: "8px",
                                                 fontWeight: 600,
                                             }}

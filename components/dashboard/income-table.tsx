@@ -210,7 +210,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                         {[...Array(5)].map((_, i) => (
                             <div
                                 key={i}
-                                className="h-12 bg-slate-700 rounded"
+                                className="h-12 bg-gray-200 dark:bg-gray-800 rounded"
                             ></div>
                         ))}
                     </div>
@@ -221,9 +221,9 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
 
     if (entries.length === 0) {
         return (
-            <Card className="glass border-white/10">
+            <Card className="glass border-border/50">
                 <CardContent className="p-12 text-center">
-                    <p className="text-slate-400">
+                    <p className="text-muted-foreground">
                         No income entries yet. Add your first entry to get
                         started!
                     </p>
@@ -233,20 +233,20 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
     }
 
     return (
-        <Card className="glass relative overflow-hidden border-white/5 shadow-2xl">
+        <Card className="glass relative overflow-hidden border-border/50 shadow-2xl">
             {/* Subtle internal glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 blur-[100px] -z-10" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10" />
 
             <CardHeader className="relative">
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
-                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 gradient-text">
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground via-muted-foreground to-foreground gradient-text">
                         Recent Transactions
                     </CardTitle>
 
                     <div className="flex flex-wrap items-center gap-4">
                         {/* Status Filter */}
-                        <div className="flex gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
+                        <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border border-border/50">
                             {["all", "pending", "received"].map((status) => (
                                 <Button
                                     key={status}
@@ -258,11 +258,11 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                     className={`rounded-lg px-3 py-1 text-[11px] font-bold uppercase transition-all duration-300 ${
                                         statusFilter === status
                                             ? status === "all"
-                                                ? "bg-white/10 text-white"
+                                                ? "bg-background shadow-sm text-foreground"
                                                 : status === "pending"
-                                                  ? "bg-amber-500/20 text-amber-400"
-                                                  : "bg-emerald-500/20 text-emerald-400"
-                                            : "text-slate-500 hover:text-slate-300"
+                                                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                            : "text-muted-foreground hover:text-foreground"
                                     }`}
                                 >
                                     {status}
@@ -271,7 +271,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                         </div>
 
                         {/* Category Filter */}
-                        <div className="flex gap-1 bg-black/40 p-1 rounded-xl border border-white/5">
+                        <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border border-border/50">
                             {["all", "primary", "secondary"].map((cat) => (
                                 <Button
                                     key={cat}
@@ -282,8 +282,8 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                     }
                                     className={`rounded-lg px-3 py-1 text-[11px] font-bold uppercase transition-all duration-300 ${
                                         categoryFilter === cat
-                                            ? "bg-purple-500/20 text-purple-400"
-                                            : "text-slate-500 hover:text-slate-300"
+                                            ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                            : "text-muted-foreground hover:text-foreground"
                                     }`}
                                 >
                                     {cat === "primary"
@@ -309,10 +309,10 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                             : "desc",
                                 }))
                             }
-                            className={`rounded-xl border border-white/5 bg-black/40 px-3 text-[11px] font-bold uppercase transition-all ${
+                            className={`rounded-xl border border-border/50 bg-muted/50 px-3 text-[11px] font-bold uppercase transition-all ${
                                 sortConfig.key === "amount"
-                                    ? "text-cyan-400 ring-1 ring-cyan-500/30"
-                                    : "text-slate-500"
+                                    ? "text-cyan-600 dark:text-cyan-400 ring-1 ring-cyan-500/30"
+                                    : "text-muted-foreground"
                             }`}
                         >
                             Sort:{" "}
@@ -424,7 +424,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                         <TableHeader>
                             <TableRow className="border-white/5 hover:bg-transparent">
                                 <TableHead
-                                    className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em] cursor-pointer hover:text-white transition-colors group/head"
+                                    className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em] cursor-pointer hover:text-foreground transition-colors group/head"
                                     onClick={() =>
                                         setSortConfig((prev) => ({
                                             key: "date",
@@ -440,28 +440,28 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                         Date
                                         {sortConfig.key === "date" &&
                                             (sortConfig.direction === "asc" ? (
-                                                <ArrowUp className="h-3 w-3 text-cyan-400" />
+                                                <ArrowUp className="h-3 w-3 text-cyan-500" />
                                             ) : (
-                                                <ArrowDown className="h-3 w-3 text-cyan-400" />
+                                                <ArrowDown className="h-3 w-3 text-cyan-500" />
                                             ))}
                                     </div>
                                 </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
+                                <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Amount
                                 </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
+                                <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Type
                                 </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
+                                <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Category
                                 </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
+                                <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Status
                                 </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
+                                <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Description
                                 </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em] text-right">
+                                <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em] text-right">
                                     Actions
                                 </TableHead>
                             </TableRow>
@@ -473,9 +473,9 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: index * 0.04 }}
-                                    className="border-white/5 group hover:bg-white/[0.04] transition-all duration-300"
+                                    className="border-border/50 group hover:bg-muted/50 transition-all duration-300"
                                 >
-                                    <TableCell className="text-slate-300 py-4 font-medium whitespace-nowrap">
+                                    <TableCell className="text-muted-foreground py-4 font-medium whitespace-nowrap">
                                         <div className="flex flex-col">
                                             <span>{entry.month}</span>
                                             <span className="text-slate-500 text-[10px] uppercase font-bold tracking-tighter">
@@ -483,7 +483,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                             </span>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-bold text-slate-100 tabular-nums">
+                                    <TableCell className="font-bold text-foreground tabular-nums">
                                         {formatCurrency(entry.amount)}
                                     </TableCell>
                                     <TableCell>
@@ -514,10 +514,10 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                     </TableCell>
                                     <TableCell>
                                         <div
-                                            className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-white/5 ${
+                                            className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-border/50 ${
                                                 entry.category === "primary"
-                                                    ? "bg-purple-500/10 text-purple-400"
-                                                    : "bg-cyan-500/10 text-cyan-400"
+                                                    ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                                    : "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
                                             }`}
                                         >
                                             {entry.category === "primary"
@@ -537,17 +537,17 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                             }
                                         >
                                             <SelectTrigger
-                                                className={`h-7 w-fit min-w-[100px] px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-white/5 focus:ring-0 transition-all duration-300 ${
+                                                className={`h-7 w-fit min-w-[100px] px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-border/50 focus:ring-0 transition-all duration-300 ${
                                                     entry.status === "received"
-                                                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                                                        : "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
+                                                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                                                        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
                                                 }`}
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <SelectValue placeholder="Status" />
                                                 </div>
                                             </SelectTrigger>
-                                            <SelectContent className="glass border-white/10 bg-slate-900/90 text-white min-w-[120px]">
+                                            <SelectContent className="glass border-border/50 bg-background/95 backdrop-blur-md text-foreground min-w-[120px]">
                                                 <SelectItem
                                                     value="pending"
                                                     className="text-[10px] font-bold uppercase tracking-wider focus:bg-amber-500/20 focus:text-amber-400"
@@ -570,7 +570,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                         </Select>
                                     </TableCell>
 
-                                    <TableCell className="text-slate-400 max-w-[150px] truncate text-[13px]">
+                                    <TableCell className="text-muted-foreground max-w-[150px] truncate text-[13px]">
                                         {entry.description || (
                                             <span className="opacity-30 italic">
                                                 No note
@@ -587,7 +587,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                                                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
                                                     >
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
@@ -602,7 +602,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                 disabled={
                                                     deletingId === entry.id
                                                 }
-                                                className="h-8 w-8 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                                className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

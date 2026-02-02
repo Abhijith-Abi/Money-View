@@ -4,6 +4,34 @@
 
 @layer base {
     :root {
+        --background: 210 40% 98%;
+        --foreground: 222.2 47.4% 11.2%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 47.4% 11.2%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 47.4% 11.2%;
+        --primary: 262.1 83.3% 57.8%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 90%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 85%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 262.1 83.3% 57.8%;
+        --radius: 0.75rem;
+        --chart-1: 12 76% 61%;
+        --chart-2: 173 58% 39%;
+        --chart-3: 197 37% 24%;
+        --chart-4: 43 74% 66%;
+        --chart-5: 27 87% 67%;
+    }
+
+    .dark {
         --background: 222.2 84% 2%;
         --foreground: 210 40% 98%;
         --card: 222.2 84% 3%;
@@ -23,7 +51,11 @@
         --border: 217.2 32.6% 17.5%;
         --input: 217.2 32.6% 17.5%;
         --ring: 262.1 83.3% 57.8%;
-        --radius: 0.75rem;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 30 80% 55%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
     }
 }
 
@@ -32,7 +64,7 @@
         @apply border-border;
     }
     body {
-        @apply bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-foreground;
+        @apply bg-background text-foreground transition-colors duration-300;
         font-feature-settings:
             "rlig" 1,
             "calt" 1;
@@ -45,11 +77,11 @@
     }
 
     .glass {
-        @apply bg-black/40 backdrop-blur-2xl border border-white/5;
+        @apply bg-card/50 backdrop-blur-2xl border border-border/50;
     }
 
     .glass-hover {
-        @apply transition-all duration-500 hover:bg-white/5 hover:border-white/20 hover:shadow-[0_0_20px_rgba(168,85,247,0.15)];
+        @apply transition-all duration-500 hover:bg-accent/50 hover:border-accent hover:shadow-lg dark:hover:shadow-[0_0_20px_rgba(168,85,247,0.15)];
     }
 
     .gradient-primary {

@@ -62,7 +62,7 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
                 {[...Array(5)].map((_, i) => (
                     <Card key={i} className="glass animate-pulse">
                         <CardContent className="p-6">
-                            <div className="h-20 bg-slate-700 rounded"></div>
+                            <div className="h-20 bg-gray-200 dark:bg-gray-800 rounded"></div>
                         </CardContent>
                     </Card>
                 ))}
@@ -89,14 +89,14 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
                         }}
                     />
 
-                    <Card className="relative glass backdrop-blur-2xl border-white/10 overflow-hidden shadow-xl transition-all duration-300 group-hover:border-white/30">
+                    <Card className="relative glass backdrop-blur-2xl overflow-hidden shadow-xl transition-all duration-300">
                         {/* Gradient overlay on hover */}
                         <div
                             className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}
                         ></div>
 
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-                            <CardTitle className="text-sm font-medium text-slate-300">
+                            <CardTitle className="text-sm font-medium text-muted-foreground">
                                 {card.title}
                             </CardTitle>
                             <motion.div

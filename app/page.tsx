@@ -22,6 +22,7 @@ import { IncomeCharts } from "@/components/dashboard/income-charts";
 import { IncomeTable } from "@/components/dashboard/income-table";
 import { IncomeForm } from "@/components/dashboard/income-form";
 import { UserProfile } from "@/components/auth/user-profile";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Toaster } from "@/components/ui/toaster";
 import {
     Select,
@@ -141,7 +142,7 @@ export default function Home() {
     if (authLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
         );
     }
@@ -156,7 +157,7 @@ export default function Home() {
         <div className="min-h-screen relative overflow-hidden">
             {/* Subtle gradient background */}
             <div
-                className="fixed inset-0 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 -z-10"
+                className="fixed inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 -z-10"
                 style={{
                     backgroundSize: "400% 400%",
                     animation: "gradientFlow 20s ease infinite",
@@ -216,7 +217,7 @@ export default function Home() {
                             </motion.div>
                             <div>
                                 <motion.h1
-                                    className="text-4xl font-bold bg-gradient-to-r from-purple-200 via-white to-cyan-200 gradient-text"
+                                    className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-primary to-cyan-500 dark:from-purple-200 dark:via-white dark:to-cyan-200 gradient-text"
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.1 }}
@@ -224,13 +225,13 @@ export default function Home() {
                                     Money View
                                 </motion.h1>
                                 <motion.p
-                                    className="text-slate-400 mt-1"
+                                    className="text-muted-foreground mt-1"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.2 }}
                                 >
                                     Welcome back,{" "}
-                                    <span className="text-purple-300 font-medium">
+                                    <span className="text-primary font-medium">
                                         {user.displayName?.split(" ")[0] ||
                                             "there"}
                                     </span>
@@ -245,7 +246,7 @@ export default function Home() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
                         >
-                            <label className="text-sm text-slate-300 font-medium">
+                            <label className="text-sm text-muted-foreground font-medium">
                                 Year:
                             </label>
                             <Select
@@ -269,6 +270,7 @@ export default function Home() {
                                 </SelectContent>
                             </Select>
 
+                            <ModeToggle />
                             <UserProfile />
                         </motion.div>
                     </motion.div>
