@@ -26,6 +26,8 @@ const SECONDARY_INCOME_2025 = [
   { month: 'December', amount: 32200 },
 ]
 
+const SEED_USER_ID = 'seed-user-id'
+
 async function seedData() {
   console.log('🌱 Starting data seed...')
   
@@ -39,8 +41,9 @@ async function seedData() {
         month: entry.month,
         year: 2025,
         type: 'credit',
+        status: 'received',
         description: 'Monthly salary',
-      })
+      }, SEED_USER_ID)
       console.log(`✅ Added ${entry.month} - ₹${entry.amount}`)
     }
     
@@ -53,8 +56,9 @@ async function seedData() {
         month: entry.month,
         year: 2025,
         type: 'credit',
+        status: 'received',
         description: 'Support & other income',
-      })
+      }, SEED_USER_ID)
       console.log(`✅ Added ${entry.month} - ₹${entry.amount}`)
     }
     
