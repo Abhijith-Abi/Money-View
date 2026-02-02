@@ -51,7 +51,64 @@ export async function addIncome(
       createdAt: Timestamp.now(),
     }
     
-    console.log('📝 [addIncome] Writing to Firestore...', dataToWrite)
+    // Check for existing entry to aggregate
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('userId', '==', userId),
+      where('year', '==', entry.year),
+      where('month', '==', entry.month),
+      where('type', '==', entry.type),
+      where('category', '==', entry.category),
+      where('status', '==', entry.status)
+    );
+
+    const querySnapshot = await getDocs(q);
+    
+    // If a matching entry exists, update it instead of creating new
+    if (!querySnapshot.empty) {
+      const existingDoc = querySnapshot.docs[0];
+      const existingData = existingDoc.data();
+      const existingAmount = existingData.amount || 0;
+      const existingDescription = existingData.description || '';
+      
+      const newAmount = existingAmount + entry.amount;
+      
+      // Merge descriptions if requested entry has one
+      let newDescription = existingDescription;
+      if (entry.description && entry.description.trim() !== '') {
+        if (existingDescription && existingDescription.trim() !== '') {
+           // Avoid duplicating if description is identical
+           if (!existingDescription.includes(entry.description)) {
+              newDescription = `${existingDescription} | ${entry.description}`;
+           }
+        } else {
+          newDescription = entry.description;
+        }
+      }
+
+      console.log('🔄 [addIncome] Found existing entry, aggregating...', {
+        id: existingDoc.id,
+        oldAmount: existingAmount,
+        newAmount: newAmount
+      });
+
+      await updateDoc(doc(db, COLLECTION_NAME, existingDoc.id), {
+        amount: newAmount,
+        description: newDescription,
+        // Update createdAt so it jumps to top/recent if sorted by date? 
+        // Or keep original date? Keeping original date is usually better for history, 
+        // but user might expect it to show as "recent". 
+        // For now, let's just update the content.
+      });
+
+      // Invalidate cache
+      incomeCache.invalidate({ userId, year: entry.year });
+      
+      return existingDoc.id;
+    }
+
+    // No existing entry found, proceed to add new
+    console.log('📝 [addIncome] No matching entry found. Writing new doc to Firestore...', dataToWrite)
     
     // Race between the actual Firebase operation and the timeout
     const docRef = await Promise.race([
