@@ -81,7 +81,7 @@ export function IncomeForm({
             month: initialData?.month || "",
             year: (initialData?.year || defaultYear).toString(),
             type: initialData?.type || "credit",
-            status: initialData?.status || "received",
+            status: initialData?.status || "pending",
             description: initialData?.description || "",
         },
     });
