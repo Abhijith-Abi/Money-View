@@ -2,6 +2,8 @@
 
 A modern, beautiful financial income tracking web application built with Next.js, Firebase, and shadcn/ui.
 
+**Live Demo**: [money-view.abisolutions.online](https://money-view.abisolutions.online)
+
 ## Features
 
 - 📊 **Interactive Charts** - Visualize income with line, bar, area, and pie charts
@@ -56,7 +58,7 @@ npm start
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 with App Router
+- **Framework**: Next.js 16 with App Router (Turbopack)
 - **UI Library**: shadcn/ui
 - **Charts**: Recharts
 - **Animations**: Framer Motion

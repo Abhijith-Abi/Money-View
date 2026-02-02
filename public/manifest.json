@@ -1,0 +1,16 @@
+{
+  "name": "Money View",
+  "short_name": "Money View",
+  "description": "Track and visualize your income with beautiful charts and analytics.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#9333ea",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
