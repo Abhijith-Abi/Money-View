@@ -1,6 +1,7 @@
 import {
   collection,
   addDoc,
+  updateDoc,
   deleteDoc,
   doc,
   query,
@@ -96,6 +97,23 @@ export async function deleteIncome(id: string, userId: string): Promise<void> {
     incomeCache.clear()
   } catch (error) {
     console.error('Error deleting income:', error)
+    throw error
+  }
+}
+
+export async function updateIncome(
+  id: string,
+  userId: string,
+  updates: Partial<Omit<IncomeEntry, 'id' | 'createdAt' | 'userId'>>
+): Promise<void> {
+  try {
+    const docRef = doc(db, COLLECTION_NAME, id)
+    await updateDoc(docRef, updates)
+    
+    // If year was updated or to be safe, clear cache
+    incomeCache.clear()
+  } catch (error) {
+    console.error('Error updating income:', error)
     throw error
   }
 }

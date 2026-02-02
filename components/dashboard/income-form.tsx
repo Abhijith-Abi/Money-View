@@ -5,8 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/lib/auth-context";
-import { addIncome } from "@/lib/income-service";
+import { addIncome, updateIncome } from "@/lib/income-service";
 import { MONTHS } from "@/lib/utils";
+import { IncomeEntry } from "@/types/income";
 import {
     Dialog,
     DialogContent,
@@ -33,7 +34,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Pencil } from "lucide-react";
 
 const formSchema = z.object({
     amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -55,24 +56,33 @@ const formSchema = z.object({
 interface IncomeFormProps {
     onSuccess: () => void;
     defaultYear: number;
+    initialData?: IncomeEntry;
+    trigger?: React.ReactNode;
 }
 
-export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
+export function IncomeForm({
+    onSuccess,
+    defaultYear,
+    initialData,
+    trigger,
+}: IncomeFormProps) {
     const { user } = useAuth();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
 
+    const isEditing = !!initialData;
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            amount: "",
-            category: "primary",
-            month: "",
-            year: defaultYear.toString(),
-            type: "credit",
-            status: "received",
-            description: "",
+            amount: initialData?.amount.toString() || "",
+            category: initialData?.category || "primary",
+            month: initialData?.month || "",
+            year: (initialData?.year || defaultYear).toString(),
+            type: initialData?.type || "credit",
+            status: initialData?.status || "received",
+            description: initialData?.description || "",
         },
     });
 
@@ -81,7 +91,6 @@ export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
 
         setLoading(true);
 
-        // Close modal and show success immediately for faster UX
         const formData = {
             amount: Number(values.amount),
             category: values.category,
@@ -92,66 +101,41 @@ export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
             description: values.description,
         };
 
-        console.log("📋 [IncomeForm] Submitting form with data:", formData);
-        console.log("👤 [IncomeForm] User UID:", user.uid);
-
-        // Optimistic UI update - close modal and reset form immediately
-        form.reset({
-            amount: "",
-            category: "primary",
-            month: "",
-            year: defaultYear.toString(),
-            type: "credit",
-            status: "received",
-            description: "",
-        });
-        setOpen(false);
-
-        toast({
-            title: "Adding entry...",
-            description: "Your entry is being saved",
-        });
-
         try {
-            console.log("🚀 [IncomeForm] Calling addIncome...");
-            const docId = await addIncome(formData, user.uid);
-            console.log(
-                "✅ [IncomeForm] Successfully added! Document ID:",
-                docId,
-            );
+            if (isEditing && initialData) {
+                console.log("🚀 [IncomeForm] Calling updateIncome...");
+                await updateIncome(initialData.id, user.uid, formData);
+                toast({
+                    title: "Success!",
+                    description: "Entry updated successfully",
+                    duration: 1000,
+                });
+            } else {
+                console.log("🚀 [IncomeForm] Calling addIncome...");
+                await addIncome(formData, user.uid);
+                toast({
+                    title: "Success!",
+                    description: "Income entry added successfully",
+                    duration: 1000,
+                });
+            }
 
-            toast({
-                title: "Success!",
-                description: "Income entry added successfully",
-            });
-
+            setOpen(false);
+            if (!isEditing) {
+                form.reset();
+            }
             onSuccess();
         } catch (error: any) {
-            console.error("❌ [IncomeForm] Failed to add income:", error);
-
-            // Determine the error message based on error type
-            let errorMessage = "Failed to add income entry. Please try again.";
-
-            if (error?.message?.includes("timeout")) {
-                errorMessage =
-                    "Request timed out. Please check your Firestore security rules and try again.";
-            } else if (error?.code === "permission-denied") {
-                errorMessage =
-                    "Permission denied. Please check your Firestore security rules.";
-            } else if (error?.code === "unavailable") {
-                errorMessage =
-                    "Firebase server is unavailable. Please check your internet connection.";
-            } else if (error?.message) {
-                errorMessage = `Error: ${error.message}`;
-            }
+            console.error("❌ [IncomeForm] Error:", error);
+            let errorMessage = "Operation failed. Please try again.";
+            if (error?.message) errorMessage = error.message;
 
             toast({
                 title: "Error",
                 description: errorMessage,
                 variant: "destructive",
+                duration: 2000,
             });
-            // Reopen modal on error so user can retry
-            setOpen(true);
         } finally {
             setLoading(false);
         }
@@ -160,21 +144,24 @@ export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button
-                    size="lg"
-                    className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 z-50"
-                >
-                    <Plus className="h-6 w-6" />
-                </Button>
+                {trigger || (
+                    <Button
+                        size="lg"
+                        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 z-50"
+                    >
+                        <Plus className="h-6 w-6" />
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="glass border-white/10 sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle className="bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
-                        Add Income Entry
+                        {isEditing ? "Edit Entry" : "Add Income Entry"}
                     </DialogTitle>
                     <DialogDescription className="text-slate-400">
-                        Add a new income or expense entry to your financial
-                        tracker
+                        {isEditing
+                            ? "Update the details of your transaction"
+                            : "Add a new income or expense entry to your financial tracker"}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -276,10 +263,10 @@ export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
                                         </FormControl>
                                         <SelectContent className="glass border-white/10">
                                             <SelectItem value="primary">
-                                                Primary (Salary)
+                                                Primary / Salary
                                             </SelectItem>
                                             <SelectItem value="secondary">
-                                                Secondary (Support & Other)
+                                                Secondary / Other
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
@@ -326,15 +313,36 @@ export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel>Year</FormLabel>
-                                        <FormControl>
-                                            <Input
-                                                placeholder="2025"
-                                                inputMode="numeric"
-                                                maxLength={4}
-                                                {...field}
-                                                className="glass border-white/10"
-                                            />
-                                        </FormControl>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="glass border-white/10">
+                                                    <SelectValue placeholder="Select year" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="glass border-white/10 max-h-[200px]">
+                                                {Array.from(
+                                                    {
+                                                        length:
+                                                            new Date().getFullYear() -
+                                                            2020 +
+                                                            2,
+                                                    },
+                                                    (_, i) => 2020 + i,
+                                                )
+                                                    .reverse()
+                                                    .map((year) => (
+                                                        <SelectItem
+                                                            key={year}
+                                                            value={year.toString()}
+                                                        >
+                                                            {year}
+                                                        </SelectItem>
+                                                    ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -369,8 +377,10 @@ export function IncomeForm({ onSuccess, defaultYear }: IncomeFormProps) {
                             {loading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Adding...
+                                    {isEditing ? "Updating..." : "Adding..."}
                                 </>
+                            ) : isEditing ? (
+                                "Update Entry"
                             ) : (
                                 "Add Entry"
                             )}

@@ -42,23 +42,25 @@ export default function Home() {
         }
     }, [authLoading, user, router]);
 
-    async function fetchData() {
+    async function fetchData(forceRefresh = false) {
         if (!user) return;
 
         const cacheKey = { userId: user.uid, year: selectedYear };
 
         // Try to get from cache first for instant loading
-        const cachedEntries = incomeCache.getEntries(cacheKey);
-        const cachedMonthly = incomeCache.getMonthlyStats(cacheKey);
-        const cachedYearly = incomeCache.getYearlyStats(cacheKey);
+        if (!forceRefresh) {
+            const cachedEntries = incomeCache.getEntries(cacheKey);
+            const cachedMonthly = incomeCache.getMonthlyStats(cacheKey);
+            const cachedYearly = incomeCache.getYearlyStats(cacheKey);
 
-        if (cachedEntries && cachedMonthly && cachedYearly) {
-            // Use cached data instantly
-            setEntries(cachedEntries);
-            setMonthlyStats(cachedMonthly);
-            setYearlyStats(cachedYearly);
-            setLoading(false);
-            return;
+            if (cachedEntries && cachedMonthly && cachedYearly) {
+                // Use cached data instantly
+                setEntries(cachedEntries);
+                setMonthlyStats(cachedMonthly);
+                setYearlyStats(cachedYearly);
+                setLoading(false);
+                return;
+            }
         }
 
         setLoading(true);
@@ -242,7 +244,7 @@ export default function Home() {
                     <IncomeTable
                         entries={entries}
                         loading={loading}
-                        onDelete={fetchData}
+                        onDelete={() => fetchData(true)}
                     />
 
                     {/* Stats Cards */}
@@ -256,7 +258,7 @@ export default function Home() {
 
                     {/* Floating Add Button */}
                     <IncomeForm
-                        onSuccess={fetchData}
+                        onSuccess={() => fetchData(true)}
                         defaultYear={selectedYear}
                     />
                 </div>

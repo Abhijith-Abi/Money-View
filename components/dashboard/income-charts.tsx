@@ -53,7 +53,7 @@ export function IncomeCharts({ monthlyStats, loading }: IncomeChartsProps) {
             value: monthlyStats.reduce((sum, m) => sum + m.primary, 0),
         },
         {
-            name: "Secondary Income",
+            name: "Secondary / Other Income",
             value: monthlyStats.reduce((sum, m) => sum + m.secondary, 0),
         },
     ];
@@ -198,7 +198,7 @@ export function IncomeCharts({ monthlyStats, loading }: IncomeChartsProps) {
                                 <Bar
                                     dataKey="secondary"
                                     fill="url(#secondaryGradient)"
-                                    name="Secondary"
+                                    name="Secondary / Other"
                                     radius={[6, 6, 0, 0]}
                                     style={{ filter: "url(#glow)" }}
                                     barSize={24}

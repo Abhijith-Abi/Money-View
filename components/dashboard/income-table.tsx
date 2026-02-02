@@ -3,8 +3,17 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { IncomeEntry } from "@/types/income";
-import { deleteIncome } from "@/lib/income-service";
-import { formatCurrency } from "@/lib/utils";
+import { deleteIncome, updateIncome } from "@/lib/income-service";
+import { formatCurrency, MONTHS } from "@/lib/utils";
+
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+
 import {
     Table,
     TableBody,
@@ -16,7 +25,16 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, TrendingUp, TrendingDown } from "lucide-react";
+import {
+    Trash2,
+    TrendingUp,
+    TrendingDown,
+    Clock,
+    CheckCircle2,
+    Pencil,
+} from "lucide-react";
+import { IncomeForm } from "./income-form";
+
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -40,8 +58,9 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
         direction: "desc" | "asc";
     }>({
         key: "date",
-        direction: "desc",
+        direction: "asc",
     });
+
     const { toast } = useToast();
 
     // Enhanced Filter and Sort logic
@@ -67,12 +86,20 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                     ? b.amount - a.amount
                     : a.amount - b.amount;
             }
-            // Default Date Sort (Month/Year)
-            const dateA = new Date(`${a.month} 1, ${a.year}`).getTime();
-            const dateB = new Date(`${b.month} 1, ${b.year}`).getTime();
+
+            // Explicit Month/Year Sort
+            const monthIndexA = MONTHS.indexOf(a.month);
+            const monthIndexB = MONTHS.indexOf(b.month);
+
+            if (a.year !== b.year) {
+                return sortConfig.direction === "desc"
+                    ? b.year - a.year
+                    : a.year - b.year;
+            }
+
             return sortConfig.direction === "desc"
-                ? dateB - dateA
-                : dateA - dateB;
+                ? monthIndexB - monthIndexA
+                : monthIndexA - monthIndexB;
         });
 
         return result;
@@ -83,13 +110,70 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
         const credits = filteredAndSortedEntries
             .filter((e) => e.type === "credit")
             .reduce((sum, e) => sum + e.amount, 0);
+
+        const primaryCredits = filteredAndSortedEntries
+            .filter((e) => e.type === "credit" && e.category === "primary")
+            .reduce((sum, e) => sum + e.amount, 0);
+
+        const secondaryCredits = filteredAndSortedEntries
+            .filter((e) => e.type === "credit" && e.category === "secondary")
+            .reduce((sum, e) => sum + e.amount, 0);
+
         const debits = filteredAndSortedEntries
             .filter((e) => e.type === "debit")
             .reduce((sum, e) => sum + e.amount, 0);
+
+        const primaryDebits = filteredAndSortedEntries
+            .filter((e) => e.type === "debit" && e.category === "primary")
+            .reduce((sum, e) => sum + e.amount, 0);
+
+        const secondaryDebits = filteredAndSortedEntries
+            .filter((e) => e.type === "debit" && e.category === "secondary")
+            .reduce((sum, e) => sum + e.amount, 0);
+
         const net = credits - debits;
 
-        return { credits, debits, net };
+        return {
+            credits,
+            primaryCredits,
+            secondaryCredits,
+            debits,
+            primaryDebits,
+            secondaryDebits,
+            net,
+        };
     }, [filteredAndSortedEntries]);
+
+    // Calculate totals for the entire year (unfiltered by status/category)
+    const yearTotals = useMemo(() => {
+        const pending = entries
+            .filter((e) => e.status === "pending" && e.type === "credit")
+            .reduce((sum, e) => sum + e.amount, 0);
+        const received = entries
+            .filter((e) => e.status === "received" && e.type === "credit")
+            .reduce((sum, e) => sum + e.amount, 0);
+        return { pending, received };
+    }, [entries]);
+
+    async function handleStatusUpdate(id: string, newStatus: string) {
+        if (!user) return;
+        try {
+            await updateIncome(id, user.uid, { status: newStatus as any });
+            toast({
+                title: "Status Updated",
+                description: `Transaction marked as ${newStatus}`,
+                duration: 1000,
+            });
+            onDelete(); // Refresh data
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update status",
+                variant: "destructive",
+                duration: 2000,
+            });
+        }
+    }
 
     async function handleDelete(id: string) {
         if (!confirm("Are you sure you want to delete this entry?")) return;
@@ -101,6 +185,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
             toast({
                 title: "Success!",
                 description: "Income entry deleted successfully",
+                duration: 1000,
             });
             onDelete();
         } catch (error) {
@@ -108,6 +193,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                 title: "Error",
                 description: "Failed to delete entry",
                 variant: "destructive",
+                duration: 2000,
             });
         } finally {
             setDeletingId(null);
@@ -198,7 +284,11 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                             : "text-slate-500 hover:text-slate-300"
                                     }`}
                                 >
-                                    {cat}
+                                    {cat === "primary"
+                                        ? "Primary / Salary"
+                                        : cat === "secondary"
+                                          ? "Secondary / Other"
+                                          : cat}
                                 </Button>
                             ))}
                         </div>
@@ -233,36 +323,96 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                     </div>
                 </div>
 
-                {/* Filtered Totals */}
+                {/* Filtered Totals & Year Summary */}
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     key={`${statusFilter}-${categoryFilter}`}
-                    className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4"
+                    className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"
                 >
                     <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:bg-emerald-500/10 transition-colors group">
-                        <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider font-semibold">
-                            Credits
-                        </p>
+                        <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+                                Credits
+                            </p>
+                            <TrendingUp className="h-3 w-3 text-emerald-500/50" />
+                        </div>
                         <p className="text-xl font-bold text-emerald-400">
                             {formatCurrency(totals.credits)}
                         </p>
+                        <div className="mt-2 text-[10px] space-y-0.5 text-slate-500">
+                            <div className="flex justify-between">
+                                <span>Primary:</span>
+                                <span className="text-emerald-400/80">
+                                    {formatCurrency(totals.primaryCredits)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Secondary:</span>
+                                <span className="text-emerald-400/80">
+                                    {formatCurrency(totals.secondaryCredits)}
+                                </span>
+                            </div>
+                        </div>
                     </div>
+
                     <div className="p-4 rounded-xl bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500/10 transition-colors group">
-                        <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider font-semibold">
-                            Debits
-                        </p>
+                        <div className="flex items-center justify-between mb-1">
+                            <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
+                                Debits
+                            </p>
+                            <TrendingDown className="h-3 w-3 text-rose-500/50" />
+                        </div>
                         <p className="text-xl font-bold text-rose-400">
                             {formatCurrency(totals.debits)}
                         </p>
+                        <div className="mt-2 text-[10px] space-y-0.5 text-slate-500">
+                            <div className="flex justify-between">
+                                <span>Primary:</span>
+                                <span className="text-rose-400/80">
+                                    {formatCurrency(totals.primaryDebits)}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Secondary:</span>
+                                <span className="text-rose-400/80">
+                                    {formatCurrency(totals.secondaryDebits)}
+                                </span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 hover:bg-purple-500/10 transition-colors group">
+
+                    <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 hover:bg-purple-500/10 transition-colors group flex flex-col justify-center">
                         <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider font-semibold">
                             Net
                         </p>
                         <p className="text-xl font-bold text-purple-400">
                             {formatCurrency(totals.net)}
                         </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-colors group">
+                        <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider font-semibold">
+                            Total Year Pending
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-amber-400" />
+                            <p className="text-xl font-bold text-amber-400">
+                                {formatCurrency(yearTotals.pending)}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10 hover:bg-emerald-500/10 transition-colors group">
+                        <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider font-semibold">
+                            Total Year Received
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                            <p className="text-xl font-bold text-emerald-400">
+                                {formatCurrency(yearTotals.received)}
+                            </p>
+                        </div>
                     </div>
                 </motion.div>
             </CardHeader>
@@ -275,6 +425,9 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                     Date
                                 </TableHead>
                                 <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
+                                    Amount
+                                </TableHead>
+                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Type
                                 </TableHead>
                                 <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
@@ -282,9 +435,6 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                 </TableHead>
                                 <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Status
-                                </TableHead>
-                                <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
-                                    Amount
                                 </TableHead>
                                 <TableHead className="text-slate-400 uppercase text-[10px] font-bold tracking-[0.2em]">
                                     Description
@@ -310,6 +460,9 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                 {entry.year}
                                             </span>
                                         </div>
+                                    </TableCell>
+                                    <TableCell className="font-bold text-slate-100 tabular-nums">
+                                        {formatCurrency(entry.amount)}
                                     </TableCell>
                                     <TableCell>
                                         <div className="flex items-center gap-2">
@@ -345,30 +498,62 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                     : "bg-cyan-500/10 text-cyan-400"
                                             }`}
                                         >
-                                            {entry.category}
+                                            {entry.category === "primary"
+                                                ? "Primary / Salary"
+                                                : "Secondary / Other"}
                                         </div>
                                     </TableCell>
+
                                     <TableCell>
-                                        <div
-                                            className={`flex items-center gap-1.5 text-[11px] font-semibold ${
-                                                entry.status === "received"
-                                                    ? "text-emerald-400"
-                                                    : "text-amber-400"
-                                            }`}
+                                        <Select
+                                            defaultValue={entry.status}
+                                            onValueChange={(value) =>
+                                                handleStatusUpdate(
+                                                    entry.id,
+                                                    value,
+                                                )
+                                            }
                                         >
-                                            <div
-                                                className={`w-1 h-1 rounded-full ${
+                                            <SelectTrigger
+                                                className={`h-7 w-fit min-w-[100px] px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-white/5 focus:ring-0 transition-all duration-300 ${
                                                     entry.status === "received"
-                                                        ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"
-                                                        : "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                                                        ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                                                        : "bg-amber-500/10 text-amber-400 hover:bg-amber-500/20"
                                                 }`}
-                                            />
-                                            {entry.status}
-                                        </div>
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    {entry.status ===
+                                                    "received" ? (
+                                                        <CheckCircle2 className="h-3 w-3" />
+                                                    ) : (
+                                                        <Clock className="h-3 w-3" />
+                                                    )}
+                                                    <SelectValue placeholder="Status" />
+                                                </div>
+                                            </SelectTrigger>
+                                            <SelectContent className="glass border-white/10 bg-slate-900/90 text-white min-w-[120px]">
+                                                <SelectItem
+                                                    value="pending"
+                                                    className="text-[10px] font-bold uppercase tracking-wider focus:bg-amber-500/20 focus:text-amber-400"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="h-3 w-3" />
+                                                        <span>Pending</span>
+                                                    </div>
+                                                </SelectItem>
+                                                <SelectItem
+                                                    value="received"
+                                                    className="text-[10px] font-bold uppercase tracking-wider focus:bg-emerald-500/20 focus:text-emerald-400"
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <CheckCircle2 className="h-3 w-3" />
+                                                        <span>Received</span>
+                                                    </div>
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </TableCell>
-                                    <TableCell className="font-bold text-slate-100 tabular-nums">
-                                        {formatCurrency(entry.amount)}
-                                    </TableCell>
+
                                     <TableCell className="text-slate-400 max-w-[150px] truncate text-[13px]">
                                         {entry.description || (
                                             <span className="opacity-30 italic">
@@ -377,17 +562,35 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() =>
-                                                handleDelete(entry.id)
-                                            }
-                                            disabled={deletingId === entry.id}
-                                            className="h-8 w-8 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        <div className="flex items-center justify-end gap-1">
+                                            <IncomeForm
+                                                onSuccess={onDelete}
+                                                defaultYear={entry.year}
+                                                initialData={entry}
+                                                trigger={
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 transition-colors"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                }
+                                            />
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    handleDelete(entry.id)
+                                                }
+                                                disabled={
+                                                    deletingId === entry.id
+                                                }
+                                                className="h-8 w-8 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </TableCell>
                                 </motion.tr>
                             ))}
