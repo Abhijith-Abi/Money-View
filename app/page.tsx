@@ -27,9 +27,10 @@ import { Wallet, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
+    const year = new Date().getFullYear();
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
-    const [selectedYear, setSelectedYear] = useState(2026);
+    const [selectedYear, setSelectedYear] = useState(year);
     const [entries, setEntries] = useState<IncomeEntry[]>([]);
     const [monthlyStats, setMonthlyStats] = useState<MonthlyStats[]>([]);
     const [yearlyStats, setYearlyStats] = useState<YearlyStats | null>(null);
