@@ -4,8 +4,6 @@ import { useState } from "react";
 import { MonthlyStats, AnnualStats } from "@/types/income";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    AreaChart,
-    Area,
     BarChart,
     Bar,
     XAxis,
@@ -43,7 +41,10 @@ export function IncomeCharts({
         );
     }
 
-    const data = viewMode === "month" ? monthlyStats : annualStats;
+    const data =
+        viewMode === "month"
+            ? monthlyStats
+            : annualStats.filter((stat) => stat.year >= 2023);
 
     return (
         <div className="flex flex-col gap-6">
@@ -88,8 +89,9 @@ export function IncomeCharts({
                         <div className="h-[400px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 {viewMode === "month" ? (
-                                    <AreaChart
+                                    <BarChart
                                         data={data}
+                                        barSize={32}
                                         margin={{
                                             top: 20,
                                             right: 30,
@@ -99,57 +101,39 @@ export function IncomeCharts({
                                     >
                                         <defs>
                                             <linearGradient
-                                                id="colorTotal"
+                                                id="receivedGradient"
                                                 x1="0"
                                                 y1="0"
                                                 x2="0"
                                                 y2="1"
                                             >
                                                 <stop
-                                                    offset="5%"
-                                                    stopColor="#ec4899"
-                                                    stopOpacity={0.3}
+                                                    offset="0%"
+                                                    stopColor="#34d399"
+                                                    stopOpacity={1}
                                                 />
                                                 <stop
-                                                    offset="95%"
-                                                    stopColor="#ec4899"
-                                                    stopOpacity={0}
+                                                    offset="100%"
+                                                    stopColor="#059669"
+                                                    stopOpacity={1}
                                                 />
                                             </linearGradient>
                                             <linearGradient
-                                                id="colorReceived"
+                                                id="pendingGradient"
                                                 x1="0"
                                                 y1="0"
                                                 x2="0"
                                                 y2="1"
                                             >
                                                 <stop
-                                                    offset="5%"
-                                                    stopColor="#10b981"
-                                                    stopOpacity={0.3}
+                                                    offset="0%"
+                                                    stopColor="#fbbf24"
+                                                    stopOpacity={1}
                                                 />
                                                 <stop
-                                                    offset="95%"
-                                                    stopColor="#10b981"
-                                                    stopOpacity={0}
-                                                />
-                                            </linearGradient>
-                                            <linearGradient
-                                                id="colorPending"
-                                                x1="0"
-                                                y1="0"
-                                                x2="0"
-                                                y2="1"
-                                            >
-                                                <stop
-                                                    offset="5%"
-                                                    stopColor="#f59e0b"
-                                                    stopOpacity={0.3}
-                                                />
-                                                <stop
-                                                    offset="95%"
-                                                    stopColor="#f59e0b"
-                                                    stopOpacity={0}
+                                                    offset="100%"
+                                                    stopColor="#d97706"
+                                                    stopOpacity={1}
                                                 />
                                             </linearGradient>
                                         </defs>
@@ -157,7 +141,7 @@ export function IncomeCharts({
                                             strokeDasharray="3 3"
                                             stroke="#334155"
                                             vertical={false}
-                                            opacity={0.4}
+                                            opacity={0.1}
                                         />
                                         <XAxis
                                             dataKey="month"
@@ -165,6 +149,7 @@ export function IncomeCharts({
                                             tick={{
                                                 fill: "#94a3b8",
                                                 fontSize: 12,
+                                                fontWeight: 500,
                                             }}
                                             tickFormatter={(value) =>
                                                 value.slice(0, 3)
@@ -178,6 +163,7 @@ export function IncomeCharts({
                                             tick={{
                                                 fill: "#94a3b8",
                                                 fontSize: 12,
+                                                fontWeight: 500,
                                             }}
                                             axisLine={false}
                                             tickLine={false}
@@ -196,6 +182,9 @@ export function IncomeCharts({
                                                 boxShadow:
                                                     "0 10px 15px -3px rgba(0, 0, 0, 0.5)",
                                                 padding: "12px",
+                                            }}
+                                            cursor={{
+                                                fill: "rgba(255, 255, 255, 0.05)",
                                             }}
                                             itemStyle={{
                                                 fontSize: "13px",
@@ -219,37 +208,25 @@ export function IncomeCharts({
                                             }}
                                         />
 
-                                        <Area
-                                            type="monotone"
-                                            dataKey="total"
-                                            name="Total Expected"
-                                            stroke="#ec4899"
-                                            strokeWidth={3}
-                                            fillOpacity={1}
-                                            fill="url(#colorTotal)"
-                                        />
-                                        <Area
-                                            type="monotone"
+                                        <Bar
                                             dataKey="received"
                                             name="Received"
-                                            stroke="#10b981"
-                                            strokeWidth={3}
-                                            fillOpacity={1}
-                                            fill="url(#colorReceived)"
+                                            fill="url(#receivedGradient)"
+                                            radius={[0, 0, 4, 4]}
+                                            stackId="a"
                                         />
-                                        <Area
-                                            type="monotone"
+                                        <Bar
                                             dataKey="pending"
                                             name="Pending"
-                                            stroke="#f59e0b"
-                                            strokeWidth={3}
-                                            fillOpacity={1}
-                                            fill="url(#colorPending)"
+                                            fill="url(#pendingGradient)"
+                                            radius={[4, 4, 0, 0]}
+                                            stackId="a"
                                         />
-                                    </AreaChart>
+                                    </BarChart>
                                 ) : (
                                     <BarChart
                                         data={data}
+                                        barSize={32}
                                         margin={{
                                             top: 20,
                                             right: 30,
@@ -257,11 +234,49 @@ export function IncomeCharts({
                                             bottom: 5,
                                         }}
                                     >
+                                        <defs>
+                                            <linearGradient
+                                                id="receivedGradient"
+                                                x1="0"
+                                                y1="0"
+                                                x2="0"
+                                                y2="1"
+                                            >
+                                                <stop
+                                                    offset="0%"
+                                                    stopColor="#34d399"
+                                                    stopOpacity={1}
+                                                />
+                                                <stop
+                                                    offset="100%"
+                                                    stopColor="#059669"
+                                                    stopOpacity={1}
+                                                />
+                                            </linearGradient>
+                                            <linearGradient
+                                                id="pendingGradient"
+                                                x1="0"
+                                                y1="0"
+                                                x2="0"
+                                                y2="1"
+                                            >
+                                                <stop
+                                                    offset="0%"
+                                                    stopColor="#fbbf24"
+                                                    stopOpacity={1}
+                                                />
+                                                <stop
+                                                    offset="100%"
+                                                    stopColor="#d97706"
+                                                    stopOpacity={1}
+                                                />
+                                            </linearGradient>
+                                        </defs>
                                         <CartesianGrid
                                             strokeDasharray="3 3"
                                             stroke="#334155"
                                             vertical={false}
-                                            opacity={0.4}
+                                            opacity={0.1}
                                         />
                                         <XAxis
                                             dataKey="year"
@@ -269,6 +284,7 @@ export function IncomeCharts({
                                             tick={{
                                                 fill: "#94a3b8",
                                                 fontSize: 12,
+                                                fontWeight: 500,
                                             }}
                                             axisLine={false}
                                             tickLine={false}
@@ -279,6 +295,7 @@ export function IncomeCharts({
                                             tick={{
                                                 fill: "#94a3b8",
                                                 fontSize: 12,
+                                                fontWeight: 500,
                                             }}
                                             axisLine={false}
                                             tickLine={false}
@@ -297,6 +314,9 @@ export function IncomeCharts({
                                                 boxShadow:
                                                     "0 10px 15px -3px rgba(0, 0, 0, 0.5)",
                                                 padding: "12px",
+                                            }}
+                                            cursor={{
+                                                fill: "rgba(255, 255, 255, 0.05)",
                                             }}
                                             itemStyle={{
                                                 fontSize: "13px",
@@ -323,14 +343,14 @@ export function IncomeCharts({
                                         <Bar
                                             dataKey="received"
                                             name="Received"
-                                            fill="#10b981"
+                                            fill="url(#receivedGradient)"
                                             radius={[0, 0, 4, 4]}
                                             stackId="a"
                                         />
                                         <Bar
                                             dataKey="pending"
                                             name="Pending"
-                                            fill="#f59e0b"
+                                            fill="url(#pendingGradient)"
                                             radius={[4, 4, 0, 0]}
                                             stackId="a"
                                         />
