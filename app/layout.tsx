@@ -52,9 +52,9 @@ export const metadata: Metadata = {
         creator: "@moneyview",
     },
     icons: {
-        icon: "/icon.svg",
-        shortcut: "/icon.svg",
-        apple: "/icon.svg",
+        icon: "/AppImages/android/android-launchericon-192-192.png",
+        shortcut: "/AppImages/android/android-launchericon-192-192.png",
+        apple: "/AppImages/ios/180.png",
     },
     manifest: "/manifest.json",
 };
