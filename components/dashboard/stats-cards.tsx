@@ -58,9 +58,12 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
 
     if (loading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            <div className="flex overflow-x-auto pb-4 gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-6 md:pb-0 hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
                 {[...Array(5)].map((_, i) => (
-                    <Card key={i} className="glass animate-pulse">
+                    <Card
+                        key={i}
+                        className="glass animate-pulse min-w-[85vw] sm:min-w-[45vw] md:min-w-0"
+                    >
                         <CardContent className="p-6">
                             <div className="h-20 bg-gray-200 dark:bg-gray-800 rounded"></div>
                         </CardContent>
@@ -71,7 +74,7 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="flex overflow-x-auto pb-4 gap-4 snap-x snap-mandatory md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 md:gap-6 md:pb-0 hide-scrollbar -mx-4 px-4 md:mx-0 md:px-0">
             {cards.map((card, index) => (
                 <motion.div
                     key={card.title}
@@ -79,7 +82,7 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -8, scale: 1.02 }}
-                    className="relative group"
+                    className="relative group min-w-[85vw] sm:min-w-[45vw] md:min-w-0 snap-center first:pl-0"
                 >
                     {/* Animated glow border */}
                     <div

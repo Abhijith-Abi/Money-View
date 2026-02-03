@@ -191,15 +191,15 @@ export default function Home() {
                 ))}
             </div>
 
-            <div className="relative p-6 md:p-12">
-                <div className="max-w-[1600px] mx-auto space-y-8">
+            <div className="relative p-3 md:p-6 lg:p-12">
+                <div className="max-w-[1600px] mx-auto space-y-6 md:space-y-8">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                     >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-3 md:gap-4">
                             <motion.div
                                 className="relative"
                                 whileHover={{ scale: 1.05, rotate: 5 }}
@@ -211,13 +211,13 @@ export default function Home() {
                             >
                                 {/* Icon glow */}
                                 <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-md opacity-50" />
-                                <div className="relative p-3 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-cyan-600">
-                                    <Wallet className="h-8 w-8 text-white" />
+                                <div className="relative p-2.5 md:p-3 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-cyan-600">
+                                    <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white" />
                                 </div>
                             </motion.div>
                             <div>
                                 <motion.h1
-                                    className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-primary to-cyan-500 dark:from-purple-200 dark:via-white dark:to-cyan-200 gradient-text"
+                                    className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-primary to-cyan-500 dark:from-purple-200 dark:via-white dark:to-cyan-200 gradient-text"
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.1 }}
@@ -225,7 +225,7 @@ export default function Home() {
                                     Money View
                                 </motion.h1>
                                 <motion.p
-                                    className="text-muted-foreground mt-1"
+                                    className="text-sm md:text-base text-muted-foreground mt-0.5 md:mt-1"
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: 0.2 }}
@@ -241,12 +241,12 @@ export default function Home() {
                         </div>
 
                         <motion.div
-                            className="flex items-center gap-3"
+                            className="flex flex-wrap items-center justify-end gap-2 md:gap-3"
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 }}
                         >
-                            <label className="text-sm text-muted-foreground font-medium">
+                            <label className="text-sm text-muted-foreground font-medium whitespace-nowrap hidden sm:block">
                                 Year:
                             </label>
                             <Select
@@ -255,7 +255,7 @@ export default function Home() {
                                     setSelectedYear(Number(val))
                                 }
                             >
-                                <SelectTrigger className="w-32 glass border-white/10 hover:border-white/20 transition-colors">
+                                <SelectTrigger className="w-24 md:w-32 glass border-white/10 hover:border-white/20 transition-colors h-9 md:h-10 text-xs md:text-sm">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="glass border-white/10">

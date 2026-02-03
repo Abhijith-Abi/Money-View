@@ -239,89 +239,96 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10" />
 
             <CardHeader className="relative">
-                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-6">
-                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-foreground via-muted-foreground to-foreground gradient-text">
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 md:gap-6">
+                    <CardTitle className="text-xl md:text-2xl font-bold bg-gradient-to-r from-foreground via-muted-foreground to-foreground gradient-text">
                         Recent Transactions
                     </CardTitle>
 
-                    <div className="flex flex-wrap items-center gap-4">
-                        {/* Status Filter */}
-                        <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border border-border/50">
-                            {["all", "pending", "received"].map((status) => (
-                                <Button
-                                    key={status}
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                        setStatusFilter(status as StatusFilter)
-                                    }
-                                    className={`rounded-lg px-3 py-1 text-[11px] font-bold uppercase transition-all duration-300 ${
-                                        statusFilter === status
-                                            ? status === "all"
-                                                ? "bg-background shadow-sm text-foreground"
-                                                : status === "pending"
-                                                  ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                                                  : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    }`}
-                                >
-                                    {status}
-                                </Button>
-                            ))}
-                        </div>
+                    {/* Mobile optimized toolbar */}
+                    <div className="flex flex-col sm:flex-row gap-3 sm:items-center overflow-x-auto pb-1 sm:pb-0 hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                            {/* Status Filter */}
+                            <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border border-border/50 shrink-0">
+                                {["all", "pending", "received"].map(
+                                    (status) => (
+                                        <Button
+                                            key={status}
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() =>
+                                                setStatusFilter(
+                                                    status as StatusFilter,
+                                                )
+                                            }
+                                            className={`rounded-lg px-2 md:px-3 py-1 text-[10px] md:text-[11px] font-bold uppercase transition-all duration-300 h-7 md:h-8 ${
+                                                statusFilter === status
+                                                    ? status === "all"
+                                                        ? "bg-background shadow-sm text-foreground"
+                                                        : status === "pending"
+                                                          ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                                          : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                                    : "text-muted-foreground hover:text-foreground"
+                                            }`}
+                                        >
+                                            {status}
+                                        </Button>
+                                    ),
+                                )}
+                            </div>
 
-                        {/* Category Filter */}
-                        <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border border-border/50">
-                            {["all", "primary", "secondary"].map((cat) => (
-                                <Button
-                                    key={cat}
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                        setCategoryFilter(cat as any)
-                                    }
-                                    className={`rounded-lg px-3 py-1 text-[11px] font-bold uppercase transition-all duration-300 ${
-                                        categoryFilter === cat
-                                            ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-                                            : "text-muted-foreground hover:text-foreground"
-                                    }`}
-                                >
-                                    {cat === "primary"
-                                        ? "Primary / Salary"
-                                        : cat === "secondary"
-                                          ? "Secondary / Other"
-                                          : cat}
-                                </Button>
-                            ))}
-                        </div>
+                            {/* Category Filter */}
+                            <div className="flex gap-1 bg-muted/50 p-1 rounded-xl border border-border/50 shrink-0">
+                                {["all", "primary", "secondary"].map((cat) => (
+                                    <Button
+                                        key={cat}
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                            setCategoryFilter(cat as any)
+                                        }
+                                        className={`rounded-lg px-2 md:px-3 py-1 text-[10px] md:text-[11px] font-bold uppercase transition-all duration-300 h-7 md:h-8 ${
+                                            categoryFilter === cat
+                                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                                : "text-muted-foreground hover:text-foreground"
+                                        }`}
+                                    >
+                                        {cat === "primary"
+                                            ? "Primary"
+                                            : cat === "secondary"
+                                              ? "Secondary"
+                                              : "All"}
+                                    </Button>
+                                ))}
+                            </div>
 
-                        {/* Amount Toggle */}
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                                setSortConfig((prev) => ({
-                                    key: "amount",
-                                    direction:
-                                        prev.key === "amount" &&
-                                        prev.direction === "desc"
-                                            ? "asc"
-                                            : "desc",
-                                }))
-                            }
-                            className={`rounded-xl border border-border/50 bg-muted/50 px-3 text-[11px] font-bold uppercase transition-all ${
-                                sortConfig.key === "amount"
-                                    ? "text-cyan-600 dark:text-cyan-400 ring-1 ring-cyan-500/30"
-                                    : "text-muted-foreground"
-                            }`}
-                        >
-                            Sort:{" "}
-                            {sortConfig.key === "amount"
-                                ? sortConfig.direction === "desc"
-                                    ? "Largest"
-                                    : "Smallest"
-                                : "Amount"}
-                        </Button>
+                            {/* Amount Toggle */}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                    setSortConfig((prev) => ({
+                                        key: "amount",
+                                        direction:
+                                            prev.key === "amount" &&
+                                            prev.direction === "desc"
+                                                ? "asc"
+                                                : "desc",
+                                    }))
+                                }
+                                className={`rounded-xl border border-border/50 bg-muted/50 px-3 text-[10px] md:text-[11px] font-bold uppercase transition-all h-8 md:h-9 shrink-0 ${
+                                    sortConfig.key === "amount"
+                                        ? "text-cyan-600 dark:text-cyan-400 ring-1 ring-cyan-500/30"
+                                        : "text-muted-foreground"
+                                }`}
+                            >
+                                Sort:{" "}
+                                {sortConfig.key === "amount"
+                                    ? sortConfig.direction === "desc"
+                                        ? "Largest"
+                                        : "Smallest"
+                                    : "Amount"}
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -418,8 +425,113 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                     </div>
                 </motion.div>
             </CardHeader>
-            <CardContent>
-                <div className="overflow-x-auto custom-scrollbar">
+            <CardContent className="p-0 sm:p-6">
+                {/* Modern List View (Mobile) */}
+                <div className="block md:hidden">
+                    <div className="divide-y divide-border/30">
+                        {filteredAndSortedEntries.map((entry, index) => (
+                            <motion.div
+                                key={entry.id}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.03 }}
+                                className="group relative p-4 hover:bg-muted/30 transition-colors"
+                            >
+                                <div className="flex items-center gap-3">
+                                    {/* Icon Box */}
+                                    <div
+                                        className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border ${
+                                            entry.type === "credit"
+                                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                                : "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                                        }`}
+                                    >
+                                        {entry.type === "credit" ? (
+                                            <TrendingUp className="h-5 w-5" />
+                                        ) : (
+                                            <TrendingDown className="h-5 w-5" />
+                                        )}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-0.5">
+                                            <h3 className="font-bold text-base truncate pr-2">
+                                                {entry.month}
+                                            </h3>
+                                            <span
+                                                className={`font-bold text-base whitespace-nowrap tabular-nums ${
+                                                    entry.type === "credit"
+                                                        ? "text-emerald-500"
+                                                        : "text-rose-500"
+                                                }`}
+                                            >
+                                                {entry.type === "credit"
+                                                    ? "+"
+                                                    : "-"}
+                                                {formatCurrency(entry.amount)}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                            <div className="flex items-center gap-2 truncate">
+                                                <span className="font-medium">
+                                                    {entry.year}
+                                                </span>
+                                                <span className="w-1 h-1 rounded-full bg-border" />
+                                                <span className="truncate">
+                                                    {entry.description ||
+                                                        entry.category}
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                                <div
+                                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${
+                                                        entry.status ===
+                                                        "received"
+                                                            ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
+                                                            : "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                                                    }`}
+                                                >
+                                                    {entry.status}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Actions (visible on tap/long press ideally, but here inline for simplicity) */}
+                                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm p-1 rounded-lg border border-border/50 shadow-lg">
+                                    <IncomeForm
+                                        onSuccess={onDelete}
+                                        defaultYear={entry.year}
+                                        initialData={entry}
+                                        trigger={
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="h-8 w-8 text-blue-500 hover:bg-blue-500/10 hover:text-blue-600"
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                        }
+                                    />
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => handleDelete(entry.id)}
+                                        className="h-8 w-8 text-rose-500 hover:bg-rose-500/10 hover:text-rose-600"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto custom-scrollbar">
                     <Table>
                         <TableHeader>
                             <TableRow className="border-white/5 hover:bg-transparent">

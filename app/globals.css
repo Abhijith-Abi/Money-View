@@ -119,6 +119,15 @@
     @apply bg-slate-600;
 }
 
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 /* Number animation */
 @keyframes countUp {
     from {
@@ -150,7 +159,8 @@
 
 /* Floating particles animation */
 @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateY(0px) translateX(0px);
     }
     33% {
@@ -162,7 +172,8 @@
 }
 
 @keyframes floatSlow {
-    0%, 100% {
+    0%,
+    100% {
         transform: translateY(0px) translateX(0px) scale(1);
     }
     50% {
@@ -172,13 +183,16 @@
 
 /* Glow pulse animation */
 @keyframes glowPulse {
-    0%, 100% {
-        box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), 
-                    0 0 40px rgba(59, 130, 246, 0.2);
+    0%,
+    100% {
+        box-shadow:
+            0 0 20px rgba(168, 85, 247, 0.4),
+            0 0 40px rgba(59, 130, 246, 0.2);
     }
     50% {
-        box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 
-                    0 0 60px rgba(59, 130, 246, 0.4);
+        box-shadow:
+            0 0 30px rgba(168, 85, 247, 0.6),
+            0 0 60px rgba(59, 130, 246, 0.4);
     }
 }
 

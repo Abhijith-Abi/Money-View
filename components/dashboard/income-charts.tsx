@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MonthlyStats, AnnualStats } from "@/types/income";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -22,12 +22,42 @@ interface IncomeChartsProps {
     loading: boolean;
 }
 
+function useMediaQuery(query: string) {
+    const [matches, setMatches] = useState(false);
+
+    useEffect(() => {
+        const media = window.matchMedia(query);
+        if (media.matches !== matches) {
+            setMatches(media.matches);
+        }
+        const listener = () => setMatches(media.matches);
+        media.addEventListener("change", listener);
+        return () => media.removeEventListener("change", listener);
+    }, [matches, query]);
+
+    return matches;
+}
+
 export function IncomeCharts({
     monthlyStats,
     annualStats,
     loading,
 }: IncomeChartsProps) {
     const [viewMode, setViewMode] = useState<"month" | "year">("month");
+
+    // Hook must be called before conditional returns
+    const isMobile = useMediaQuery("(max-width: 768px)");
+
+    // Chart Configuration based on screen size
+    const chartConfig = {
+        barSize: isMobile ? 20 : 32,
+        margin: isMobile
+            ? { top: 20, right: 10, left: -20, bottom: 5 }
+            : { top: 20, right: 30, left: 20, bottom: 5 },
+        xAxisFontSize: isMobile ? 10 : 12,
+        yAxisFontSize: isMobile ? 10 : 12,
+        yAxisWidth: isMobile ? 30 : 40,
+    };
 
     if (loading) {
         return (
@@ -45,6 +75,9 @@ export function IncomeCharts({
         viewMode === "month"
             ? monthlyStats
             : annualStats.filter((stat) => stat.year >= 2023);
+
+    // Previously hook was here, causing error
+    // const isMobile = useMediaQuery("(max-width: 768px)"); ...
 
     return (
         <div className="flex flex-col gap-6">
@@ -86,18 +119,13 @@ export function IncomeCharts({
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[400px] w-full">
+                        <div className="h-[300px] md:h-[400px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 {viewMode === "month" ? (
                                     <BarChart
                                         data={data}
-                                        barSize={32}
-                                        margin={{
-                                            top: 20,
-                                            right: 30,
-                                            left: 20,
-                                            bottom: 5,
-                                        }}
+                                        barSize={chartConfig.barSize}
+                                        margin={chartConfig.margin}
                                     >
                                         <defs>
                                             <linearGradient
@@ -148,7 +176,8 @@ export function IncomeCharts({
                                             stroke="var(--muted-foreground)"
                                             tick={{
                                                 fill: "var(--muted-foreground)",
-                                                fontSize: 12,
+                                                fontSize:
+                                                    chartConfig.xAxisFontSize,
                                                 fontWeight: 500,
                                             }}
                                             tickFormatter={(value) =>
@@ -160,9 +189,11 @@ export function IncomeCharts({
                                         />
                                         <YAxis
                                             stroke="var(--muted-foreground)"
+                                            width={chartConfig.yAxisWidth}
                                             tick={{
                                                 fill: "var(--muted-foreground)",
-                                                fontSize: 12,
+                                                fontSize:
+                                                    chartConfig.yAxisFontSize,
                                                 fontWeight: 500,
                                             }}
                                             axisLine={false}
@@ -226,13 +257,8 @@ export function IncomeCharts({
                                 ) : (
                                     <BarChart
                                         data={data}
-                                        barSize={32}
-                                        margin={{
-                                            top: 20,
-                                            right: 30,
-                                            left: 20,
-                                            bottom: 5,
-                                        }}
+                                        barSize={chartConfig.barSize}
+                                        margin={chartConfig.margin}
                                     >
                                         <defs>
                                             <linearGradient
@@ -283,7 +309,8 @@ export function IncomeCharts({
                                             stroke="var(--muted-foreground)"
                                             tick={{
                                                 fill: "var(--muted-foreground)",
-                                                fontSize: 12,
+                                                fontSize:
+                                                    chartConfig.xAxisFontSize,
                                                 fontWeight: 500,
                                             }}
                                             axisLine={false}
@@ -292,9 +319,11 @@ export function IncomeCharts({
                                         />
                                         <YAxis
                                             stroke="var(--muted-foreground)"
+                                            width={chartConfig.yAxisWidth}
                                             tick={{
                                                 fill: "var(--muted-foreground)",
-                                                fontSize: 12,
+                                                fontSize:
+                                                    chartConfig.yAxisFontSize,
                                                 fontWeight: 500,
                                             }}
                                             axisLine={false}
