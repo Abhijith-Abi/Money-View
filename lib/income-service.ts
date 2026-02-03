@@ -9,6 +9,7 @@ import {
   getDocs,
   orderBy,
   Timestamp,
+  getDoc,
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { IncomeEntry, MonthlyStats, YearlyStats, AllTimeStats, AnnualStats } from '@/types/income'
@@ -165,6 +166,75 @@ export async function updateIncome(
 ): Promise<void> {
   try {
     const docRef = doc(db, COLLECTION_NAME, id)
+    
+    // Check if we are merging (status changes to 'received')
+    if (updates.status === 'received') {
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const currentData = docSnap.data() as IncomeEntry;
+        
+        // Determine the effective data (current data + updates)
+        const effectiveEntry = { ...currentData, ...updates };
+
+        // Only merge if the status WAS 'pending' and is becoming 'received'
+        if (currentData.status === 'pending') {
+          console.log('🔄 [updateIncome] Status changed to received. Checking for merge candidates...');
+          
+          const q = query(
+            collection(db, COLLECTION_NAME),
+            where('userId', '==', userId),
+            where('year', '==', effectiveEntry.year),
+            where('month', '==', effectiveEntry.month),
+            where('type', '==', effectiveEntry.type),
+            where('category', '==', effectiveEntry.category),
+            where('status', '==', 'received'), // Look for existing RECEIVED entries
+          );
+
+          const querySnapshot = await getDocs(q);
+          
+          // Filter out the current document itself
+          const otherDocs = querySnapshot.docs.filter(d => d.id !== id);
+          
+          if (otherDocs.length > 0) {
+            const targetDoc = otherDocs[0];
+            const targetData = targetDoc.data();
+            
+            const newAmount = (targetData.amount || 0) + (effectiveEntry.amount || 0);
+            
+            // Merge descriptions
+            let newDescription = targetData.description || '';
+            const descriptionToAdd = effectiveEntry.description || '';
+            
+            if (descriptionToAdd && descriptionToAdd.trim() !== '') {
+              if (newDescription && newDescription.trim() !== '') {
+                 if (!newDescription.includes(descriptionToAdd)) {
+                    newDescription = `${newDescription} | ${descriptionToAdd}`;
+                 }
+              } else {
+                newDescription = descriptionToAdd;
+              }
+            }
+
+            console.log('🔄 [updateIncome] Merging into existing entry:', targetDoc.id);
+
+            // Update the target entry
+            await updateDoc(doc(db, COLLECTION_NAME, targetDoc.id), {
+              amount: newAmount,
+              description: newDescription
+            });
+
+            // Delete the current entry (it's now merged)
+            await deleteDoc(docRef);
+            
+            console.log('✅ [updateIncome] Merge complete. Original entry deleted.');
+            incomeCache.clear();
+            return;
+          }
+        }
+      }
+    }
+
+    // Standard update if no merge happened
     await updateDoc(docRef, updates)
     
     // If year was updated or to be safe, clear cache

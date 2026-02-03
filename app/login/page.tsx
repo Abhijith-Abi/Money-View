@@ -12,6 +12,7 @@ import {
     CardTitle,
 } from "@/components/ui/card";
 import { Wallet, Loader2 } from "lucide-react";
+import { MoneyLoader } from "@/components/ui/money-loader";
 import { motion } from "framer-motion";
 import Image from "next/image";
 
@@ -39,8 +40,8 @@ export default function LoginPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            <div className="min-h-screen flex items-center justify-center bg-slate-950">
+                <MoneyLoader />
             </div>
         );
     }
@@ -58,7 +59,7 @@ export default function LoginPage() {
 
             {/* Additional gradient overlay */}
             <div
-                className="absolute inset-0 bg-gradient-to-tr from-pink-500/10 via-transparent to-blue-500/10"
+                className="absolute inset-0 bg-gradient-to-tr from-[#9999ff]/10 via-transparent to-blue-500/10"
                 style={{
                     backgroundSize: "400% 400%",
                     animation: "gradientFlow 20s ease infinite reverse",
@@ -103,7 +104,7 @@ export default function LoginPage() {
                 <div className="relative">
                     {/* Animated glow border */}
                     <div
-                        className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 rounded-2xl blur-lg opacity-50"
+                        className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-[#9999ff] to-cyan-600 rounded-2xl blur-lg opacity-50"
                         style={{
                             backgroundSize: "400% 400%",
                             animation:

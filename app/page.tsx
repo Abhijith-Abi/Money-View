@@ -31,8 +31,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { Wallet, Loader2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { MoneyLoader } from "@/components/ui/money-loader";
+import { Wallet } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
     const year = new Date().getFullYear();
@@ -139,172 +140,202 @@ export default function Home() {
         }
     }, [user]);
 
-    if (authLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        );
-    }
+    const [showSplash, setShowSplash] = useState(true);
 
-    if (!user) {
-        return null;
-    }
+    useEffect(() => {
+        // Enforce minimum splash screen time of 2.5 seconds
+        const timer = setTimeout(() => {
+            setShowSplash(false);
+        }, 2500);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    // Combine auth loading and splash screen logic
+    // We use a single return with AnimatePresence to handle exit animations
+
+    // Determine what to show
+    const showLoader = authLoading || showSplash;
+    const showContent = !showLoader && user;
+
+    if (!user && !showLoader) return null;
 
     const years = Array.from({ length: 5 }, (_, i) => 2023 + i);
 
     return (
-        <div className="min-h-screen relative overflow-hidden">
-            {/* Subtle gradient background */}
-            <div
-                className="fixed inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 -z-10"
-                style={{
-                    backgroundSize: "400% 400%",
-                    animation: "gradientFlow 20s ease infinite",
-                }}
-            />
-
-            {/* Subtle floating particles */}
-            <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-                {[...Array(6)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute rounded-full bg-gradient-to-br from-purple-500/10 to-cyan-500/10 blur-2xl"
+        <AnimatePresence mode="wait">
+            {showLoader ? (
+                <motion.div
+                    key="loader"
+                    className="min-h-screen flex items-center justify-center bg-gray-50/50 dark:bg-gray-950/50 backdrop-blur-sm fixed inset-0 z-50"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    <MoneyLoader />
+                </motion.div>
+            ) : (
+                <motion.div
+                    key="dashboard"
+                    className="min-h-screen relative overflow-hidden"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {/* Subtle gradient background */}
+                    <div
+                        className="fixed inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 -z-10"
                         style={{
-                            width: Math.random() * 200 + 150,
-                            height: Math.random() * 200 + 150,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
-                        animate={{
-                            y: [0, -40, 0],
-                            x: [0, Math.random() * 30 - 15, 0],
-                            scale: [1, 1.2, 1],
-                        }}
-                        transition={{
-                            duration: Math.random() * 15 + 15,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: Math.random() * 5,
+                            backgroundSize: "400% 400%",
+                            animation: "gradientFlow 20s ease infinite",
                         }}
                     />
-                ))}
-            </div>
 
-            <div className="relative p-3 md:p-6 lg:p-12">
-                <div className="max-w-[1600px] mx-auto space-y-6 md:space-y-8">
-                    {/* Header */}
-                    <motion.div
-                        initial={{ opacity: 0, y: -20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-                    >
-                        <div className="flex items-center gap-3 md:gap-4">
+                    {/* Subtle floating particles */}
+                    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+                        {[...Array(6)].map((_, i) => (
                             <motion.div
-                                className="relative"
-                                whileHover={{ scale: 1.05, rotate: 5 }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 400,
-                                    damping: 17,
+                                key={i}
+                                className="absolute rounded-full bg-gradient-to-br from-purple-500/10 to-cyan-500/10 blur-2xl"
+                                style={{
+                                    width: Math.random() * 200 + 150,
+                                    height: Math.random() * 200 + 150,
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
                                 }}
-                            >
-                                {/* Icon glow */}
-                                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-md opacity-50" />
-                                <div className="relative p-2.5 md:p-3 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-cyan-600">
-                                    <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white" />
-                                </div>
-                            </motion.div>
-                            <div>
-                                <motion.h1
-                                    className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-primary to-cyan-500 dark:from-purple-200 dark:via-white dark:to-cyan-200 gradient-text"
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 }}
-                                >
-                                    Money View
-                                </motion.h1>
-                                <motion.p
-                                    className="text-sm md:text-base text-muted-foreground mt-0.5 md:mt-1"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.2 }}
-                                >
-                                    Welcome back,{" "}
-                                    <span className="text-primary font-medium">
-                                        {user.displayName?.split(" ")[0] ||
-                                            "there"}
-                                    </span>
-                                    !
-                                </motion.p>
-                            </div>
-                        </div>
+                                animate={{
+                                    y: [0, -40, 0],
+                                    x: [0, Math.random() * 30 - 15, 0],
+                                    scale: [1, 1.2, 1],
+                                }}
+                                transition={{
+                                    duration: Math.random() * 15 + 15,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: Math.random() * 5,
+                                }}
+                            />
+                        ))}
+                    </div>
 
-                        <motion.div
-                            className="flex flex-wrap items-center justify-end gap-2 md:gap-3"
-                            initial={{ opacity: 0, x: 20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            <label className="text-sm text-muted-foreground font-medium whitespace-nowrap hidden sm:block">
-                                Year:
-                            </label>
-                            <Select
-                                value={selectedYear.toString()}
-                                onValueChange={(val) =>
-                                    setSelectedYear(Number(val))
-                                }
+                    <div className="relative p-3 md:p-6 lg:p-12">
+                        <div className="max-w-[1600px] mx-auto space-y-6 md:space-y-8">
+                            {/* Header */}
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
                             >
-                                <SelectTrigger className="w-24 md:w-32 glass border-white/10 hover:border-white/20 transition-colors h-9 md:h-10 text-xs md:text-sm">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="glass border-white/10">
-                                    {years.map((year) => (
-                                        <SelectItem
-                                            key={year}
-                                            value={year.toString()}
+                                <div className="flex items-center gap-3 md:gap-4">
+                                    <motion.div
+                                        className="relative"
+                                        whileHover={{ scale: 1.05, rotate: 5 }}
+                                        transition={{
+                                            type: "spring",
+                                            stiffness: 400,
+                                            damping: 17,
+                                        }}
+                                    >
+                                        {/* Icon glow */}
+                                        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-md opacity-50" />
+                                        <div className="relative p-2.5 md:p-3 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-cyan-600">
+                                            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                                        </div>
+                                    </motion.div>
+                                    <div>
+                                        <motion.h1
+                                            className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-primary to-cyan-500 dark:from-purple-200 dark:via-white dark:to-cyan-200 gradient-text"
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: 0.1 }}
                                         >
-                                            {year}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                            Money View
+                                        </motion.h1>
+                                        <motion.p
+                                            className="text-sm md:text-base text-muted-foreground mt-0.5 md:mt-1"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{ delay: 0.2 }}
+                                        >
+                                            Welcome back,{" "}
+                                            <span className="text-primary font-medium">
+                                                {user?.displayName?.split(
+                                                    " ",
+                                                )[0] || "there"}
+                                            </span>
+                                            !
+                                        </motion.p>
+                                    </div>
+                                </div>
 
-                            <ModeToggle />
-                            <UserProfile />
-                        </motion.div>
-                    </motion.div>
+                                <motion.div
+                                    className="flex flex-wrap items-center justify-end gap-2 md:gap-3"
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.3 }}
+                                >
+                                    <label className="text-sm text-muted-foreground font-medium whitespace-nowrap hidden sm:block">
+                                        Year:
+                                    </label>
+                                    <Select
+                                        value={selectedYear.toString()}
+                                        onValueChange={(val) =>
+                                            setSelectedYear(Number(val))
+                                        }
+                                    >
+                                        <SelectTrigger className="w-24 md:w-32 glass border-white/10 hover:border-white/20 transition-colors h-9 md:h-10 text-xs md:text-sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="glass border-white/10">
+                                            {years.map((year) => (
+                                                <SelectItem
+                                                    key={year}
+                                                    value={year.toString()}
+                                                >
+                                                    {year}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
 
-                    {/* Stats Cards */}
-                    <StatsCards
-                        stats={yearlyStats}
-                        allTimeStats={allTimeStats}
-                        loading={loading}
-                    />
+                                    <ModeToggle />
+                                    <UserProfile />
+                                </motion.div>
+                            </motion.div>
 
-                    {/* Table */}
-                    <IncomeTable
-                        entries={entries}
-                        loading={loading}
-                        onDelete={() => fetchData(true)}
-                    />
+                            {/* Stats Cards */}
+                            <StatsCards
+                                stats={yearlyStats}
+                                allTimeStats={allTimeStats}
+                                loading={loading}
+                            />
 
-                    {/* Charts */}
-                    <IncomeCharts
-                        monthlyStats={monthlyStats}
-                        annualStats={annualStats}
-                        loading={loading}
-                    />
+                            {/* Table */}
+                            <IncomeTable
+                                entries={entries}
+                                loading={loading}
+                                onDelete={() => fetchData(true)}
+                            />
 
-                    {/* Floating Add Button */}
-                    <IncomeForm
-                        onSuccess={() => fetchData(true)}
-                        defaultYear={selectedYear}
-                    />
-                </div>
-            </div>
+                            {/* Charts */}
+                            <IncomeCharts
+                                monthlyStats={monthlyStats}
+                                annualStats={annualStats}
+                                loading={loading}
+                            />
 
-            <Toaster />
-        </div>
+                            {/* Floating Add Button */}
+                            <IncomeForm
+                                onSuccess={() => fetchData(true)}
+                                defaultYear={selectedYear}
+                            />
+                        </div>
+                    </div>
+
+                    <Toaster />
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 }

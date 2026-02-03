@@ -37,7 +37,7 @@ import {
 } from "lucide-react";
 import { IncomeForm } from "./income-form";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface IncomeTableProps {
@@ -265,7 +265,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                                     ? status === "all"
                                                         ? "bg-background shadow-sm text-foreground"
                                                         : status === "pending"
-                                                          ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                                                          ? "bg-[#ffb200]/10 text-[#ffb200] dark:text-[#ffb200]"
                                                           : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                                                     : "text-muted-foreground hover:text-foreground"
                                             }`}
@@ -288,7 +288,7 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                                         }
                                         className={`rounded-lg px-2 md:px-3 py-1 text-[10px] md:text-[11px] font-bold uppercase transition-all duration-300 h-7 md:h-8 ${
                                             categoryFilter === cat
-                                                ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                                ? "bg-blue-500/10 text-blue-600 dark:text-blue-400"
                                                 : "text-muted-foreground hover:text-foreground"
                                         }`}
                                     >
@@ -400,13 +400,13 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                         </p>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 hover:bg-amber-500/10 transition-colors group">
+                    <div className="p-4 rounded-xl bg-[#ffb200]/5 border border-[#ffb200]/10 hover:bg-[#ffb200]/10 transition-colors group">
                         <p className="text-xs text-slate-400 mb-1 uppercase tracking-wider font-semibold">
                             Total Year Pending
                         </p>
                         <div className="flex items-center gap-2">
-                            <Hourglass className="h-4 w-4 text-amber-400" />
-                            <p className="text-xl font-bold text-amber-400">
+                            <Hourglass className="h-4 w-4 text-[#ffb200]" />
+                            <p className="text-xl font-bold text-[#ffb200]">
                                 {formatCurrency(yearTotals.pending)}
                             </p>
                         </div>
@@ -429,104 +429,112 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                 {/* Modern List View (Mobile) */}
                 <div className="block md:hidden">
                     <div className="divide-y divide-border/30">
-                        {filteredAndSortedEntries.map((entry, index) => (
-                            <motion.div
-                                key={entry.id}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: index * 0.03 }}
-                                className="group relative p-4 hover:bg-muted/30 transition-colors"
-                            >
-                                <div className="flex items-center gap-3">
-                                    {/* Icon Box */}
-                                    <div
-                                        className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border ${
-                                            entry.type === "credit"
-                                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
-                                                : "bg-rose-500/10 border-rose-500/20 text-rose-500"
-                                        }`}
-                                    >
-                                        {entry.type === "credit" ? (
-                                            <TrendingUp className="h-5 w-5" />
-                                        ) : (
-                                            <TrendingDown className="h-5 w-5" />
-                                        )}
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between mb-0.5">
-                                            <h3 className="font-bold text-base truncate pr-2">
-                                                {entry.month}
-                                            </h3>
-                                            <span
-                                                className={`font-bold text-base whitespace-nowrap tabular-nums ${
-                                                    entry.type === "credit"
-                                                        ? "text-emerald-500"
-                                                        : "text-rose-500"
-                                                }`}
-                                            >
-                                                {entry.type === "credit"
-                                                    ? "+"
-                                                    : "-"}
-                                                {formatCurrency(entry.amount)}
-                                            </span>
+                        <AnimatePresence mode="popLayout">
+                            {filteredAndSortedEntries.map((entry, index) => (
+                                <motion.div
+                                    layout
+                                    key={entry.id}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="group relative p-4 hover:bg-muted/30 transition-colors"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        {/* Icon Box */}
+                                        <div
+                                            className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border ${
+                                                entry.type === "credit"
+                                                    ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500"
+                                                    : "bg-rose-500/10 border-rose-500/20 text-rose-500"
+                                            }`}
+                                        >
+                                            {entry.type === "credit" ? (
+                                                <TrendingUp className="h-5 w-5" />
+                                            ) : (
+                                                <TrendingDown className="h-5 w-5" />
+                                            )}
                                         </div>
 
-                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                                            <div className="flex items-center gap-2 truncate">
-                                                <span className="font-medium">
-                                                    {entry.year}
-                                                </span>
-                                                <span className="w-1 h-1 rounded-full bg-border" />
-                                                <span className="truncate">
-                                                    {entry.description ||
-                                                        entry.category}
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2 shrink-0">
-                                                <div
-                                                    className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${
-                                                        entry.status ===
-                                                        "received"
-                                                            ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
-                                                            : "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-0.5">
+                                                <h3 className="font-bold text-base truncate pr-2">
+                                                    {entry.month}
+                                                </h3>
+                                                <span
+                                                    className={`font-bold text-base whitespace-nowrap tabular-nums ${
+                                                        entry.type === "credit"
+                                                            ? "text-emerald-500"
+                                                            : "text-rose-500"
                                                     }`}
                                                 >
-                                                    {entry.status}
+                                                    {entry.type === "credit"
+                                                        ? "+"
+                                                        : "-"}
+                                                    {formatCurrency(
+                                                        entry.amount,
+                                                    )}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                                <div className="flex items-center gap-2 truncate">
+                                                    <span className="font-medium">
+                                                        {/* {entry.year} */}
+                                                    </span>
+                                                    {/* <span className="w-1 h-1 rounded-full bg-border" /> */}
+                                                    <span className="truncate">
+                                                        {entry.description ||
+                                                            entry.category}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    <div
+                                                        className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border ${
+                                                            entry.status ===
+                                                            "received"
+                                                                ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
+                                                                : "bg-[#ffb200]/5 text-[#ffb200] dark:text-[#ffb200] border-[#ffb200]/10"
+                                                        }`}
+                                                    >
+                                                        {entry.status}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Actions (visible on tap/long press ideally, but here inline for simplicity) */}
-                                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm p-1 rounded-lg border border-border/50 shadow-lg">
-                                    <IncomeForm
-                                        onSuccess={onDelete}
-                                        defaultYear={entry.year}
-                                        initialData={entry}
-                                        trigger={
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 text-blue-500 hover:bg-blue-500/10 hover:text-blue-600"
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                        }
-                                    />
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => handleDelete(entry.id)}
-                                        className="h-8 w-8 text-rose-500 hover:bg-rose-500/10 hover:text-rose-600"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </motion.div>
-                        ))}
+                                    {/* Actions (visible on tap/long press ideally, but here inline for simplicity) */}
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 backdrop-blur-sm p-1 rounded-lg border border-border/50 shadow-lg">
+                                        <IncomeForm
+                                            onSuccess={onDelete}
+                                            defaultYear={entry.year}
+                                            initialData={entry}
+                                            trigger={
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-blue-500 hover:bg-blue-500/10 hover:text-blue-600"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                            }
+                                        />
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() =>
+                                                handleDelete(entry.id)
+                                            }
+                                            className="h-8 w-8 text-rose-500 hover:bg-rose-500/10 hover:text-rose-600"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
                     </div>
                 </div>
 
@@ -535,6 +543,9 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                     <Table>
                         <TableHeader>
                             <TableRow className="border-white/5 hover:bg-transparent">
+                                <TableHead className="w-[50px] text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em]">
+                                    No.
+                                </TableHead>
                                 <TableHead
                                     className="text-muted-foreground uppercase text-[10px] font-bold tracking-[0.2em] cursor-pointer hover:text-foreground transition-colors group/head"
                                     onClick={() =>
@@ -579,149 +590,171 @@ export function IncomeTable({ entries, loading, onDelete }: IncomeTableProps) {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredAndSortedEntries.map((entry, index) => (
-                                <motion.tr
-                                    key={entry.id}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: index * 0.04 }}
-                                    className="border-border/50 group hover:bg-muted/50 transition-all duration-300"
-                                >
-                                    <TableCell className="text-muted-foreground py-4 font-medium whitespace-nowrap">
-                                        <div className="flex flex-col">
-                                            <span>{entry.month}</span>
-                                            <span className="text-slate-500 text-[10px] uppercase font-bold tracking-tighter">
-                                                {entry.year}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell className="font-bold text-foreground tabular-nums">
-                                        {formatCurrency(entry.amount)}
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex items-center gap-2">
-                                            <div
-                                                className={`p-1.5 rounded-md ${
-                                                    entry.type === "credit"
-                                                        ? "bg-emerald-500/10 text-emerald-500"
-                                                        : "bg-rose-500/10 text-rose-500"
-                                                }`}
-                                            >
-                                                {entry.type === "credit" ? (
-                                                    <TrendingUp className="h-3 w-3" />
-                                                ) : (
-                                                    <TrendingDown className="h-3 w-3" />
-                                                )}
-                                            </div>
-                                            <span
-                                                className={`text-xs font-bold uppercase tracking-tight ${
-                                                    entry.type === "credit"
-                                                        ? "text-emerald-400"
-                                                        : "text-rose-400"
-                                                }`}
-                                            >
-                                                {entry.type}
-                                            </span>
-                                        </div>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div
-                                            className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-border/50 ${
-                                                entry.category === "primary"
-                                                    ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
-                                                    : "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
-                                            }`}
+                            <AnimatePresence mode="popLayout">
+                                {filteredAndSortedEntries.map(
+                                    (entry, index) => (
+                                        <motion.tr
+                                            layout
+                                            key={entry.id}
+                                            initial={{ opacity: 0, x: -10 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: 10 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="border-border/50 group hover:bg-muted/50 transition-all duration-300"
                                         >
-                                            {entry.category === "primary"
-                                                ? "Primary / Salary"
-                                                : "Secondary / Other"}
-                                        </div>
-                                    </TableCell>
-
-                                    <TableCell>
-                                        <Select
-                                            defaultValue={entry.status}
-                                            onValueChange={(value) =>
-                                                handleStatusUpdate(
-                                                    entry.id,
-                                                    value,
-                                                )
-                                            }
-                                        >
-                                            <SelectTrigger
-                                                className={`h-7 w-fit min-w-[100px] px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-border/50 focus:ring-0 transition-all duration-300 ${
-                                                    entry.status === "received"
-                                                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
-                                                        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <SelectValue placeholder="Status" />
+                                            <TableCell className="text-muted-foreground font-bold text-xs py-4">
+                                                {index + 1}
+                                            </TableCell>
+                                            <TableCell className="text-muted-foreground py-4 font-medium whitespace-nowrap">
+                                                <div className="flex flex-col">
+                                                    <span>{entry.month}</span>
+                                                    {/* <span className="text-slate-500 text-[10px] uppercase font-bold tracking-tighter">
+                                                        {entry.year}
+                                                    </span> */}
                                                 </div>
-                                            </SelectTrigger>
-                                            <SelectContent className="glass border-border/50 bg-background/95 backdrop-blur-md text-foreground min-w-[120px]">
-                                                <SelectItem
-                                                    value="pending"
-                                                    className="text-[10px] font-bold uppercase tracking-wider focus:bg-amber-500/20 focus:text-amber-400"
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <Hourglass className="h-3 w-3" />
-                                                        <span>Pending</span>
+                                            </TableCell>
+                                            <TableCell className="font-bold text-foreground tabular-nums">
+                                                {formatCurrency(entry.amount)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <div
+                                                        className={`p-1.5 rounded-md ${
+                                                            entry.type ===
+                                                            "credit"
+                                                                ? "bg-emerald-500/10 text-emerald-500"
+                                                                : "bg-rose-500/10 text-rose-500"
+                                                        }`}
+                                                    >
+                                                        {entry.type ===
+                                                        "credit" ? (
+                                                            <TrendingUp className="h-3 w-3" />
+                                                        ) : (
+                                                            <TrendingDown className="h-3 w-3" />
+                                                        )}
                                                     </div>
-                                                </SelectItem>
-                                                <SelectItem
-                                                    value="received"
-                                                    className="text-[10px] font-bold uppercase tracking-wider focus:bg-emerald-500/20 focus:text-emerald-400"
+                                                    <span
+                                                        className={`text-xs font-bold uppercase tracking-tight ${
+                                                            entry.type ===
+                                                            "credit"
+                                                                ? "text-emerald-400"
+                                                                : "text-rose-400"
+                                                        }`}
+                                                    >
+                                                        {entry.type}
+                                                    </span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div
+                                                    className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-border/50 ${
+                                                        entry.category ===
+                                                        "primary"
+                                                            ? "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                                            : "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
+                                                    }`}
                                                 >
-                                                    <div className="flex items-center gap-2">
-                                                        <CheckCircle className="h-3 w-3" />
-                                                        <span>Received</span>
-                                                    </div>
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </TableCell>
+                                                    {entry.category ===
+                                                    "primary"
+                                                        ? "Primary / Salary"
+                                                        : "Secondary / Other"}
+                                                </div>
+                                            </TableCell>
 
-                                    <TableCell className="text-muted-foreground max-w-[150px] truncate text-[13px]">
-                                        {entry.description || (
-                                            <span className="opacity-30 italic">
-                                                No note
-                                            </span>
-                                        )}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex items-center justify-end gap-1">
-                                            <IncomeForm
-                                                onSuccess={onDelete}
-                                                defaultYear={entry.year}
-                                                initialData={entry}
-                                                trigger={
+                                            <TableCell>
+                                                <Select
+                                                    defaultValue={entry.status}
+                                                    onValueChange={(value) =>
+                                                        handleStatusUpdate(
+                                                            entry.id,
+                                                            value,
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger
+                                                        className={`h-7 w-fit min-w-[100px] px-2.5 py-0.5 rounded-md text-[10px] font-bold tracking-wider uppercase border border-border/50 focus:ring-0 transition-all duration-300 ${
+                                                            entry.status ===
+                                                            "received"
+                                                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
+                                                                : "bg-[#ffb200]/10 text-[#ffb200] dark:text-[#ffb200] hover:bg-[#ffb200]/20"
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <SelectValue placeholder="Status" />
+                                                        </div>
+                                                    </SelectTrigger>
+                                                    <SelectContent className="glass border-border/50 bg-background/95 backdrop-blur-md text-foreground min-w-[120px]">
+                                                        <SelectItem
+                                                            value="pending"
+                                                            className="text-[10px] font-bold uppercase tracking-wider focus:bg-[#ffb200]/20 focus:text-[#ffb200] dark:focus:text-[#ffb200]"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Hourglass className="h-3 w-3" />
+                                                                <span>
+                                                                    Pending
+                                                                </span>
+                                                            </div>
+                                                        </SelectItem>
+                                                        <SelectItem
+                                                            value="received"
+                                                            className="text-[10px] font-bold uppercase tracking-wider focus:bg-emerald-500/20 focus:text-emerald-400"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <CheckCircle className="h-3 w-3" />
+                                                                <span>
+                                                                    Received
+                                                                </span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </TableCell>
+
+                                            <TableCell className="text-muted-foreground max-w-[150px] truncate text-[13px]">
+                                                {entry.description || (
+                                                    <span className="opacity-30 italic">
+                                                        No note
+                                                    </span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-1">
+                                                    <IncomeForm
+                                                        onSuccess={onDelete}
+                                                        defaultYear={entry.year}
+                                                        initialData={entry}
+                                                        trigger={
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-lg text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Button>
+                                                        }
+                                                    />
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-blue-500 hover:bg-blue-500/10 transition-colors"
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                entry.id,
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            deletingId ===
+                                                            entry.id
+                                                        }
+                                                        className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                                                     >
-                                                        <Pencil className="h-4 w-4" />
+                                                        <Trash2 className="h-4 w-4" />
                                                     </Button>
-                                                }
-                                            />
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() =>
-                                                    handleDelete(entry.id)
-                                                }
-                                                disabled={
-                                                    deletingId === entry.id
-                                                }
-                                                className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </TableCell>
-                                </motion.tr>
-                            ))}
+                                                </div>
+                                            </TableCell>
+                                        </motion.tr>
+                                    ),
+                                )}
+                            </AnimatePresence>
                         </TableBody>
                     </Table>
                 </div>

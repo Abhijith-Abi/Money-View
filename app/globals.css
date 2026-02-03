@@ -44,7 +44,7 @@
         --secondary-foreground: 210 40% 98%;
         --muted: 222.2 47.4% 11.2%;
         --muted-foreground: 215.4 16.3% 56.9%;
-        --accent: 316.6 70.3% 50.4%;
+        --accent: 217.2 91.2% 59.8%;
         --accent-foreground: 210 40% 98%;
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 210 40% 98%;
@@ -142,6 +142,32 @@
 
 .animate-count {
     animation: countUp 0.5s ease-out;
+}
+
+.animate-shimmer {
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* Modern gradient background animation */
