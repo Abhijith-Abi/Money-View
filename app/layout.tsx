@@ -51,11 +51,6 @@ export const metadata: Metadata = {
             "Track and visualize your income with beautiful charts and analytics.",
         creator: "@moneyview",
     },
-    icons: {
-        icon: "/AppImages/android/android-launchericon-192-192.png",
-        shortcut: "/AppImages/android/android-launchericon-192-192.png",
-        apple: "/AppImages/ios/180.png",
-    },
     manifest: "/manifest.json",
 };
 
