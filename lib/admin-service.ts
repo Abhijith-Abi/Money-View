@@ -21,84 +21,30 @@ const userInfoCache = new Map<string, { name: string; email: string }>();
 
 export async function getAllUsersStats(): Promise<AdminUserStats[]> {
   try {
-    // Note: This requires Firestore rules to allow reading all documents
-    // otherwise this will fail with permission-denied.
-    const q = query(collection(db, COLLECTION_NAME), orderBy('createdAt', 'desc'));
+    const response = await fetch('/api/admin/stats');
     
-    const querySnapshot = await getDocs(q);
-    const entries = querySnapshot.docs.map(doc => ({
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-    })) as IncomeEntry[];
+    if (!response.ok) {
+        const errorData = await response.json();
+        const error = new Error(errorData.error || `API Error: ${response.statusText}`);
+        (error as any).code = errorData.code; // Propagate the error code
+        throw error;
+    }
 
-    const userMap = new Map<string, AdminUserStats>();
-
-    entries.forEach(entry => {
-      const data = entry as any;
-      const userId = data.userId;
-
-      if (!userId) return;
-
-      if (!userMap.has(userId)) {
-        userMap.set(userId, {
-          userId,
-          userName: 'Loading...',
-          userEmail: '',
-          totalIncome: 0,
-          totalPending: 0,
-          totalReceived: 0,
-          entryCount: 0,
-          lastActive: new Date(0),
-        });
-      }
-
-      const stats = userMap.get(userId)!;
-      
-      // Update stats
-      if (entry.type === 'credit') {
-        stats.totalIncome += entry.amount;
-        
-        const status = entry.status || 'received';
-        if (status === 'pending') {
-          stats.totalPending += entry.amount;
-        } else {
-          stats.totalReceived += entry.amount;
-        }
-      }
-
-      stats.entryCount++;
-
-      if (entry.createdAt > stats.lastActive) {
-        stats.lastActive = entry.createdAt;
-      }
-    });
-
-    // Fetch all user profiles
-    const userProfiles = await getAllUserProfiles();
+    const data = await response.json();
     
-    // Populate user names from profiles
-    const statsArray = Array.from(userMap.values());
+    // Parse the date strings back to Date objects
+    if (data.stats && Array.isArray(data.stats)) {
+        return data.stats.map((stat: any) => ({
+            ...stat,
+            lastActive: new Date(stat.lastActive)
+        }));
+    }
     
-    statsArray.forEach(stat => {
-      const profile = userProfiles.get(stat.userId);
-      if (profile) {
-        stat.userName = profile.displayName || stat.userName;
-        stat.userEmail = profile.email || stat.userEmail;
-      } else {
-         // Fallback for users not yet in the new collection
-         if (stat.userId === auth.currentUser?.uid) {
-             stat.userName = auth.currentUser.displayName || 'Current User';
-             stat.userEmail = auth.currentUser.email || '';
-         } else {
-             stat.userName = `User ${stat.userId.substring(0, 8)}...`;
-             stat.userEmail = 'N/A';
-         }
-      }
-    });
+    return [];
 
-    return statsArray;
   } catch (error) {
     console.error('Error fetching admin stats:', error);
+    // Propagate error so UI can show the error state (or permission denied message if applicable)
     throw error;
   }
 }
@@ -123,3 +69,10 @@ export async function getUserEntries(userId: string): Promise<IncomeEntry[]> {
   }
 }
 
+
+export async function getUserDetails(userId: string): Promise<AdminUserStats | undefined> {
+    // For now, we reuse the all-users fetch since we don't have a single-user API yet.
+    // In a larger app, we would make a dedicated endpoint /api/admin/users/[userId]
+    const allStats = await getAllUsersStats();
+    return allStats.find(s => s.userId === userId);
+}
