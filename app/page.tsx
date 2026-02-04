@@ -24,6 +24,7 @@ import { IncomeForm } from "@/components/dashboard/income-form";
 import { UserProfile } from "@/components/auth/user-profile";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Toaster } from "@/components/ui/toaster";
+import { Button } from "@/components/ui/button";
 import {
     Select,
     SelectContent,
@@ -32,7 +33,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { MoneyLoader } from "@/components/ui/money-loader";
-import { Wallet } from "lucide-react";
+import { Wallet, Briefcase } from "lucide-react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Home() {
@@ -299,6 +301,16 @@ export default function Home() {
                                         </SelectContent>
                                     </Select>
 
+                                    <Link href="/business">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="glass hover:bg-white/10"
+                                            title="Business Management"
+                                        >
+                                            <Briefcase className="h-5 w-5 text-purple-400" />
+                                        </Button>
+                                    </Link>
                                     <ModeToggle />
                                     <UserProfile />
                                 </motion.div>
