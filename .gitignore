@@ -33,3 +33,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Service Account Key (Security)
+service-account-key.json
