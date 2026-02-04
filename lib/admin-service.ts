@@ -1,6 +1,7 @@
 import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db, auth } from './firebase';
 import { IncomeEntry } from '@/types/income';
+import { getAllUserProfiles } from './user-service';
 
 export interface AdminUserStats {
   userId: string;
@@ -72,25 +73,26 @@ export async function getAllUsersStats(): Promise<AdminUserStats[]> {
       }
     });
 
-    // Since we can't directly query Firebase Auth users from client-side,
-    // we'll extract user info from the current user or use a placeholder
-    // In a production app, you'd want a Cloud Function or server-side API for this
-    const currentUser = auth.currentUser;
+    // Fetch all user profiles
+    const userProfiles = await getAllUserProfiles();
     
+    // Populate user names from profiles
     const statsArray = Array.from(userMap.values());
     
-    // Try to populate user names from cache or current user
     statsArray.forEach(stat => {
-      if (currentUser && stat.userId === currentUser.uid) {
-        stat.userName = currentUser.displayName || 'Current User';
-        stat.userEmail = currentUser.email || '';
-      } else if (userInfoCache.has(stat.userId)) {
-        const cached = userInfoCache.get(stat.userId)!;
-        stat.userName = cached.name;
-        stat.userEmail = cached.email;
+      const profile = userProfiles.get(stat.userId);
+      if (profile) {
+        stat.userName = profile.displayName || stat.userName;
+        stat.userEmail = profile.email || stat.userEmail;
       } else {
-        stat.userName = `User ${stat.userId.substring(0, 8)}...`;
-        stat.userEmail = 'N/A';
+         // Fallback for users not yet in the new collection
+         if (stat.userId === auth.currentUser?.uid) {
+             stat.userName = auth.currentUser.displayName || 'Current User';
+             stat.userEmail = auth.currentUser.email || '';
+         } else {
+             stat.userName = `User ${stat.userId.substring(0, 8)}...`;
+             stat.userEmail = 'N/A';
+         }
       }
     });
 

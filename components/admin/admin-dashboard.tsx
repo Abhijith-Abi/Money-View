@@ -19,6 +19,7 @@ import {
     IndianRupee,
     Clock,
     ArrowUpCircle,
+    Eye,
 } from "lucide-react";
 import { getAllUsersStats, AdminUserStats } from "@/lib/admin-service";
 import { formatCurrency } from "@/lib/utils";
@@ -178,158 +179,195 @@ export function AdminDashboard() {
                 variants={container}
                 initial="hidden"
                 animate="show"
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                className="space-y-8"
             >
-                <motion.div variants={item}>
-                    <Card className="glass border-white/20 shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Users
-                            </CardTitle>
-                            <Users className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                {totalUsers}
+                {/* Hero Stats Section - Prioritizing Total Pending */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Main Hero Card - Total Pending */}
+                    <motion.div
+                        variants={item}
+                        className="md:col-span-2 lg:col-span-2"
+                    >
+                        <Card className="h-full glass border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Clock className="w-24 h-24 text-amber-500" />
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                                Active platform users
-                            </p>
-                        </CardContent>
-                    </Card>
-                </motion.div>
+                            <CardHeader>
+                                <CardTitle className="text-lg font-medium text-amber-600 dark:text-amber-400 flex items-center gap-2">
+                                    <Clock className="w-5 h-5" />
+                                    Total Outstanding
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-4xl md:text-5xl font-bold text-amber-700 dark:text-amber-300 mb-2">
+                                    {formatCurrency(totalPending)}
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Total pending payments across all users
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
 
+                    {/* Secondary Stats */}
+                    <motion.div variants={item} className="lg:col-span-1">
+                        <Card className="h-full glass border-white/20 shadow-lg flex flex-col justify-center">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium flex items-center justify-between">
+                                    Total Tracked Income
+                                    <IndianRupee className="h-4 w-4 text-emerald-500" />
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                                    {formatCurrency(totalRevenue)}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Lifetime revenue
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+
+                    <motion.div variants={item} className="lg:col-span-1">
+                        <Card className="h-full glass border-white/20 shadow-lg flex flex-col justify-center">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm font-medium flex items-center justify-between">
+                                    Total Users
+                                    <Users className="h-4 w-4 text-purple-500" />
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                                    {totalUsers}
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Active accounts
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </motion.div>
+                </div>
+
+                {/* User Table Section */}
                 <motion.div variants={item}>
-                    <Card className="glass border-white/20 shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Tracked Income
-                            </CardTitle>
-                            <IndianRupee className="h-4 w-4 text-emerald-500" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                                {formatCurrency(totalRevenue)}
+                    <Card className="glass border-white/20 shadow-xl overflow-hidden">
+                        <CardHeader className="border-b border-border/50 bg-muted/20">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle>User Registry</CardTitle>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        Manage and view user details
+                                    </p>
+                                </div>
                             </div>
-                            <p className="text-xs text-muted-foreground">
-                                Across all users
-                            </p>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-
-                <motion.div variants={item}>
-                    <Card className="glass border-white/20 shadow-lg">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">
-                                Total Pending
-                            </CardTitle>
-                            <Clock className="h-4 w-4 text-amber-500" />
                         </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                                {formatCurrency(totalPending)}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                                Outstanding payments
-                            </p>
-                        </CardContent>
-                    </Card>
-                </motion.div>
-            </motion.div>
-
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-            >
-                <Card className="glass border-white/20 shadow-xl overflow-hidden">
-                    <CardHeader>
-                        <CardTitle>User Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>User Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Last Active</TableHead>
-                                    <TableHead>Entries</TableHead>
-                                    <TableHead className="text-right">
-                                        Total Income
-                                    </TableHead>
-                                    <TableHead className="text-right">
-                                        Pending
-                                    </TableHead>
-                                    <TableHead className="text-right">
-                                        Received
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={7}
-                                            className="h-24 text-center"
-                                        >
-                                            Loading user data...
-                                        </TableCell>
+                        <CardContent className="p-0">
+                            <Table>
+                                <TableHeader className="bg-muted/30">
+                                    <TableRow className="hover:bg-transparent border-border/30">
+                                        <TableHead className="w-[250px] font-bold">
+                                            User Name
+                                        </TableHead>
+                                        <TableHead className="font-bold">
+                                            Email
+                                        </TableHead>
+                                        <TableHead className="text-center font-bold">
+                                            Entries
+                                        </TableHead>
+                                        <TableHead className="text-right font-bold text-emerald-600 dark:text-emerald-400">
+                                            Total Income
+                                        </TableHead>
+                                        <TableHead className="text-right font-bold text-amber-600 dark:text-amber-400">
+                                            Pending
+                                        </TableHead>
+                                        <TableHead className="text-center font-bold">
+                                            Action
+                                        </TableHead>
                                     </TableRow>
-                                ) : stats.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={7}
-                                            className="h-24 text-center"
-                                        >
-                                            No user data found.
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    stats.map((user) => (
-                                        <TableRow
-                                            key={user.userId}
-                                            className="cursor-pointer hover:bg-muted/50 transition-colors"
-                                            onClick={() =>
-                                                (window.location.href = `/admin/user/${user.userId}`)
-                                            }
-                                        >
-                                            <TableCell className="font-medium">
-                                                {user.userName}
-                                            </TableCell>
-                                            <TableCell className="text-muted-foreground text-sm">
-                                                {user.userEmail}
-                                            </TableCell>
-                                            <TableCell>
-                                                {user.lastActive.toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="secondary">
-                                                    {user.entryCount}
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="text-right font-medium text-emerald-600 dark:text-emerald-400">
-                                                {formatCurrency(
-                                                    user.totalIncome,
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right text-amber-600 dark:text-amber-400">
-                                                {formatCurrency(
-                                                    user.totalPending,
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right text-blue-600 dark:text-blue-400">
-                                                {formatCurrency(
-                                                    user.totalReceived,
-                                                )}
+                                </TableHeader>
+                                <TableBody>
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={6}
+                                                className="h-32 text-center text-muted-foreground"
+                                            >
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <RefreshCcw className="h-6 w-6 animate-spin" />
+                                                    <p>Loading user data...</p>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                                    ) : stats.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell
+                                                colSpan={6}
+                                                className="h-32 text-center text-muted-foreground"
+                                            >
+                                                No users found.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        stats.map((user) => (
+                                            <TableRow
+                                                key={user.userId}
+                                                className="hover:bg-muted/40 transition-colors border-border/30"
+                                            >
+                                                <TableCell className="font-medium">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-base">
+                                                            {user.userName}
+                                                        </span>
+                                                        <span className="text-xs text-muted-foreground md:hidden">
+                                                            {user.userEmail}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="text-muted-foreground hidden md:table-cell">
+                                                    {user.userEmail}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="bg-slate-100 dark:bg-slate-800"
+                                                    >
+                                                        {user.entryCount}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-right font-semibold">
+                                                    {formatCurrency(
+                                                        user.totalIncome,
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-right font-bold text-amber-600 dark:text-amber-400">
+                                                    {formatCurrency(
+                                                        user.totalPending,
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="h-8 w-8 p-0 rounded-full hover:bg-purple-100 dark:hover:bg-purple-900/30 text-purple-600 dark:text-purple-400"
+                                                        onClick={() =>
+                                                            (window.location.href = `/admin/user/${user.userId}`)
+                                                        }
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                        <span className="sr-only">
+                                                            View User
+                                                        </span>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </motion.div>
             </motion.div>
         </div>
     );

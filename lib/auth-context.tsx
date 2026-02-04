@@ -15,6 +15,7 @@ import {
     GoogleAuthProvider,
 } from "firebase/auth";
 import { auth } from "./firebase";
+import { saveUserProfile } from "./user-service";
 
 interface AuthContextType {
     user: User | null;
@@ -46,7 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const signInWithGoogle = async () => {
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
+            const result = await signInWithPopup(auth, provider);
+            // Save user profile to Firestore
+            if (result.user) {
+                await saveUserProfile(result.user);
+            }
         } catch (error) {
             console.error("Error signing in with Google:", error);
             throw error;
