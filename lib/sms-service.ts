@@ -1,58 +1,99 @@
-/**
- * SMS Service using Fast2SMS (fast2sms.com)
- * Uses the Developer API (route: "v3") which supports custom messages
- * without DLT template registration.
- *
- * Set FAST2SMS_API_KEY in your .env.local to activate SMS sending.
- */
+import twilio from "twilio";
 
-const FAST2SMS_URL = "https://www.fast2sms.com/dev/bulkV2";
+/**
+ * SMS Service using Twilio
+ * 
+ * Required environment variables in .env.local:
+ * - TWILIO_ACCOUNT_SID
+ * - TWILIO_AUTH_TOKEN
+ * - TWILIO_PHONE_NUMBER (The Twilio number to send from)
+ */
 
 interface SmsResult {
     success: boolean;
     phone: string;
     error?: string;
+    messageSid?: string;
 }
 
 /**
- * Normalizes a phone number to exactly 10 digits (strips +91 / 91 prefix)
+ * Normalizes a phone number to E.164 format (e.g., +919876543210)
+ * Defaults to Indian country code (+91) if 10 digits are provided.
  */
 function normalizePhone(phone: string): string {
     // 1. Strip everything except digits
-    const digits = phone.replace(/\D/g, "");
+    let digits = phone.replace(/\D/g, "");
     
     // 2. Handle Indian numbers (+91 / 91 prefix)
-    // If it's 12 digits and starts with 91, it's likely 91 (country code) + 10 digits
     if (digits.length === 12 && digits.startsWith("91")) {
-        return digits.slice(2);
+        return `+${digits}`;
     }
     
-    // 3. Otherwise, just take the last 10 digits
-    return digits.slice(-10);
+    // 3. If it's already 10 digits, assume it's an Indian number and add +91
+    if (digits.length === 10) {
+        return `+91${digits}`;
+    }
+
+    // 4. If it's already prefixed with something else, just add the +
+    if (digits.length > 10) {
+        return `+${digits}`;
+    }
+    
+    return digits; // Fallback for invalid formats
 }
 
 /**
- * Send an SMS to a single phone number via Fast2SMS Developer API.
- * Phone should be a 10-digit Indian mobile number (no country code).
+ * Get Twilio client instance
+ */
+function getTwilioClient() {
+    const accountSid = process.env.TWILIO_ACCOUNT_SID;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+
+    if (!accountSid || !authToken || !fromNumber) {
+        return null;
+    }
+
+    return {
+        client: twilio(accountSid, authToken),
+        fromNumber
+    };
+}
+
+/**
+ * Send an SMS to a single phone number via Twilio.
  */
 export async function sendSms(phone: string, message: string): Promise<SmsResult> {
-    const apiKey = process.env.FAST2SMS_API_KEY;
+    const config = getTwilioClient();
 
-    if (!apiKey) {
-        console.warn("[SMS] FAST2SMS_API_KEY not set — skipping SMS to", phone);
-        return { success: false, phone, error: "API key not configured" };
+    if (!config) {
+        console.warn("[SMS] Twilio credentials not fully configured — skipping SMS to", phone);
+        return { success: false, phone, error: "Twilio not configured" };
     }
 
-    const cleaned = normalizePhone(phone);
-    if (cleaned.length !== 10) {
-        return { success: false, phone, error: "Invalid phone number (must be 10 digits)" };
+    const to = normalizePhone(phone);
+    if (!to.startsWith("+") || to.length < 12) {
+        return { success: false, phone, error: "Invalid phone number format" };
     }
 
-    return sendBulkSms(apiKey, [cleaned], message, phone);
+    try {
+        const result = await config.client.messages.create({
+            body: message,
+            from: config.fromNumber,
+            to: to
+        });
+
+        console.log(`[SMS] ✅ Twilio Sent to: ${to} | SID: ${result.sid}`);
+        return { success: true, phone, messageSid: result.sid };
+    } catch (err: any) {
+        console.error("[SMS] ❌ Twilio error:", err.message);
+        return { success: false, phone, error: err.message };
+    }
 }
 
 /**
  * Send SMS to multiple phone numbers. Returns counts of successes and failures.
+ * Uses Promise.all for concurrent sending.
  */
 export async function sendSmsToMany(
     phones: string[],
@@ -60,94 +101,20 @@ export async function sendSmsToMany(
 ): Promise<{ smsSentCount: number; smsFailedCount: number }> {
     if (phones.length === 0) return { smsSentCount: 0, smsFailedCount: 0 };
 
-    const apiKey = process.env.FAST2SMS_API_KEY;
-    if (!apiKey) {
-        console.warn("[SMS] FAST2SMS_API_KEY not set — skipping bulk SMS");
+    const config = getTwilioClient();
+    if (!config) {
+        console.warn("[SMS] Twilio credentials not set — skipping bulk SMS");
         return { smsSentCount: 0, smsFailedCount: phones.length };
     }
 
-    // Normalize all numbers and filter out invalid ones
-    const cleaned = phones
-        .map(normalizePhone)
-        .filter((p) => p.length === 10);
+    console.log(`[SMS] Sending via Twilio to ${phones.length} number(s)`);
 
-    if (cleaned.length === 0) {
-        console.warn("[SMS] No valid phone numbers after normalization. Input phones:", phones);
-        return { smsSentCount: 0, smsFailedCount: phones.length };
-    }
+    const results = await Promise.all(
+        phones.map(phone => sendSms(phone, message))
+    );
 
-    console.log(`[SMS] Sending to ${cleaned.length} number(s):`, cleaned);
+    const smsSentCount = results.filter(r => r.success).length;
+    const smsFailedCount = results.length - smsSentCount;
 
-    try {
-        const result = await sendBulkSms(apiKey, cleaned, message);
-        if (result.success) {
-            return {
-                smsSentCount: cleaned.length,
-                smsFailedCount: phones.length - cleaned.length,
-            };
-        } else {
-            return { smsSentCount: 0, smsFailedCount: phones.length };
-        }
-    } catch (err: any) {
-        console.error("[SMS] Unexpected error:", err);
-        return { smsSentCount: 0, smsFailedCount: phones.length };
-    }
-}
-
-/**
- * Internal helper: send SMS to a list of 10-digit numbers using Fast2SMS Developer API (v3).
- */
-async function sendBulkSms(
-    apiKey: string,
-    numbers: string[],
-    message: string,
-    originalPhone?: string
-): Promise<SmsResult> {
-    const numbersStr = numbers.join(",");
-
-    const payload = {
-        route: "v3",           // Developer route — no DLT template required
-        sender_id: "TXTIND",   // Fast2SMS default sender for transactional messages
-        message,
-        language: "english",
-        flash: 0,
-        numbers: numbersStr,
-    };
-
-    console.log("[SMS] Sending payload:", JSON.stringify({ ...payload, apiKey: "***" }));
-
-    try {
-        const res = await fetch(FAST2SMS_URL, {
-            method: "POST",
-            headers: {
-                authorization: apiKey,
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
-
-        const text = await res.text();
-        let data: any;
-        try {
-            data = JSON.parse(text);
-        } catch {
-            console.error("[SMS] Non-JSON response from Fast2SMS:", text);
-            return { success: false, phone: numbersStr, error: `Non-JSON response: ${text.slice(0, 200)}` };
-        }
-
-        console.log("[SMS] Fast2SMS response:", JSON.stringify(data));
-
-        if (data.return === true) {
-            console.log(`[SMS] ✅ Sent to: ${numbersStr}`);
-            return { success: true, phone: originalPhone ?? numbersStr };
-        } else {
-            const errMsg = data.message?.join?.(" ") ?? data.message ?? JSON.stringify(data);
-            console.error("[SMS] ❌ Fast2SMS error:", errMsg, "| Full response:", JSON.stringify(data));
-            return { success: false, phone: originalPhone ?? numbersStr, error: errMsg };
-        }
-    } catch (err: any) {
-        console.error("[SMS] Network error:", err.message);
-        return { success: false, phone: originalPhone ?? numbersStr, error: err.message };
-    }
+    return { smsSentCount, smsFailedCount };
 }

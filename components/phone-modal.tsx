@@ -13,30 +13,38 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Phone, Loader2 } from "lucide-react";
+import { Phone, User, Loader2 } from "lucide-react";
 
 export function PhoneNumberModal() {
     const { user, loading } = useAuth();
     const [open, setOpen] = useState(false);
     const [phone, setPhone] = useState("");
+    const [name, setName] = useState("");
+    const [needsName, setNeedsName] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [checked, setChecked] = useState(false);
 
-    // Once auth is ready and user is logged in, check if phone is already stored
+    // Once auth is ready and user is logged in, check if profile is complete
     useEffect(() => {
         if (loading || !user || checked) return;
 
         (async () => {
             setChecked(true);
             const profile = await getUserProfile(user.uid);
-            if (!profile?.phoneNumber) {
+
+            const missingPhone = !profile?.phoneNumber;
+            const missingName = !profile?.displayName;
+
+            if (missingPhone || missingName) {
+                setNeedsName(missingName);
+                if (profile?.displayName) setName(profile.displayName);
                 setOpen(true);
             }
         })();
     }, [user, loading, checked]);
 
-    const validate = (value: string) => {
+    const validatePhone = (value: string) => {
         const digits = value.replace(/\D/g, "");
         if (digits.length !== 10)
             return "Please enter a valid 10-digit mobile number.";
@@ -47,16 +55,26 @@ export function PhoneNumberModal() {
 
     const handleSave = async () => {
         const digits = phone.replace(/\D/g, "");
-        const err = validate(digits);
-        if (err) {
-            setError(err);
+        const phoneErr = validatePhone(digits);
+        if (phoneErr) {
+            setError(phoneErr);
             return;
         }
+
+        if (needsName && !name.trim()) {
+            setError("Please enter your name.");
+            return;
+        }
+
         if (!user) return;
 
         setSaving(true);
         try {
-            await savePhoneNumber(user.uid, digits);
+            await savePhoneNumber(
+                user.uid,
+                digits,
+                needsName ? name.trim() : undefined,
+            );
             setOpen(false);
         } catch {
             setError("Failed to save. Please try again.");
@@ -81,20 +99,42 @@ export function PhoneNumberModal() {
                 <DialogHeader>
                     <div className="flex items-center gap-3 mb-1">
                         <div className="p-2.5 rounded-xl bg-violet-100 dark:bg-violet-950/60">
-                            <Phone className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                            <User className="w-5 h-5 text-violet-600 dark:text-violet-400" />
                         </div>
                         <DialogTitle className="text-xl">
-                            Add Your Mobile Number
+                            Complete Your Profile
                         </DialogTitle>
                     </div>
                     <DialogDescription className="text-sm leading-relaxed">
-                        We'll send important notifications to your phone via
-                        SMS. Enter your 10-digit Indian mobile number below. You
-                        only need to do this once.
+                        Please provide the following details to continue. We use
+                        this to personalize your experience and send
+                        notifications.
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 pt-2">
+                    {needsName && (
+                        <div className="space-y-2">
+                            <Label
+                                htmlFor="name-input"
+                                className="text-sm font-semibold"
+                            >
+                                Your Name
+                            </Label>
+                            <Input
+                                id="name-input"
+                                placeholder="John Doe"
+                                value={name}
+                                onChange={(e) => {
+                                    setName(e.target.value);
+                                    setError("");
+                                }}
+                                className="w-full"
+                                autoFocus={needsName}
+                            />
+                        </div>
+                    )}
+
                     <div className="space-y-2">
                         <Label
                             htmlFor="phone-input"
@@ -120,7 +160,7 @@ export function PhoneNumberModal() {
                                 }
                                 maxLength={10}
                                 className="flex-1"
-                                autoFocus
+                                autoFocus={!needsName}
                             />
                         </div>
                         {error && (
@@ -141,7 +181,9 @@ export function PhoneNumberModal() {
                             className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
                             onClick={handleSave}
                             disabled={
-                                saving || phone.replace(/\D/g, "").length !== 10
+                                saving ||
+                                phone.replace(/\D/g, "").length !== 10 ||
+                                (needsName && !name.trim())
                             }
                         >
                             {saving ? (
@@ -150,14 +192,14 @@ export function PhoneNumberModal() {
                                     Saving...
                                 </>
                             ) : (
-                                "Save Number"
+                                "Save Details"
                             )}
                         </Button>
                     </div>
 
                     <p className="text-[11px] text-center text-muted-foreground">
-                        🔒 Your number is stored securely and only used for
-                        notifications.
+                        🔒 Your data is stored securely and only used for
+                        personalization and notifications.
                     </p>
                 </div>
             </DialogContent>

@@ -2,7 +2,8 @@
 
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "./firebase";
-import { User } from "firebase/auth";
+import { User, updateProfile } from "firebase/auth";
+import { auth } from "./firebase";
 
 export interface UserProfile {
     uid: string;
@@ -40,6 +41,11 @@ export async function saveUserProfile(user: User): Promise<void> {
                 createdAt: serverTimestamp(),
             });
         } else {
+            // If the incoming displayName is null but we already have one in Firestore, don't overwrite it
+            const existingData = userSnap.data();
+            if (!userData.displayName && existingData?.displayName) {
+                delete userData.displayName;
+            }
             // Update existing user to keep lastLogin fresh
             await setDoc(userRef, userData, { merge: true });
         }
@@ -78,15 +84,24 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
 }
 
 /**
- * Saves the user's phone number to Firestore (called once from the phone-number modal)
+ * Saves the user's phone number and optionally their name to Firestore
  */
-export async function savePhoneNumber(uid: string, phone: string): Promise<void> {
+export async function savePhoneNumber(uid: string, phone: string, name?: string): Promise<void> {
     try {
         const userRef = doc(db, COLLECTION_NAME, uid);
-        await setDoc(userRef, { phoneNumber: phone }, { merge: true });
-        console.log('[User] Phone number saved:', phone);
+        const data: any = { phoneNumber: phone };
+        if (name) data.displayName = name;
+        
+        await setDoc(userRef, data, { merge: true });
+
+        // Also update the Firebase Auth profile for immediate local feedback
+        if (name && auth.currentUser) {
+            await updateProfile(auth.currentUser, { displayName: name });
+        }
+        
+        console.log('[User] Profile updated:', data);
     } catch (error) {
-        console.error('Error saving phone number:', error);
+        console.error('Error updating user profile:', error);
     }
 }
 
