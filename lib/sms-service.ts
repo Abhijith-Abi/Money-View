@@ -46,16 +46,30 @@ function normalizePhone(phone: string): string {
  * Get Twilio client instance
  */
 function getTwilioClient() {
-    const accountSid = process.env.TWILIO_ACCOUNT_SID;
-    const authToken = process.env.TWILIO_AUTH_TOKEN;
+    const sid = process.env.TWILIO_ACCOUNT_SID;
+    const token = process.env.TWILIO_AUTH_TOKEN;
     const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
-    if (!accountSid || !authToken || !fromNumber) {
+    if (!sid || !token || !fromNumber) {
         return null;
     }
 
+    // If 'sid' starts with 'SK', it's an API Key, which requires accountSid to be passed explicitly.
+    // We'll check if the user provided TWILIO_ACTUAL_ACCOUNT_SID.
+    if (sid.startsWith("SK")) {
+        const actualAccountSid = process.env.TWILIO_ACTUAL_ACCOUNT_SID;
+        if (!actualAccountSid) {
+            console.error("[SMS] Twilio API Key used (SK...), but TWILIO_ACTUAL_ACCOUNT_SID is missing.");
+            return null;
+        }
+        return {
+            client: twilio(sid, token, { accountSid: actualAccountSid }),
+            fromNumber
+        };
+    }
+
     return {
-        client: twilio(accountSid, authToken),
+        client: twilio(sid, token),
         fromNumber
     };
 }
