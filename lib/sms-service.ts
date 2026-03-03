@@ -18,7 +18,17 @@ interface SmsResult {
  * Normalizes a phone number to exactly 10 digits (strips +91 / 91 prefix)
  */
 function normalizePhone(phone: string): string {
-    return phone.replace(/^\+?91/, "").replace(/\D/g, "").slice(-10);
+    // 1. Strip everything except digits
+    const digits = phone.replace(/\D/g, "");
+    
+    // 2. Handle Indian numbers (+91 / 91 prefix)
+    // If it's 12 digits and starts with 91, it's likely 91 (country code) + 10 digits
+    if (digits.length === 12 && digits.startsWith("91")) {
+        return digits.slice(2);
+    }
+    
+    // 3. Otherwise, just take the last 10 digits
+    return digits.slice(-10);
 }
 
 /**

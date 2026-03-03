@@ -88,7 +88,7 @@ export function NotificationBell() {
 
             {/* Dropdown Panel */}
             {open && (
-                <div className="absolute right-0 top-11 z-50 w-[calc(100vw-1.5rem)] max-w-[360px] max-h-[520px] flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-xl overflow-hidden">
+                <div className="fixed inset-x-3 top-[72px] md:absolute md:inset-auto md:right-0 md:top-11 z-[100] md:w-[360px] max-h-[80vh] md:max-h-[520px] flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b">
                         <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ export function NotificationBell() {
                                             handleNotificationClick(notif)
                                         }
                                         className={cn(
-                                            "group flex gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-muted/60",
+                                            "group flex gap-3 px-4 py-3 border-b last:border-b-0 cursor-pointer transition-colors hover:bg-muted/60 relative",
                                             !notif.read && "bg-primary/5",
                                         )}
                                     >
@@ -201,7 +201,7 @@ export function NotificationBell() {
                                         </div>
 
                                         {/* Action buttons */}
-                                        <div className="flex flex-col gap-1 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="flex flex-col gap-1 flex-shrink-0 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                                             {!notif.read && (
                                                 <button
                                                     onClick={(e) => {
@@ -212,20 +212,20 @@ export function NotificationBell() {
                                                                 notif.id,
                                                             );
                                                     }}
-                                                    className="p-1 rounded-md hover:bg-background text-muted-foreground hover:text-foreground"
+                                                    className="p-1.5 rounded-md bg-background/50 md:bg-transparent hover:bg-background text-muted-foreground hover:text-foreground border md:border-0"
                                                     title="Mark as read"
                                                 >
-                                                    <Check className="h-3.5 w-3.5" />
+                                                    <Check className="h-4 w-4 md:h-3.5 md:w-3.5" />
                                                 </button>
                                             )}
                                             <button
                                                 onClick={(e) =>
                                                     handleDelete(e, notif.id)
                                                 }
-                                                className="p-1 rounded-md hover:bg-background text-muted-foreground hover:text-destructive"
+                                                className="p-1.5 rounded-md bg-background/50 md:bg-transparent hover:bg-background text-muted-foreground hover:text-destructive border md:border-0"
                                                 title="Delete"
                                             >
-                                                <Trash2 className="h-3.5 w-3.5" />
+                                                <Trash2 className="h-4 w-4 md:h-3.5 md:w-3.5" />
                                             </button>
                                         </div>
                                     </li>
