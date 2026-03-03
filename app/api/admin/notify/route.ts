@@ -6,21 +6,19 @@ import { sendSmsToMany } from "@/lib/sms-service";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
-    if (!adminAuth || !adminDb) {
-        return NextResponse.json(
-            {
-                error: "Firebase Admin not initialized. Check server credentials.",
-                code: "CONFIG_MISSING",
-            },
-            { status: 500 }
-        );
-    }
-
-    let body: { title?: string; body?: string; image?: string; extraPhones?: string[] };
+    let body: {
+        title?: string;
+        body?: string;
+        image?: string;
+        extraPhones?: string[];
+    };
     try {
         body = await req.json();
     } catch {
-        return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+        return NextResponse.json(
+            { error: "Invalid JSON body" },
+            { status: 400 }
+        );
     }
 
     const { title, body: messageBody, image, extraPhones = [] } = body;
@@ -32,116 +30,123 @@ export async function POST(req: Request) {
         );
     }
 
+    const results = {
+        success: true,
+        totalUsers: 0,
+        sentCount: 0,
+        failedCount: 0,
+        tokensFound: 0,
+        phonesFound: 0,
+        smsSentCount: 0,
+        smsFailedCount: 0,
+        error: null as string | null,
+        adminInitialized: !!(adminAuth && adminDb),
+    };
+
     try {
-        // 1. Fetch all users from Firebase Auth
-        const listResult = await adminAuth.listUsers(1000);
-        const users = listResult.users;
-
-        if (users.length === 0) {
-            return NextResponse.json({
-                success: true,
-                sentCount: 0,
-                failedCount: 0,
-                smsSentCount: 0,
-                smsFailedCount: 0,
-            });
-        }
-
-        // 2. For each user: collect FCM token + phone number + write notification to Firestore
         const tokens: string[] = [];
         const phones: string[] = [];
-        const batch = adminDb.batch();
-        const now = admin.firestore.FieldValue.serverTimestamp();
+        const smsMessage = `${title}\n${messageBody}`;
 
-        await Promise.all(
-            users.map(async (user) => {
-                // Write in-app notification to Firestore sub-collection
-                const notifRef = adminDb!
-                    .collection("users")
-                    .doc(user.uid)
-                    .collection("notifications")
-                    .doc();
+        // 1. Notification logic (Requires Firebase Admin)
+        if (adminAuth && adminDb) {
+            try {
+                // Fetch all users from Firebase Auth
+                const listResult = await adminAuth.listUsers(1000);
+                const users = listResult.users;
+                results.totalUsers = users.length;
 
-                batch.set(notifRef, {
-                    title,
-                    body: messageBody,
-                    image: image || null,
-                    link: null,
-                    read: false,
-                    createdAt: now,
-                });
+                if (users.length > 0) {
+                    const batch = adminDb.batch();
+                    const now = admin.firestore.FieldValue.serverTimestamp();
 
-                // Collect FCM token and phone number if available
-                const userDoc = await adminDb!.collection("users").doc(user.uid).get();
-                const data = userDoc.data();
-                const token = data?.fcmToken as string | undefined;
-                const phone = data?.phoneNumber as string | undefined;
+                    await Promise.all(
+                        users.map(async (user) => {
+                            // Write in-app notification
+                            const notifRef = adminDb!
+                                .collection("users")
+                                .doc(user.uid)
+                                .collection("notifications")
+                                .doc();
 
-                if (token) tokens.push(token);
-                if (phone) phones.push(phone);
-            })
-        );
+                            batch.set(notifRef, {
+                                title,
+                                body: messageBody,
+                                image: image || null,
+                                link: null,
+                                read: false,
+                                createdAt: now,
+                            });
 
-        // 3. Commit all Firestore notification writes
-        await batch.commit();
+                            // Collect tokens and phones from Firestore
+                            const userDoc = await adminDb!
+                                .collection("users")
+                                .doc(user.uid)
+                                .get();
+                            const data = userDoc.data();
+                            const token = data?.fcmToken as string | undefined;
+                            const phone = data?.phoneNumber as string | undefined;
 
-        // 4. Send FCM push to all collected tokens
-        let sentCount = 0;
-        let failedCount = 0;
+                            if (token) tokens.push(token);
+                            if (phone) phones.push(phone);
+                        })
+                    );
 
-        if (tokens.length > 0) {
-            const messaging = admin.messaging();
-            const message: admin.messaging.MulticastMessage = {
-                tokens,
-                notification: {
-                    title,
-                    body: messageBody,
-                    ...(image ? { imageUrl: image } : {}),
-                },
-                data: {
-                    title,
-                    body: messageBody,
-                    ...(image ? { image } : {}),
-                    link: "/",
-                },
-                webpush: {
-                    notification: {
-                        title,
-                        body: messageBody,
-                        ...(image ? { image } : {}),
-                        icon: "/icon-192x192.png",
-                        badge: "/icon-192x192.png",
-                    },
-                    fcmOptions: {
-                        link: "/",
-                    },
-                },
-            };
+                    await batch.commit();
+                    results.tokensFound = tokens.length;
+                    results.phonesFound = phones.length;
 
-            const result = await messaging.sendEachForMulticast(message);
-            sentCount = result.successCount;
-            failedCount = result.failureCount;
+                    // Send FCM push
+                    if (tokens.length > 0 && admin.apps.length > 0) {
+                        try {
+                            const messaging = admin.messaging();
+                            const pushMessage: admin.messaging.MulticastMessage = {
+                                tokens,
+                                notification: {
+                                    title,
+                                    body: messageBody,
+                                    ...(image ? { imageUrl: image } : {}),
+                                },
+                                data: {
+                                    title,
+                                    body: messageBody,
+                                    ...(image ? { image } : {}),
+                                    link: "/",
+                                },
+                            };
+                            const result = await messaging.sendEachForMulticast(pushMessage);
+                            results.sentCount = result.successCount;
+                            results.failedCount = result.failureCount;
+                        } catch (pushErr: any) {
+                            console.error("[notify] Push error:", pushErr.message);
+                        }
+                    }
+                }
+            } catch (adminErr: any) {
+                console.error("[notify] Admin logic error:", adminErr.message);
+                results.error = "Firebase Admin logic failed: " + adminErr.message;
+            }
+        } else {
+            console.warn("[notify] Firebase Admin NOT initialized. Skipping push/inbox.");
+            results.error = "Push notifications skipped: Firebase Admin credentials missing.";
         }
 
-        // 5. Send SMS to all collected phone numbers (Firestore + extra admin-specified numbers)
+        // 2. SMS logic (Twilio works independently if configured)
         const allPhones = [...new Set([...phones, ...extraPhones.filter((p) => p.trim())])];
-        const smsMessage = `${title}\n${messageBody}`;
-        console.log(`[notify] Found ${allPhones.length} phone numbers for SMS (${phones.length} from Firestore, ${extraPhones.length} extra):`, allPhones);
-        const { smsSentCount, smsFailedCount } = await sendSmsToMany(allPhones, smsMessage);
-        console.log(`[notify] SMS result — sent: ${smsSentCount}, failed: ${smsFailedCount}`);
+        if (allPhones.length > 0) {
+            console.log(`[notify] Sending SMS to ${allPhones.length} numbers via Twilio...`);
+            const { smsSentCount, smsFailedCount } = await sendSmsToMany(allPhones, smsMessage);
+            results.smsSentCount = smsSentCount;
+            results.smsFailedCount = smsFailedCount;
+            if (results.phonesFound === 0) results.phonesFound = allPhones.length;
+        }
 
-        return NextResponse.json({
-            success: true,
-            totalUsers: users.length,
-            sentCount,
-            failedCount,
-            tokensFound: tokens.length,
-            phonesFound: phones.length,
-            smsSentCount,
-            smsFailedCount,
-        });
-    } catch (error) {
-        console.error("[/api/admin/notify] Error:", error);
-        return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+        return NextResponse.json(results);
+    } catch (error: any) {
+        console.error("[/api/admin/notify] Global error:", error);
+        return NextResponse.json(
+            { error: "Internal server error: " + error.message },
+            { status: 500 }
+        );
     }
 }
