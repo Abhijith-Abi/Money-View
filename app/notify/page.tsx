@@ -28,6 +28,9 @@ export default function NotifyPage() {
         sentCount: number;
         failedCount: number;
         tokensFound: number;
+        phonesFound: number;
+        smsSentCount: number;
+        smsFailedCount: number;
     } | null>(null);
 
     const [title, setTitle] = useState("");
@@ -74,7 +77,7 @@ export default function NotifyPage() {
             setLastResult(data);
             toast({
                 title: "✅ Notification sent!",
-                description: `Push sent to ${data.sentCount} of ${data.tokensFound} devices. Written to ${data.totalUsers} user inboxes.`,
+                description: `Push sent to ${data.sentCount}/${data.tokensFound} devices. SMS sent to ${data.smsSentCount}/${data.phonesFound} numbers. Written to ${data.totalUsers} inboxes.`,
             });
 
             // Clear form
@@ -321,7 +324,7 @@ export default function NotifyPage() {
                                     <p className="font-semibold text-emerald-800 dark:text-emerald-300">
                                         Notification sent successfully
                                     </p>
-                                    <div className="grid grid-cols-3 gap-4 mt-3">
+                                    <div className="grid grid-cols-2 gap-4 mt-3">
                                         {[
                                             {
                                                 label: "Total Users",
@@ -332,7 +335,11 @@ export default function NotifyPage() {
                                                 value: lastResult.sentCount,
                                             },
                                             {
-                                                label: "Failed",
+                                                label: "SMS Sent",
+                                                value: lastResult.smsSentCount,
+                                            },
+                                            {
+                                                label: "Push Failed",
                                                 value: lastResult.failedCount,
                                             },
                                         ].map(({ label, value }) => (

@@ -9,6 +9,7 @@ export interface UserProfile {
     displayName: string | null;
     email: string | null;
     photoURL: string | null;
+    phoneNumber?: string | null;
     lastLogin: Date;
     createdAt?: Date;
 }
@@ -58,6 +59,34 @@ export async function saveFcmToken(uid: string, token: string): Promise<void> {
         console.log('[FCM] Token saved to Firestore:', token);
     } catch (error) {
         console.error('Error saving FCM token:', error);
+    }
+}
+
+/**
+ * Fetches the full user profile from Firestore
+ */
+export async function getUserProfile(uid: string): Promise<UserProfile | null> {
+    try {
+        const userRef = doc(db, COLLECTION_NAME, uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) return null;
+        return snap.data() as UserProfile;
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        return null;
+    }
+}
+
+/**
+ * Saves the user's phone number to Firestore (called once from the phone-number modal)
+ */
+export async function savePhoneNumber(uid: string, phone: string): Promise<void> {
+    try {
+        const userRef = doc(db, COLLECTION_NAME, uid);
+        await setDoc(userRef, { phoneNumber: phone }, { merge: true });
+        console.log('[User] Phone number saved:', phone);
+    } catch (error) {
+        console.error('Error saving phone number:', error);
     }
 }
 

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminAuth, adminDb } from "@/lib/firebase-admin";
 import * as admin from "firebase-admin";
+import { sendSmsToMany } from "@/lib/sms-service";
 
 export const dynamic = "force-dynamic";
 
@@ -37,11 +38,18 @@ export async function POST(req: Request) {
         const users = listResult.users;
 
         if (users.length === 0) {
-            return NextResponse.json({ success: true, sentCount: 0, failedCount: 0 });
+            return NextResponse.json({
+                success: true,
+                sentCount: 0,
+                failedCount: 0,
+                smsSentCount: 0,
+                smsFailedCount: 0,
+            });
         }
 
-        // 2. For each user: collect FCM token + write notification to Firestore
+        // 2. For each user: collect FCM token + phone number + write notification to Firestore
         const tokens: string[] = [];
+        const phones: string[] = [];
         const batch = adminDb.batch();
         const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -63,10 +71,14 @@ export async function POST(req: Request) {
                     createdAt: now,
                 });
 
-                // Collect FCM token if available
+                // Collect FCM token and phone number if available
                 const userDoc = await adminDb!.collection("users").doc(user.uid).get();
-                const token = userDoc.data()?.fcmToken as string | undefined;
+                const data = userDoc.data();
+                const token = data?.fcmToken as string | undefined;
+                const phone = data?.phoneNumber as string | undefined;
+
                 if (token) tokens.push(token);
+                if (phone) phones.push(phone);
             })
         );
 
@@ -111,12 +123,19 @@ export async function POST(req: Request) {
             failedCount = result.failureCount;
         }
 
+        // 5. Send SMS to all collected phone numbers
+        const smsMessage = `${title}\n${messageBody}`;
+        const { smsSentCount, smsFailedCount } = await sendSmsToMany(phones, smsMessage);
+
         return NextResponse.json({
             success: true,
             totalUsers: users.length,
             sentCount,
             failedCount,
             tokensFound: tokens.length,
+            phonesFound: phones.length,
+            smsSentCount,
+            smsFailedCount,
         });
     } catch (error) {
         console.error("[/api/admin/notify] Error:", error);
