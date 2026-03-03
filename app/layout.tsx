@@ -4,6 +4,7 @@ import "./globals.css";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
+import { NotificationProvider } from "@/components/notification-provider";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -68,16 +69,21 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning>
-            <body className={`${inter.variable} font-sans antialiased`}>
+            <body
+                className={`${inter.variable} font-sans antialiased`}
+                suppressHydrationWarning
+            >
                 <AuthProvider>
-                    <ThemeProvider
-                        attribute="class"
-                        defaultTheme="system"
-                        enableSystem
-                        disableTransitionOnChange
-                    >
-                        {children}
-                    </ThemeProvider>
+                    <NotificationProvider>
+                        <ThemeProvider
+                            attribute="class"
+                            defaultTheme="system"
+                            enableSystem
+                            disableTransitionOnChange
+                        >
+                            {children}
+                        </ThemeProvider>
+                    </NotificationProvider>
                 </AuthProvider>
             </body>
         </html>

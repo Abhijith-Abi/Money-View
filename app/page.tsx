@@ -23,6 +23,7 @@ import { IncomeTable } from "@/components/dashboard/income-table";
 import { IncomeForm } from "@/components/dashboard/income-form";
 import { UserProfile } from "@/components/auth/user-profile";
 import { ModeToggle } from "@/components/mode-toggle";
+import { NotificationBell } from "@/components/notification-bell";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import {
@@ -311,6 +312,7 @@ export default function Home() {
                                             <Briefcase className="h-5 w-5 text-purple-400" />
                                         </Button>
                                     </Link>
+                                    <NotificationBell />
                                     <ModeToggle />
                                     <UserProfile />
                                 </motion.div>

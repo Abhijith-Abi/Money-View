@@ -22,12 +22,14 @@ import {
     Eye,
     CalendarClock,
     Search,
+    Bell,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { getAllUsersStats, AdminUserStats } from "@/lib/admin-service";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 export function AdminDashboard() {
     const [stats, setStats] = useState<AdminUserStats[]>([]);
@@ -229,6 +231,15 @@ export function AdminDashboard() {
                             className={`w-4 h-4 ${loading ? "animate-spin" : ""}`}
                         />
                         Refresh Data
+                    </Button>
+                    <Button
+                        asChild
+                        className="gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+                    >
+                        <Link href="/notify">
+                            <Bell className="w-4 h-4" />
+                            Send Notification
+                        </Link>
                     </Button>
                     <Button
                         onClick={() => {

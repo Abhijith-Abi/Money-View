@@ -49,6 +49,19 @@ export async function saveUserProfile(user: User): Promise<void> {
 }
 
 /**
+ * Saves the FCM push notification token for a user
+ */
+export async function saveFcmToken(uid: string, token: string): Promise<void> {
+    try {
+        const userRef = doc(db, COLLECTION_NAME, uid);
+        await setDoc(userRef, { fcmToken: token }, { merge: true });
+        console.log('[FCM] Token saved to Firestore:', token);
+    } catch (error) {
+        console.error('Error saving FCM token:', error);
+    }
+}
+
+/**
  * Fetches all user profiles (for admin use)
  */
 export async function getAllUserProfiles(): Promise<Map<string, UserProfile>> {

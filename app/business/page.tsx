@@ -29,6 +29,7 @@ import { getAllCustomers, deleteCustomer } from "@/lib/customer-service";
 import { Customer } from "@/types/customer";
 import { useToast } from "@/hooks/use-toast";
 import { ModeToggle } from "@/components/mode-toggle";
+import { NotificationBell } from "@/components/notification-bell";
 
 export default function BusinessManagementPage() {
     const { user, loading: authLoading } = useAuth();
@@ -150,7 +151,10 @@ export default function BusinessManagementPage() {
                             </p>
                         </div>
                     </div>
-                    <ModeToggle />
+                    <div className="flex items-center gap-2">
+                        <NotificationBell />
+                        <ModeToggle />
+                    </div>
                 </div>
 
                 <Tabs
