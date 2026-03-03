@@ -16,6 +16,9 @@ import {
     Loader2,
     CheckCircle2,
     Users,
+    Phone,
+    Plus,
+    X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -36,8 +39,33 @@ export default function NotifyPage() {
     const [title, setTitle] = useState("");
     const [body, setBody] = useState("");
     const [image, setImage] = useState("");
+    const [phoneInput, setPhoneInput] = useState("");
+    const [phoneList, setPhoneList] = useState<string[]>([]);
+    const [phoneError, setPhoneError] = useState("");
 
     const { toast } = useToast();
+
+    const addPhone = () => {
+        const digits = phoneInput.replace(/\D/g, "").slice(-10);
+        if (digits.length !== 10) {
+            setPhoneError("Enter a valid 10-digit Indian mobile number.");
+            return;
+        }
+        if (!/^[6-9]/.test(digits)) {
+            setPhoneError("Number must start with 6, 7, 8, or 9.");
+            return;
+        }
+        if (phoneList.includes(digits)) {
+            setPhoneError("Number already added.");
+            return;
+        }
+        setPhoneList((prev) => [...prev, digits]);
+        setPhoneInput("");
+        setPhoneError("");
+    };
+
+    const removePhone = (num: string) =>
+        setPhoneList((prev) => prev.filter((p) => p !== num));
 
     useEffect(() => {
         const auth = sessionStorage.getItem("admin_auth");
@@ -65,6 +93,7 @@ export default function NotifyPage() {
                     title: title.trim(),
                     body: body.trim(),
                     ...(image.trim() ? { image: image.trim() } : {}),
+                    ...(phoneList.length > 0 ? { extraPhones: phoneList } : {}),
                 }),
             });
 
@@ -80,10 +109,11 @@ export default function NotifyPage() {
                 description: `Push sent to ${data.sentCount}/${data.tokensFound} devices. SMS sent to ${data.smsSentCount}/${data.phonesFound} numbers. Written to ${data.totalUsers} inboxes.`,
             });
 
-            // Clear form
             setTitle("");
             setBody("");
             setImage("");
+            setPhoneList([]);
+            setPhoneInput("");
         } catch (err: any) {
             toast({
                 variant: "destructive",
@@ -219,6 +249,81 @@ export default function NotifyPage() {
                                 />
                                 <p className="text-[11px] text-muted-foreground text-right">
                                     {body.length}/500
+                                </p>
+                            </div>
+
+                            {/* Phone Numbers */}
+                            <div className="space-y-2">
+                                <Label
+                                    htmlFor="notif-phone"
+                                    className="text-sm font-semibold flex items-center gap-1.5"
+                                >
+                                    <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+                                    Send SMS To{" "}
+                                    <span className="text-muted-foreground font-normal">
+                                        (optional — extra numbers)
+                                    </span>
+                                </Label>
+                                <div className="flex gap-2">
+                                    <div className="flex items-center px-3 h-10 border border-input rounded-md bg-muted/50 text-sm text-muted-foreground font-medium flex-shrink-0">
+                                        🇮🇳 +91
+                                    </div>
+                                    <Input
+                                        id="notif-phone"
+                                        type="tel"
+                                        placeholder="98765 43210"
+                                        value={phoneInput}
+                                        onChange={(e) => {
+                                            setPhoneInput(e.target.value);
+                                            setPhoneError("");
+                                        }}
+                                        onKeyDown={(e) =>
+                                            e.key === "Enter" && addPhone()
+                                        }
+                                        maxLength={10}
+                                        className="flex-1 bg-secondary/40 focus:bg-background transition-all"
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={addPhone}
+                                        className="flex-shrink-0 hover:bg-violet-50 hover:border-violet-300 dark:hover:bg-violet-950/40"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                                {phoneError && (
+                                    <p className="text-xs text-destructive">
+                                        {phoneError}
+                                    </p>
+                                )}
+                                {phoneList.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 pt-1">
+                                        {phoneList.map((num) => (
+                                            <span
+                                                key={num}
+                                                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 dark:bg-violet-950/60 text-violet-800 dark:text-violet-300 border border-violet-200 dark:border-violet-800"
+                                            >
+                                                <Phone className="w-3 h-3" />
+                                                +91 {num}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removePhone(num)
+                                                    }
+                                                    className="ml-0.5 hover:text-destructive transition-colors"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                )}
+                                <p className="text-[11px] text-muted-foreground">
+                                    These numbers receive SMS in addition to all
+                                    users who saved their phone number in the
+                                    app.
                                 </p>
                             </div>
 

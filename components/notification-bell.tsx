@@ -75,12 +75,12 @@ export function NotificationBell() {
             {/* Bell Button */}
             <button
                 onClick={() => setOpen((prev) => !prev)}
-                className="relative p-2 rounded-full hover:bg-muted transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="relative p-2 rounded-full hover:bg-purple-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
                 aria-label="Notifications"
             >
-                <Bell className="h-5 w-5 text-muted-foreground" />
+                <Bell className="h-5 w-5 text-purple-500" />
                 {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
+                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
                         {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                 )}
@@ -88,7 +88,7 @@ export function NotificationBell() {
 
             {/* Dropdown Panel */}
             {open && (
-                <div className="absolute right-0 top-10 z-50 w-[360px] max-h-[520px] flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-xl overflow-hidden">
+                <div className="absolute right-0 top-11 z-50 w-[calc(100vw-1.5rem)] max-w-[360px] max-h-[520px] flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-xl overflow-hidden">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b">
                         <div className="flex items-center gap-2">

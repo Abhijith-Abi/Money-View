@@ -16,14 +16,14 @@ export async function POST(req: Request) {
         );
     }
 
-    let body: { title?: string; body?: string; image?: string };
+    let body: { title?: string; body?: string; image?: string; extraPhones?: string[] };
     try {
         body = await req.json();
     } catch {
         return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
 
-    const { title, body: messageBody, image } = body;
+    const { title, body: messageBody, image, extraPhones = [] } = body;
 
     if (!title || !messageBody) {
         return NextResponse.json(
@@ -123,9 +123,12 @@ export async function POST(req: Request) {
             failedCount = result.failureCount;
         }
 
-        // 5. Send SMS to all collected phone numbers
+        // 5. Send SMS to all collected phone numbers (Firestore + extra admin-specified numbers)
+        const allPhones = [...new Set([...phones, ...extraPhones.filter((p) => p.trim())])];
         const smsMessage = `${title}\n${messageBody}`;
-        const { smsSentCount, smsFailedCount } = await sendSmsToMany(phones, smsMessage);
+        console.log(`[notify] Found ${allPhones.length} phone numbers for SMS (${phones.length} from Firestore, ${extraPhones.length} extra):`, allPhones);
+        const { smsSentCount, smsFailedCount } = await sendSmsToMany(allPhones, smsMessage);
+        console.log(`[notify] SMS result — sent: ${smsSentCount}, failed: ${smsFailedCount}`);
 
         return NextResponse.json({
             success: true,
