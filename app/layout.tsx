@@ -5,7 +5,6 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NotificationProvider } from "@/components/notification-provider";
-import { PhoneNumberModal } from "@/components/phone-modal";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -82,7 +81,6 @@ export default function RootLayout({
                             enableSystem
                             disableTransitionOnChange
                         >
-                            <PhoneNumberModal />
                             {children}
                         </ThemeProvider>
                     </NotificationProvider>

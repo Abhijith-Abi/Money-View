@@ -106,7 +106,7 @@ export default function NotifyPage() {
             setLastResult(data);
             toast({
                 title: "✅ Notification sent!",
-                description: `Push sent to ${data.sentCount}/${data.tokensFound} devices. SMS sent to ${data.smsSentCount}/${data.phonesFound} numbers. Written to ${data.totalUsers} inboxes.`,
+                description: `SMS sent to ${data.smsSentCount} numbers. ${data.smsFailedCount} failed.`,
             });
 
             setTitle("");
@@ -181,14 +181,9 @@ export default function NotifyPage() {
                                 Broadcast Notification
                             </h1>
                             <p className="text-muted-foreground text-sm mt-0.5">
-                                Send a push notification to all users
+                                Send an SMS notification
                             </p>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-100 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800 text-violet-700 dark:text-violet-300">
-                        <Users className="w-3.5 h-3.5" />
-                        <span className="text-xs font-semibold">All Users</span>
                     </div>
                 </motion.div>
 
@@ -260,9 +255,6 @@ export default function NotifyPage() {
                                 >
                                     <Phone className="w-3.5 h-3.5 text-muted-foreground" />
                                     Send SMS To{" "}
-                                    <span className="text-muted-foreground font-normal">
-                                        (optional — extra numbers)
-                                    </span>
                                 </Label>
                                 <div className="flex gap-2">
                                     <div className="flex items-center px-3 h-10 border border-input rounded-md bg-muted/50 text-sm text-muted-foreground font-medium flex-shrink-0">
@@ -321,46 +313,9 @@ export default function NotifyPage() {
                                     </div>
                                 )}
                                 <p className="text-[11px] text-muted-foreground">
-                                    These numbers receive SMS in addition to all
-                                    users who saved their phone number in the
-                                    app.
+                                    Enter the 10-digit mobile numbers you want
+                                    to notify.
                                 </p>
-                            </div>
-
-                            {/* Image URL */}
-                            <div className="space-y-2">
-                                <Label
-                                    htmlFor="notif-image"
-                                    className="text-sm font-semibold flex items-center gap-1.5"
-                                >
-                                    <ImageIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                                    Image URL{" "}
-                                    <span className="text-muted-foreground font-normal">
-                                        (optional)
-                                    </span>
-                                </Label>
-                                <Input
-                                    id="notif-image"
-                                    placeholder="https://example.com/image.png"
-                                    value={image}
-                                    onChange={(e) => setImage(e.target.value)}
-                                    className="bg-secondary/40 focus:bg-background transition-all"
-                                />
-                                {/* Live image preview */}
-                                {image.trim() && (
-                                    <div className="mt-2 rounded-xl overflow-hidden border border-border/60 bg-muted/30">
-                                        <img
-                                            src={image}
-                                            alt="Notification image preview"
-                                            className="w-full max-h-52 object-cover"
-                                            onError={(e) => {
-                                                (
-                                                    e.target as HTMLImageElement
-                                                ).style.display = "none";
-                                            }}
-                                        />
-                                    </div>
-                                )}
                             </div>
 
                             {/* Preview Card */}
@@ -404,10 +359,7 @@ export default function NotifyPage() {
                                         Sending...
                                     </>
                                 ) : (
-                                    <>
-                                        <Send className="w-4 h-4" />
-                                        Send to All Users
-                                    </>
+                                    <>Send SMS</>
                                 )}
                             </Button>
                         </CardContent>
@@ -432,20 +384,12 @@ export default function NotifyPage() {
                                     <div className="grid grid-cols-2 gap-4 mt-3">
                                         {[
                                             {
-                                                label: "Total Users",
-                                                value: lastResult.totalUsers,
-                                            },
-                                            {
-                                                label: "Push Sent",
-                                                value: lastResult.sentCount,
-                                            },
-                                            {
                                                 label: "SMS Sent",
                                                 value: lastResult.smsSentCount,
                                             },
                                             {
-                                                label: "Push Failed",
-                                                value: lastResult.failedCount,
+                                                label: "SMS Failed",
+                                                value: lastResult.smsFailedCount,
                                             },
                                         ].map(({ label, value }) => (
                                             <div
@@ -461,17 +405,6 @@ export default function NotifyPage() {
                                             </div>
                                         ))}
                                     </div>
-                                    {lastResult.tokensFound <
-                                        lastResult.totalUsers && (
-                                        <p className="text-xs text-muted-foreground mt-2">
-                                            ⚠️{" "}
-                                            {lastResult.totalUsers -
-                                                lastResult.tokensFound}{" "}
-                                            user(s) have no FCM token (never
-                                            granted push permission) — their
-                                            in-app notification was still saved.
-                                        </p>
-                                    )}
                                 </div>
                             </CardContent>
                         </Card>
