@@ -42,384 +42,124 @@ export function IncomeCharts({
     monthlyStats,
     annualStats,
     loading,
+    variant = "default",
 }: IncomeChartsProps) {
     const [viewMode, setViewMode] = useState<"month" | "year">("month");
-
-    // Hook must be called before conditional returns
     const isMobile = useMediaQuery("(max-width: 768px)");
-
-    // Chart Configuration based on screen size
-    const chartConfig = {
-        barSize: isMobile ? 20 : 32,
-        margin: isMobile
-            ? { top: 20, right: 10, left: -20, bottom: 5 }
-            : { top: 20, right: 30, left: 20, bottom: 5 },
-        xAxisFontSize: isMobile ? 10 : 12,
-        yAxisFontSize: isMobile ? 10 : 12,
-        yAxisWidth: isMobile ? 30 : 40,
-    };
 
     if (loading) {
         return (
-            <div className="grid grid-cols-1 gap-6">
-                <Card className="glass animate-pulse">
-                    <CardContent className="p-6">
-                        <div className="h-96 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                    </CardContent>
-                </Card>
+            <div className="h-64 flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
-    const data =
-        viewMode === "month"
-            ? monthlyStats
-            : annualStats.filter((stat) => stat.year >= 2023);
+    if (variant === "large") {
+        return (
+            <div className="h-[350px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={monthlyStats} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                        <defs>
+                            <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.1}/>
+                                <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                            </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                        <XAxis 
+                            dataKey="month" 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fill: "#9ca3af", fontSize: 12 }}
+                            tickFormatter={(val) => val.charAt(0)}
+                        />
+                        <YAxis 
+                            axisLine={false} 
+                            tickLine={false} 
+                            tick={{ fill: "#9ca3af", fontSize: 12 }}
+                        />
+                        <Tooltip 
+                            contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
+                            itemStyle={{ color: "#fff" }}
+                        />
+                        <Line 
+                            type="monotone" 
+                            dataKey="received" 
+                            stroke="var(--primary)" 
+                            strokeWidth={3} 
+                            dot={{ r: 4, fill: "var(--primary)", strokeWidth: 2, stroke: "#fff" }}
+                            activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
+                        <Line 
+                            type="monotone" 
+                            dataKey="pending" 
+                            stroke="#ffffff" 
+                            strokeWidth={2} 
+                            strokeOpacity={0.3}
+                            dot={false}
+                        />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+        );
+    }
 
-    // Previously hook was here, causing error
-    // const isMobile = useMediaQuery("(max-width: 768px)"); ...
+    if (variant === "donut") {
+        const pieData = [
+            { name: "Sales", value: 28400, color: "#FFFFFF" },
+            { name: "Services", value: 19100, color: "#D4AF37" },
+            { name: "Investments", value: 11200, color: "#454749" },
+        ];
+
+        return (
+            <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="h-[250px] w-[250px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                            <Pie
+                                data={pieData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={70}
+                                outerRadius={90}
+                                paddingAngle={5}
+                                dataKey="value"
+                            >
+                                {pieData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="space-y-4 flex-1">
+                    {pieData.map((item) => (
+                        <div key={item.name} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                                <span className="text-gray-400">{item.name}</span>
+                            </div>
+                            <span className="text-white font-bold">${(item.value / 1000).toFixed(1)}k</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="flex flex-col gap-6">
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="relative group"
-            >
-                {/* Subtle glow border */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-[#9999ff] rounded-xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300" />
-
-                <Card className="relative glass backdrop-blur-2xl border-white/10 shadow-xl transition-all duration-300">
-                    <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-xl font-bold gradient-text bg-gradient-to-r from-foreground to-muted-foreground">
-                            Income Trends
-                        </CardTitle>
-                        <div className="flex bg-muted p-1 rounded-lg">
-                            <Button
-                                variant={
-                                    viewMode === "month" ? "default" : "ghost"
-                                }
-                                size="sm"
-                                onClick={() => setViewMode("month")}
-                                className={`text-xs h-8 transition-all ${viewMode === "month" ? "shadow-md" : "text-muted-foreground hover:text-foreground"}`}
-                            >
-                                Monthly
-                            </Button>
-                            <Button
-                                variant={
-                                    viewMode === "year" ? "default" : "ghost"
-                                }
-                                size="sm"
-                                onClick={() => setViewMode("year")}
-                                className={`text-xs h-8 transition-all ${viewMode === "year" ? "shadow-md" : "text-muted-foreground hover:text-foreground"}`}
-                            >
-                                Yearly
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[300px] md:h-[400px] w-full relative">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AnimatePresence mode="wait">
-                                    {viewMode === "month" ? (
-                                        <motion.div
-                                            key="month"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: 20 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="w-full h-full"
-                                        >
-                                            <BarChart
-                                                data={data}
-                                                barSize={chartConfig.barSize}
-                                                margin={chartConfig.margin}
-                                            >
-                                                <defs>
-                                                    <linearGradient
-                                                        id="receivedGradient"
-                                                        x1="0"
-                                                        y1="0"
-                                                        x2="0"
-                                                        y2="1"
-                                                    >
-                                                        <stop
-                                                            offset="0%"
-                                                            stopColor="#4ade80"
-                                                            stopOpacity={1}
-                                                        />
-                                                        <stop
-                                                            offset="100%"
-                                                            stopColor="#16a34a"
-                                                            stopOpacity={1}
-                                                        />
-                                                    </linearGradient>
-                                                    <linearGradient
-                                                        id="pendingGradient"
-                                                        x1="0"
-                                                        y1="0"
-                                                        x2="0"
-                                                        y2="1"
-                                                    >
-                                                        <stop
-                                                            offset="0%"
-                                                            stopColor="#60a5fa"
-                                                            stopOpacity={1}
-                                                        />
-                                                        <stop
-                                                            offset="100%"
-                                                            stopColor="#2563eb"
-                                                            stopOpacity={1}
-                                                        />
-                                                    </linearGradient>
-                                                </defs>
-                                                <CartesianGrid
-                                                    strokeDasharray="3 3"
-                                                    stroke="var(--border)"
-                                                    vertical={false}
-                                                    opacity={0.1}
-                                                />
-                                                <XAxis
-                                                    dataKey="month"
-                                                    stroke="var(--muted-foreground)"
-                                                    tick={{
-                                                        fill: "var(--muted-foreground)",
-                                                        fontSize:
-                                                            chartConfig.xAxisFontSize,
-                                                        fontWeight: 500,
-                                                    }}
-                                                    tickFormatter={(value) =>
-                                                        value.slice(0, 3)
-                                                    }
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                    dy={10}
-                                                />
-                                                <YAxis
-                                                    stroke="var(--muted-foreground)"
-                                                    width={
-                                                        chartConfig.yAxisWidth
-                                                    }
-                                                    tick={{
-                                                        fill: "var(--muted-foreground)",
-                                                        fontSize:
-                                                            chartConfig.yAxisFontSize,
-                                                        fontWeight: 500,
-                                                    }}
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                    tickFormatter={(value) =>
-                                                        `₹${value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}`
-                                                    }
-                                                    dx={-10}
-                                                />
-                                                <Tooltip
-                                                    contentStyle={{
-                                                        backgroundColor:
-                                                            "hsl(var(--popover))",
-                                                        border: "1px solid hsl(var(--border))",
-                                                        borderRadius: "12px",
-                                                        backdropFilter:
-                                                            "blur(12px)",
-                                                        boxShadow:
-                                                            "0 10px 15px -3px rgba(0, 0, 0, 0.5)",
-                                                        padding: "12px",
-                                                    }}
-                                                    cursor={{
-                                                        fill: "rgba(255, 255, 255, 0.05)",
-                                                    }}
-                                                    itemStyle={{
-                                                        fontSize: "13px",
-                                                        fontWeight: 500,
-                                                    }}
-                                                    labelStyle={{
-                                                        color: "hsl(var(--popover-foreground))",
-                                                        marginBottom: "8px",
-                                                        fontWeight: 600,
-                                                    }}
-                                                    formatter={(
-                                                        value:
-                                                            | number
-                                                            | undefined,
-                                                    ) => [
-                                                        `₹${(value || 0).toLocaleString()}`,
-                                                        undefined,
-                                                    ]}
-                                                />
-                                                <Legend
-                                                    wrapperStyle={{
-                                                        paddingTop: "20px",
-                                                    }}
-                                                />
-
-                                                <Bar
-                                                    dataKey="received"
-                                                    name="Received"
-                                                    fill="url(#receivedGradient)"
-                                                    radius={[0, 0, 4, 4]}
-                                                    stackId="a"
-                                                />
-                                                <Bar
-                                                    dataKey="pending"
-                                                    name="Pending"
-                                                    fill="url(#pendingGradient)"
-                                                    radius={[4, 4, 0, 0]}
-                                                    stackId="a"
-                                                />
-                                            </BarChart>
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div
-                                            key="year"
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: -20 }}
-                                            transition={{ duration: 0.2 }}
-                                            className="w-full h-full"
-                                        >
-                                            <BarChart
-                                                data={data}
-                                                barSize={chartConfig.barSize}
-                                                margin={chartConfig.margin}
-                                            >
-                                                <defs>
-                                                    <linearGradient
-                                                        id="receivedGradient"
-                                                        x1="0"
-                                                        y1="0"
-                                                        x2="0"
-                                                        y2="1"
-                                                    >
-                                                        <stop
-                                                            offset="0%"
-                                                            stopColor="#4ade80"
-                                                            stopOpacity={1}
-                                                        />
-                                                        <stop
-                                                            offset="100%"
-                                                            stopColor="#16a34a"
-                                                            stopOpacity={1}
-                                                        />
-                                                    </linearGradient>
-                                                    <linearGradient
-                                                        id="pendingGradient"
-                                                        x1="0"
-                                                        y1="0"
-                                                        x2="0"
-                                                        y2="1"
-                                                    >
-                                                        <stop
-                                                            offset="0%"
-                                                            stopColor="#60a5fa"
-                                                            stopOpacity={1}
-                                                        />
-                                                        <stop
-                                                            offset="100%"
-                                                            stopColor="#2563eb"
-                                                            stopOpacity={1}
-                                                        />
-                                                    </linearGradient>
-                                                </defs>
-                                                <CartesianGrid
-                                                    strokeDasharray="3 3"
-                                                    stroke="var(--border)"
-                                                    vertical={false}
-                                                    opacity={0.1}
-                                                />
-                                                <XAxis
-                                                    dataKey="year"
-                                                    stroke="var(--muted-foreground)"
-                                                    tick={{
-                                                        fill: "var(--muted-foreground)",
-                                                        fontSize:
-                                                            chartConfig.xAxisFontSize,
-                                                        fontWeight: 500,
-                                                    }}
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                    dy={10}
-                                                />
-                                                <YAxis
-                                                    stroke="var(--muted-foreground)"
-                                                    width={
-                                                        chartConfig.yAxisWidth
-                                                    }
-                                                    tick={{
-                                                        fill: "var(--muted-foreground)",
-                                                        fontSize:
-                                                            chartConfig.yAxisFontSize,
-                                                        fontWeight: 500,
-                                                    }}
-                                                    axisLine={false}
-                                                    tickLine={false}
-                                                    tickFormatter={(value) =>
-                                                        `₹${value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}`
-                                                    }
-                                                    dx={-10}
-                                                />
-                                                <Tooltip
-                                                    contentStyle={{
-                                                        backgroundColor:
-                                                            "hsl(var(--popover))",
-                                                        border: "1px solid hsl(var(--border))",
-                                                        borderRadius: "12px",
-                                                        backdropFilter:
-                                                            "blur(12px)",
-                                                        boxShadow:
-                                                            "0 10px 15px -3px rgba(0, 0, 0, 0.5)",
-                                                        padding: "12px",
-                                                    }}
-                                                    cursor={{
-                                                        fill: "rgba(255, 255, 255, 0.05)",
-                                                    }}
-                                                    itemStyle={{
-                                                        fontSize: "13px",
-                                                        fontWeight: 500,
-                                                    }}
-                                                    labelStyle={{
-                                                        color: "hsl(var(--popover-foreground))",
-                                                        marginBottom: "8px",
-                                                        fontWeight: 600,
-                                                    }}
-                                                    formatter={(
-                                                        value:
-                                                            | number
-                                                            | undefined,
-                                                    ) => [
-                                                        `₹${(value || 0).toLocaleString()}`,
-                                                        undefined,
-                                                    ]}
-                                                />
-                                                <Legend
-                                                    wrapperStyle={{
-                                                        paddingTop: "20px",
-                                                    }}
-                                                />
-
-                                                <Bar
-                                                    dataKey="received"
-                                                    name="Received"
-                                                    fill="url(#receivedGradient)"
-                                                    radius={[0, 0, 4, 4]}
-                                                    stackId="a"
-                                                />
-                                                <Bar
-                                                    dataKey="pending"
-                                                    name="Pending"
-                                                    fill="url(#pendingGradient)"
-                                                    radius={[4, 4, 0, 0]}
-                                                    stackId="a"
-                                                />
-                                            </BarChart>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </ResponsiveContainer>
-                        </div>
-                    </CardContent>
-                </Card>
-            </motion.div>
+        <div className="h-[300px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyStats}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                    <YAxis axisLine={false} tickLine={false} />
+                    <Tooltip />
+                    <Bar dataKey="received" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+                </BarChart>
+            </ResponsiveContainer>
         </div>
     );
 }

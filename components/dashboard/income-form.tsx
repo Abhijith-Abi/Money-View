@@ -147,41 +147,47 @@ export function IncomeForm({
                 {trigger || (
                     <Button
                         size="lg"
-                        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 z-50"
+                        className="fixed bottom-8 right-8 h-16 w-16 rounded-2xl shadow-[0_0_30px_rgba(212,175,55,0.3)] bg-primary hover:bg-primary/90 text-black font-bold z-50 transition-all hover:scale-110 active:scale-95 group"
                     >
-                        <Plus className="h-6 w-6" />
+                        <Plus className="h-8 w-8 transition-transform group-hover:rotate-90" />
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="glass bg-background/80 backdrop-blur-xl border border-white/20 dark:border-white/10 sm:max-w-[425px] shadow-2xl ring-1 ring-white/10">
-                <DialogHeader>
-                    <DialogTitle className="gradient-text bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-white dark:to-slate-400 text-2xl font-bold tracking-tight">
-                        {isEditing ? "Edit Entry" : "Add Income Entry"}
+            <DialogContent className="glass-gold border-white/10 dark:border-white/5 sm:max-w-[425px] p-0 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-none" />
+                
+                <DialogHeader className="p-8 pb-4">
+                    <DialogTitle className="text-white text-2xl font-bold tracking-tight">
+                        {isEditing ? "Edit Transaction" : "New Transaction"}
                     </DialogTitle>
-                    <DialogDescription className="text-muted-foreground/80 font-medium tracking-wide">
+                    <DialogDescription className="text-gray-400 font-medium">
                         {isEditing
-                            ? "Update the details of your transaction"
-                            : "Add a new income or expense entry to your financial tracker"}
+                            ? "Modify the details of this financial record"
+                            : "Record a new entry to your financial ledger"}
                     </DialogDescription>
                 </DialogHeader>
+
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="space-y-4"
+                        className="p-8 pt-2 space-y-6"
                     >
                         <FormField
                             control={form.control}
                             name="amount"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Amount (₹)</FormLabel>
+                                    <FormLabel className="text-gray-400 text-xs font-bold uppercase tracking-widest">Amount</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="29000"
-                                            inputMode="numeric"
-                                            {...field}
-                                            className="bg-muted/50 border-white/10 dark:border-white/5 focus:border-violet-500 focus:ring-violet-500/20 text-foreground placeholder:text-muted-foreground/60 font-medium transition-all duration-300 hover:bg-muted/80 backdrop-blur-sm shadow-inner"
-                                        />
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-bold">$</span>
+                                            <Input
+                                                placeholder="0.00"
+                                                inputMode="numeric"
+                                                {...field}
+                                                className="bg-white/5 border-white/10 focus:border-primary focus:ring-primary/20 text-white pl-8 h-12 font-bold text-lg"
+                                            />
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -194,23 +200,16 @@ export function IncomeForm({
                                 name="type"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Type</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
+                                        <FormLabel className="text-gray-400 text-xs font-bold uppercase tracking-widest">Type</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
-                                                <SelectTrigger className="bg-muted/50 border-white/10 dark:border-white/5 focus:border-violet-500 focus:ring-violet-500/20 text-foreground font-medium transition-all duration-300 hover:bg-muted/80 backdrop-blur-sm shadow-inner">
-                                                    <SelectValue placeholder="Select type" />
+                                                <SelectTrigger className="glass border-white/10 text-white h-11">
+                                                    <SelectValue placeholder="Type" />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent className="glass border-white/20 dark:border-slate-800/50 text-foreground bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl">
-                                                <SelectItem value="credit">
-                                                    Credit (Income)
-                                                </SelectItem>
-                                                <SelectItem value="debit">
-                                                    Debit (Expense)
-                                                </SelectItem>
+                                            <SelectContent className="glass-gold border-white/10 text-white">
+                                                <SelectItem value="credit">Credit</SelectItem>
+                                                <SelectItem value="debit">Debit</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -223,23 +222,16 @@ export function IncomeForm({
                                 name="status"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Status</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
+                                        <FormLabel className="text-gray-400 text-xs font-bold uppercase tracking-widest">Status</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
-                                                <SelectTrigger className="bg-white/30 dark:bg-black/30 border-white/20 dark:border-white/10 focus:border-primary focus:ring-primary/20 text-foreground font-medium transition-all duration-300 hover:bg-white/40 dark:hover:bg-black/40 backdrop-blur-sm">
-                                                    <SelectValue placeholder="Select status" />
+                                                <SelectTrigger className="glass border-white/10 text-white h-11">
+                                                    <SelectValue placeholder="Status" />
                                                 </SelectTrigger>
                                             </FormControl>
-                                            <SelectContent className="glass border-white/20 dark:border-slate-800/50 text-foreground bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl">
-                                                <SelectItem value="received">
-                                                    ✓ Received
-                                                </SelectItem>
-                                                <SelectItem value="pending">
-                                                    ⏳ Pending
-                                                </SelectItem>
+                                            <SelectContent className="glass-gold border-white/10 text-white">
+                                                <SelectItem value="received">Received</SelectItem>
+                                                <SelectItem value="pending">Pending</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -253,23 +245,16 @@ export function IncomeForm({
                             name="category"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Category</FormLabel>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value}
-                                    >
+                                    <FormLabel className="text-gray-400 text-xs font-bold uppercase tracking-widest">Category</FormLabel>
+                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl>
-                                            <SelectTrigger className="bg-white/30 dark:bg-black/30 border-white/20 dark:border-white/10 focus:border-primary focus:ring-primary/20 text-foreground font-medium transition-all duration-300 hover:bg-white/40 dark:hover:bg-black/40 backdrop-blur-sm">
-                                                <SelectValue placeholder="Select category" />
+                                            <SelectTrigger className="glass border-white/10 text-white h-11">
+                                                <SelectValue placeholder="Category" />
                                             </SelectTrigger>
                                         </FormControl>
-                                        <SelectContent className="glass border-white/20 dark:border-slate-800/50 text-foreground bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl">
-                                            <SelectItem value="primary">
-                                                Primary / Salary
-                                            </SelectItem>
-                                            <SelectItem value="secondary">
-                                                Secondary / Other
-                                            </SelectItem>
+                                        <SelectContent className="glass-gold border-white/10 text-white">
+                                            <SelectItem value="primary">Primary / Salary</SelectItem>
+                                            <SelectItem value="secondary">Secondary / Freelance</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />
@@ -277,93 +262,17 @@ export function IncomeForm({
                             )}
                         />
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <FormField
-                                control={form.control}
-                                name="month"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Month</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger className="bg-white/30 dark:bg-black/30 border-white/20 dark:border-white/10 focus:border-primary focus:ring-primary/20 text-foreground font-medium transition-all duration-300 hover:bg-white/40 dark:hover:bg-black/40 backdrop-blur-sm">
-                                                    <SelectValue placeholder="Select" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass border-white/20 dark:border-slate-800/50 text-foreground bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl">
-                                                {MONTHS.map((month) => (
-                                                    <SelectItem
-                                                        key={month}
-                                                        value={month}
-                                                    >
-                                                        {month}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="year"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel>Year</FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            defaultValue={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger className="bg-white/30 dark:bg-black/30 border-white/20 dark:border-white/10 focus:border-primary focus:ring-primary/20 text-foreground font-medium transition-all duration-300 hover:bg-white/40 dark:hover:bg-black/40 backdrop-blur-sm">
-                                                    <SelectValue placeholder="Select year" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass border-white/20 dark:border-slate-800/50 max-h-[200px] text-foreground bg-white/90 dark:bg-slate-950/90 backdrop-blur-xl">
-                                                {Array.from(
-                                                    {
-                                                        length:
-                                                            new Date().getFullYear() -
-                                                            2020 +
-                                                            2,
-                                                    },
-                                                    (_, i) => 2020 + i,
-                                                )
-                                                    .reverse()
-                                                    .map((year) => (
-                                                        <SelectItem
-                                                            key={year}
-                                                            value={year.toString()}
-                                                        >
-                                                            {year}
-                                                        </SelectItem>
-                                                    ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
                         <FormField
                             control={form.control}
                             name="description"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Description (Optional)
-                                    </FormLabel>
+                                    <FormLabel className="text-gray-400 text-xs font-bold uppercase tracking-widest">Description</FormLabel>
                                     <FormControl>
                                         <Input
-                                            placeholder="e.g., Monthly salary, freelance payment"
+                                            placeholder="What's this for?"
                                             {...field}
-                                            className="bg-white/30 dark:bg-black/30 border-white/20 dark:border-white/10 focus:border-primary focus:ring-primary/20 text-foreground placeholder:text-muted-foreground/60 font-medium transition-all duration-300 hover:bg-white/40 dark:hover:bg-black/40 backdrop-blur-sm"
+                                            className="bg-white/5 border-white/10 focus:border-primary text-white h-11"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -373,18 +282,15 @@ export function IncomeForm({
 
                         <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg"
+                            className="w-full bg-primary hover:bg-primary/90 text-black font-bold h-12 rounded-xl shadow-lg transition-all"
                             disabled={loading}
                         >
                             {loading ? (
-                                <>
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    {isEditing ? "Updating..." : "Adding..."}
-                                </>
+                                <Loader2 className="h-5 w-5 animate-spin" />
                             ) : isEditing ? (
-                                "Update Entry"
+                                "Update Transaction"
                             ) : (
-                                "Add Entry"
+                                "Confirm Transaction"
                             )}
                         </Button>
                     </form>

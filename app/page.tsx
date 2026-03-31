@@ -34,7 +34,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { MoneyLoader } from "@/components/ui/money-loader";
-import { Wallet, Briefcase } from "lucide-react";
+import { Wallet, Briefcase, Search } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -170,7 +170,7 @@ export default function Home() {
             {showLoader ? (
                 <motion.div
                     key="loader"
-                    className="min-h-screen flex items-center justify-center bg-gray-50/50 dark:bg-gray-950/50 backdrop-blur-sm fixed inset-0 z-50"
+                    className="min-h-screen flex items-center justify-center bg-[#050505] fixed inset-0 z-50"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -181,169 +181,150 @@ export default function Home() {
             ) : (
                 <motion.div
                     key="dashboard"
-                    className="min-h-screen relative overflow-hidden"
+                    className="min-h-screen p-6 lg:p-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.5 }}
                 >
-                    {/* Subtle gradient background */}
-                    <div
-                        className="fixed inset-0 bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 -z-10"
-                        style={{
-                            backgroundSize: "400% 400%",
-                            animation: "gradientFlow 20s ease infinite",
-                        }}
-                    />
-
-                    {/* Subtle floating particles */}
-                    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-                        {[...Array(6)].map((_, i) => (
-                            <motion.div
-                                key={i}
-                                className="absolute rounded-full bg-gradient-to-br from-purple-500/10 to-cyan-500/10 blur-2xl"
-                                style={{
-                                    width: Math.random() * 200 + 150,
-                                    height: Math.random() * 200 + 150,
-                                    left: `${Math.random() * 100}%`,
-                                    top: `${Math.random() * 100}%`,
-                                }}
-                                animate={{
-                                    y: [0, -40, 0],
-                                    x: [0, Math.random() * 30 - 15, 0],
-                                    scale: [1, 1.2, 1],
-                                }}
-                                transition={{
-                                    duration: Math.random() * 15 + 15,
-                                    repeat: Infinity,
-                                    ease: "easeInOut",
-                                    delay: Math.random() * 5,
-                                }}
-                            />
-                        ))}
-                    </div>
-
-                    <div className="relative p-3 md:p-6 lg:p-12">
-                        <div className="max-w-[1600px] mx-auto space-y-6 md:space-y-8">
-                            {/* Header */}
-                            <motion.div
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-                            >
-                                <div className="flex items-center gap-3 md:gap-4">
-                                    <motion.div
-                                        className="relative"
-                                        whileHover={{ scale: 1.05, rotate: 5 }}
-                                        transition={{
-                                            type: "spring",
-                                            stiffness: 400,
-                                            damping: 17,
-                                        }}
-                                    >
-                                        {/* Icon glow */}
-                                        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-2xl blur-md opacity-50" />
-                                        <div className="relative p-2.5 md:p-3 rounded-xl bg-gradient-to-r from-purple-600 via-purple-700 to-cyan-600">
-                                            <Wallet className="h-6 w-6 md:h-8 md:w-8 text-white" />
-                                        </div>
-                                    </motion.div>
-                                    <div>
-                                        <motion.h1
-                                            className="text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 via-primary to-cyan-500 dark:from-purple-200 dark:via-white dark:to-cyan-200 gradient-text"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.1 }}
-                                        >
-                                            Money View
-                                        </motion.h1>
-                                        <motion.p
-                                            className="text-sm md:text-base text-muted-foreground mt-0.5 md:mt-1"
-                                            initial={{ opacity: 0 }}
-                                            animate={{ opacity: 1 }}
-                                            transition={{ delay: 0.2 }}
-                                        >
-                                            Welcome back,{" "}
-                                            <span className="text-primary font-medium">
-                                                {user?.displayName?.split(
-                                                    " ",
-                                                )[0] || "there"}
-                                            </span>
-                                            !
-                                        </motion.p>
-                                    </div>
-                                </div>
-
-                                <motion.div
-                                    className="flex flex-wrap items-center justify-end gap-2 md:gap-3"
-                                    initial={{ opacity: 0, x: 20 }}
+                    <div className="max-w-[1600px] mx-auto space-y-8">
+                        {/* Header */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div>
+                                <motion.h1 
+                                    className="text-4xl font-bold text-white tracking-tight"
+                                    initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3 }}
                                 >
-                                    <label className="text-sm text-muted-foreground font-medium whitespace-nowrap hidden sm:block">
-                                        Year:
-                                    </label>
-                                    <Select
-                                        value={selectedYear.toString()}
-                                        onValueChange={(val) =>
-                                            setSelectedYear(Number(val))
-                                        }
-                                    >
-                                        <SelectTrigger className="w-24 md:w-32 glass border-white/10 hover:border-white/20 transition-colors h-9 md:h-10 text-xs md:text-sm">
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent className="glass border-white/10">
-                                            {years.map((year) => (
-                                                <SelectItem
-                                                    key={year}
-                                                    value={year.toString()}
-                                                >
-                                                    {year}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    Income Tracking
+                                </motion.h1>
+                                <motion.p 
+                                    className="text-gray-400 mt-1"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ delay: 0.1 }}
+                                >
+                                    Manage your finances with premium insights
+                                </motion.p>
+                            </div>
 
-                                    <Link href="/business">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="glass hover:bg-white/10"
-                                            title="Business Management"
-                                        >
-                                            <Briefcase className="h-5 w-5 text-purple-400" />
-                                        </Button>
-                                    </Link>
-                                    <NotificationBell />
-                                    <ModeToggle />
-                                    <UserProfile />
-                                </motion.div>
+                            <motion.div 
+                                className="flex items-center gap-3"
+                                initial={{ opacity: 0, x: 20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                            >
+                                <div className="glass px-4 py-2 rounded-xl flex items-center gap-2 text-sm text-gray-300">
+                                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                    {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                                </div>
+                                <Select
+                                    value={selectedYear.toString()}
+                                    onValueChange={(val) => setSelectedYear(Number(val))}
+                                >
+                                    <SelectTrigger className="w-[120px] glass border-none h-10">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="glass border-white/10">
+                                        {years.map((y) => (
+                                            <SelectItem key={y} value={y.toString()}>
+                                                {y}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Button className="bg-primary hover:bg-primary/80 text-black font-semibold rounded-xl h-10 px-6 transition-all shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                                    Generate Report
+                                </Button>
+                                <div className="p-2.5 glass rounded-xl cursor-pointer hover:bg-white/10 transition-colors">
+                                    <Search className="w-5 h-5 text-gray-400" />
+                                </div>
                             </motion.div>
+                        </div>
 
-                            {/* Stats Cards */}
-                            <StatsCards
-                                stats={yearlyStats}
-                                allTimeStats={allTimeStats}
-                                loading={loading}
-                            />
+                        {/* Bento Grid Layout */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-20">
+                            {/* Left Column - Large Chart */}
+                            <div className="lg:col-span-7 space-y-6">
+                                <section className="glass-gold rounded-[2rem] p-8 min-h-[460px] relative overflow-hidden group">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-white/90">Cash Flow Overview</h3>
+                                            <p className="text-sm text-gray-400">Monthly revenue trends</p>
+                                        </div>
+                                        <div className="glass px-4 py-1.5 rounded-full text-xs text-gray-400">
+                                            Line Graph
+                                        </div>
+                                    </div>
+                                    <IncomeCharts 
+                                        monthlyStats={monthlyStats}
+                                        annualStats={annualStats}
+                                        loading={loading}
+                                        variant="large"
+                                    />
+                                </section>
 
-                            {/* Table */}
-                            <IncomeTable
-                                entries={entries}
-                                loading={loading}
-                                onDelete={() => fetchData(true)}
-                            />
+                                {/* Bottom Left - Donut Chart */}
+                                <section className="glass rounded-[2rem] p-8 min-h-[380px]">
+                                    <div className="mb-6">
+                                        <h3 className="text-xl font-semibold text-white/90">Top Income Sources</h3>
+                                        <p className="text-sm text-gray-400">Distribution by category</p>
+                                    </div>
+                                    <IncomeCharts 
+                                        monthlyStats={monthlyStats}
+                                        annualStats={annualStats}
+                                        loading={loading}
+                                        variant="donut"
+                                    />
+                                </section>
+                            </div>
 
-                            {/* Charts */}
-                            <IncomeCharts
-                                monthlyStats={monthlyStats}
-                                annualStats={annualStats}
-                                loading={loading}
-                            />
+                            {/* Right Column */}
+                            <div className="lg:col-span-5 space-y-6">
+                                {/* Ledger Table */}
+                                <section className="glass rounded-[2rem] p-8 min-h-[460px] flex flex-col">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="text-xl font-semibold text-white/90">Customer Ledger</h3>
+                                        <IncomeForm
+                                            onSuccess={() => fetchData(true)}
+                                            defaultYear={selectedYear}
+                                            trigger={
+                                                <Button variant="outline" className="glass border-white/5 hover:bg-white/5 rounded-xl text-xs h-8">
+                                                    Add Transaction
+                                                </Button>
+                                            }
+                                        />
+                                    </div>
+                                    <div className="flex-1 overflow-hidden">
+                                        <IncomeTable
+                                            entries={entries.slice(0, 5)}
+                                            loading={loading}
+                                            onDelete={() => fetchData(true)}
+                                            minimal
+                                        />
+                                    </div>
+                                    <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
+                                        <span className="text-gray-400">Total Accounts Receivable</span>
+                                        <span className="text-2xl font-bold text-primary">
+                                            {loading ? "..." : `$${(yearlyStats?.total || 0).toLocaleString()}`}
+                                        </span>
+                                    </div>
+                                </section>
 
-                            {/* Floating Add Button */}
-                            <IncomeForm
-                                onSuccess={() => fetchData(true)}
-                                defaultYear={selectedYear}
-                            />
+                                {/* Financial Report Card */}
+                                <section className="glass rounded-[2rem] p-8 min-h-[380px]">
+                                    <div className="flex items-center justify-between mb-8">
+                                        <h3 className="text-xl font-semibold text-white/90">Real-Time Financial Report</h3>
+                                        <Button variant="outline" className="glass border-white/5 hover:bg-white/5 rounded-xl text-xs h-8">
+                                            Generate Report
+                                        </Button>
+                                    </div>
+                                    <StatsCards
+                                        stats={yearlyStats}
+                                        allTimeStats={allTimeStats}
+                                        loading={loading}
+                                        variant="detailed"
+                                    />
+                                </section>
+                            </div>
                         </div>
                     </div>
 
