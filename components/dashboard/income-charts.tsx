@@ -17,6 +17,8 @@ import {
     PieChart,
     Pie,
     Cell,
+    AreaChart,
+    Area,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,47 +67,56 @@ export function IncomeCharts({
         return (
             <div className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={monthlyStats} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                    <AreaChart data={monthlyStats} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                         <defs>
                             <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.1}/>
+                                <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
                                 <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
                         <XAxis 
                             dataKey="month" 
                             axisLine={false} 
                             tickLine={false} 
-                            tick={{ fill: "#9ca3af", fontSize: 12 }}
-                            tickFormatter={(val) => val.charAt(0)}
+                            tick={{ fill: "#6b7280", fontSize: 12 }}
+                            dy={10}
                         />
                         <YAxis 
                             axisLine={false} 
                             tickLine={false} 
-                            tick={{ fill: "#9ca3af", fontSize: 12 }}
+                            tick={{ fill: "#6b7280", fontSize: 12 }}
+                            hide={isMobile}
                         />
                         <Tooltip 
-                            contentStyle={{ backgroundColor: "#0f172a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }}
+                            contentStyle={{ 
+                                backgroundColor: "rgba(10, 10, 10, 0.9)", 
+                                border: "1px solid rgba(255,255,255,0.05)", 
+                                borderRadius: "16px",
+                                backdropFilter: "blur(10px)",
+                                boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+                            }}
                             itemStyle={{ color: "#fff" }}
+                            cursor={{ stroke: "rgba(255,255,255,0.1)", strokeWidth: 1 }}
+                        />
+                        <Area 
+                            type="monotone" 
+                            dataKey="received" 
+                            stroke="var(--primary)" 
+                            strokeWidth={4} 
+                            fillOpacity={1} 
+                            fill="url(#lineGradient)" 
+                            animationDuration={2000}
                         />
                         <Line 
                             type="monotone" 
                             dataKey="received" 
                             stroke="var(--primary)" 
-                            strokeWidth={3} 
+                            strokeWidth={0} 
                             dot={{ r: 4, fill: "var(--primary)", strokeWidth: 2, stroke: "#fff" }}
                             activeDot={{ r: 6, strokeWidth: 0 }}
                         />
-                        <Line 
-                            type="monotone" 
-                            dataKey="pending" 
-                            stroke="#ffffff" 
-                            strokeWidth={2} 
-                            strokeOpacity={0.3}
-                            dot={false}
-                        />
-                    </LineChart>
+                    </AreaChart>
                 </ResponsiveContainer>
             </div>
         );

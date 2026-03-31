@@ -247,7 +247,7 @@ export default function Home() {
                                 <section className="glass-gold rounded-[2rem] p-8 min-h-[460px] relative overflow-hidden group">
                                     <div className="flex items-center justify-between mb-8">
                                         <div>
-                                            <h3 className="text-xl font-semibold text-white/90">Cash Flow Overview</h3>
+                                            <h3 className="text-xl font-semibold text-white/90">Income Trends</h3>
                                             <p className="text-sm text-gray-400">Monthly revenue trends</p>
                                         </div>
                                         <div className="glass px-4 py-1.5 rounded-full text-xs text-gray-400">
