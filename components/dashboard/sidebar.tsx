@@ -27,7 +27,7 @@ const menuItems = [
 
 export function Sidebar() {
     const pathname = usePathname();
-    const { signOut } = useAuth();
+    const { logout } = useAuth();
 
     return (
         <div className="w-64 h-screen bg-[#0A0C10] border-r border-white/5 flex flex-col fixed left-0 top-0 z-50">
@@ -78,7 +78,7 @@ export function Sidebar() {
             {/* User Section / Logout */}
             <div className="p-4 border-t border-white/5">
                 <button
-                    onClick={() => signOut()}
+                    onClick={() => logout()}
                     className="flex items-center gap-4 px-4 py-3 w-full text-gray-400 hover:text-red-400 hover:bg-red-400/5 rounded-xl transition-all"
                 >
                     <LogOut className="w-5 h-5" />

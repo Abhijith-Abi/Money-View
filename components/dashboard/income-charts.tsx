@@ -12,6 +12,11 @@ import {
     Tooltip,
     Legend,
     ResponsiveContainer,
+    LineChart,
+    Line,
+    PieChart,
+    Pie,
+    Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +25,7 @@ interface IncomeChartsProps {
     monthlyStats: MonthlyStats[];
     annualStats: AnnualStats[];
     loading: boolean;
+    variant?: "default" | "large" | "donut";
 }
 
 function useMediaQuery(query: string) {

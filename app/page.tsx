@@ -304,7 +304,7 @@ export default function Home() {
                                     <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
                                         <span className="text-gray-400">Total Accounts Receivable</span>
                                         <span className="text-2xl font-bold text-primary">
-                                            {loading ? "..." : `$${(yearlyStats?.total || 0).toLocaleString()}`}
+                                            {loading ? "..." : `$${(yearlyStats?.totalPending || 0).toLocaleString()}`}
                                         </span>
                                     </div>
                                 </section>

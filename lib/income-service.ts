@@ -364,6 +364,9 @@ export async function getYearlyStats(year: number, userId: string): Promise<Year
   const totalSecondary = monthlyStats.reduce((sum, month) => sum + month.secondary, 0)
   const totalIncome = totalPrimary + totalSecondary
   
+  const totalPending = monthlyStats.reduce((sum, month) => sum + month.pending, 0)
+  const totalReceived = monthlyStats.reduce((sum, month) => sum + month.received, 0)
+  
   const monthlyAverage = totalIncome / 12
   
   const highestMonth = monthlyStats.reduce((max, month) => 
@@ -372,9 +375,12 @@ export async function getYearlyStats(year: number, userId: string): Promise<Year
   )
   
   return {
+    total: totalIncome, // Alias for backward compatibility and AnnualStats match
     totalIncome,
     totalPrimary,
     totalSecondary,
+    totalPending,
+    totalReceived,
     monthlyAverage,
     highestMonth,
   }

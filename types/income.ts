@@ -29,9 +29,12 @@ export interface AnnualStats {
 }
 
 export interface YearlyStats {
+  total: number
   totalIncome: number
   totalPrimary: number
   totalSecondary: number
+  totalPending: number
+  totalReceived: number
   monthlyAverage: number
   highestMonth: {
     month: string
