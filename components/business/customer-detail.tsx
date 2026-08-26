@@ -62,9 +62,9 @@ export function CustomerDetail({ customer, onBack }: CustomerDetailProps) {
         setDownloading(true);
         try {
             const balanceLabel =
-                customer.currentBalance > 0
-                    ? "Amount Receivable"
-                    : "Amount Payable";
+                customer.currentBalance < 0
+                    ? "Amount Due (Receivable)"
+                    : "Advance Balance (Payable)";
             const balanceValue = `₹${Math.abs(customer.currentBalance).toFixed(2)}`;
 
             await exportToPDF(
@@ -205,10 +205,10 @@ export function CustomerDetail({ customer, onBack }: CustomerDetailProps) {
                             <p
                                 className={cn(
                                     "text-3xl font-black tracking-tight",
-                                    customer.currentBalance > 0
-                                        ? "text-emerald-400"
-                                        : customer.currentBalance < 0
-                                          ? "text-rose-400"
+                                    customer.currentBalance < 0
+                                        ? "text-rose-400"
+                                        : customer.currentBalance > 0
+                                          ? "text-emerald-400"
                                           : "text-muted-foreground",
                                 )}
                             >
@@ -217,17 +217,17 @@ export function CustomerDetail({ customer, onBack }: CustomerDetailProps) {
                                     customer.currentBalance,
                                 ).toLocaleString("en-IN")}
                                 <span className="text-xs ml-1 uppercase font-bold text-muted-foreground">
-                                    {customer.currentBalance > 0
-                                        ? "Dr"
-                                        : customer.currentBalance < 0
-                                          ? "Cr"
+                                    {customer.currentBalance < 0
+                                        ? "Due (Dr)"
+                                        : customer.currentBalance > 0
+                                          ? "Adv (Cr)"
                                           : ""}
                                 </span>
                             </p>
                             <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">
-                                {customer.currentBalance > 0
+                                {customer.currentBalance < 0
                                     ? "Customer owes you this amount"
-                                    : customer.currentBalance < 0
+                                    : customer.currentBalance > 0
                                       ? "You owe this amount to customer"
                                       : "Accounts are currently settled"}
                             </p>

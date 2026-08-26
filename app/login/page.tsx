@@ -5,16 +5,17 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { Wallet, Loader2 } from "lucide-react";
+    Wallet,
+    Loader2,
+    Sparkles,
+    ShieldCheck,
+    TrendingUp,
+    Calculator,
+    Zap,
+    Lock,
+} from "lucide-react";
 import { MoneyLoader } from "@/components/ui/money-loader";
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 export default function LoginPage() {
     const { user, loading, signInWithGoogle } = useAuth();
@@ -40,200 +41,145 @@ export default function LoginPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950">
+            <div className="min-h-screen flex items-center justify-center bg-[#030712]">
                 <MoneyLoader />
             </div>
         );
     }
 
+    const featurePills = [
+        { icon: Calculator, label: "Automated EMI & Pending Months Tracking" },
+        { icon: TrendingUp, label: "Real-Time Income & Business Ledger" },
+        { icon: Zap, label: "Powered by Groq Financial AI" },
+    ];
+
     return (
-        <div className="min-h-screen relative overflow-hidden flex items-center justify-center p-6">
-            {/* Animated gradient background */}
-            <div
-                className="absolute inset-0 bg-gradient-to-br from-purple-900 via-slate-900 to-cyan-900"
-                style={{
-                    backgroundSize: "400% 400%",
-                    animation: "gradientFlow 15s ease infinite",
-                }}
-            />
-
-            {/* Additional gradient overlay */}
-            <div
-                className="absolute inset-0 bg-gradient-to-tr from-[#9999ff]/10 via-transparent to-blue-500/10"
-                style={{
-                    backgroundSize: "400% 400%",
-                    animation: "gradientFlow 20s ease infinite reverse",
-                }}
-            />
-
-            {/* Floating particles */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                {[...Array(15)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute rounded-full bg-gradient-to-br from-purple-400/20 to-cyan-400/20 blur-xl"
-                        style={{
-                            width: Math.random() * 300 + 100,
-                            height: Math.random() * 300 + 100,
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
-                        animate={{
-                            y: [0, -30, 0],
-                            x: [0, Math.random() * 40 - 20, 0],
-                            scale: [1, 1.1, 1],
-                        }}
-                        transition={{
-                            duration: Math.random() * 10 + 10,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: Math.random() * 5,
-                        }}
-                    />
-                ))}
+        <div className="min-h-screen relative overflow-hidden bg-[#030712] text-white flex items-center justify-center p-4 sm:p-6">
+            {/* Ambient Background Mesh & Lighting */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] bg-gradient-to-br from-purple-600/20 via-indigo-600/10 to-transparent blur-[140px] rounded-full animate-float-slow" />
+                <div className="absolute top-[30%] -right-[15%] w-[50vw] h-[50vw] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[150px] rounded-full animate-pulse-glow" />
+                <div className="absolute -bottom-[20%] left-[25%] w-[45vw] h-[45vw] bg-gradient-to-tr from-emerald-500/15 via-purple-900/15 to-transparent blur-[140px] rounded-full" />
+                <div className="absolute inset-0 bg-[radial-gradient(#ffffff0d_1px,transparent_1px)] [background-size:28px_28px] opacity-60" />
             </div>
 
-            {/* Main content */}
+            {/* Main Center Card */}
             <motion.div
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                initial={{ opacity: 0, scale: 0.95, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="w-full max-w-md relative z-10"
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="w-full max-w-[440px] relative z-10"
             >
-                {/* Glowing card wrapper */}
+                {/* Outer Glow Halo */}
                 <div className="relative">
-                    {/* Animated glow border */}
-                    <div
-                        className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-[#9999ff] to-cyan-600 rounded-2xl blur-lg opacity-50"
-                        style={{
-                            backgroundSize: "400% 400%",
-                            animation:
-                                "gradientFlow 8s ease infinite, glowPulse 3s ease-in-out infinite",
-                        }}
-                    />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/40 via-indigo-500/30 to-cyan-500/40 rounded-[2.5rem] blur-xl opacity-60 pointer-events-none" />
 
-                    {/* Main card */}
-                    <Card className="relative bg-slate-900/60 backdrop-blur-2xl border border-white/20 shadow-2xl overflow-hidden">
-                        {/* Gradient overlay on card */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
-
-                        <CardHeader className="text-center space-y-6 relative">
-                            {/* Icon container */}
+                    {/* Card Container */}
+                    <div className="relative rounded-[2.2rem] bg-slate-950/80 backdrop-blur-3xl border border-white/10 p-7 sm:p-9 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden space-y-7">
+                        {/* Header & Logo */}
+                        <div className="text-center space-y-3">
                             <motion.div
                                 className="flex justify-center"
-                                initial={{ opacity: 0, rotate: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, rotate: 360, scale: 1 }}
-                                transition={{
-                                    duration: 1,
-                                    ease: "easeOut",
-                                    delay: 0.2,
-                                }}
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 0.5, delay: 0.1 }}
                             >
                                 <div className="relative">
-                                    <div className="absolute -inset-2 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-3xl blur-md opacity-50" />
-                                    <div className="relative p-5 rounded-3xl bg-gradient-to-br from-purple-600 via-purple-700 to-cyan-600">
-                                        <Wallet className="h-12 w-12 text-white" />
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-0.5 shadow-[0_0_30px_rgba(168,85,247,0.5)]">
+                                        <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center">
+                                            <Wallet className="w-8 h-8 text-purple-400" />
+                                        </div>
                                     </div>
+                                    <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                                    </span>
                                 </div>
                             </motion.div>
 
-                            {/* Title */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6, delay: 0.4 }}
-                            >
-                                <CardTitle className="text-4xl font-bold bg-gradient-to-r from-white via-purple-200 to-cyan-200 gradient-text">
-                                    Money View
-                                </CardTitle>
-                            </motion.div>
+                            <div className="space-y-1 pt-1">
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px] font-extrabold uppercase tracking-widest">
+                                    <Sparkles className="w-3 h-3 text-amber-400" />
+                                    Financial Operating System
+                                </div>
+                                <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight pt-1">
+                                    MoneyView
+                                </h1>
+                                <p className="text-slate-400 text-xs font-medium">
+                                    Intelligent income tracking, ledgers & EMI analytics
+                                </p>
+                            </div>
+                        </div>
 
-                            {/* Description */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6, delay: 0.5 }}
-                            >
-                                <CardDescription className="text-slate-300 text-base">
-                                    Track your financial journey with ease
-                                </CardDescription>
-                            </motion.div>
-                        </CardHeader>
-
-                        <CardContent className="space-y-5 relative">
-                            {/* Sign in button */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.6, delay: 0.6 }}
-                            >
-                                <Button
-                                    onClick={handleSignIn}
-                                    disabled={signingIn}
-                                    className="w-full h-14 bg-white hover:bg-gray-50 text-gray-900 font-semibold text-base shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group"
-                                    size="lg"
+                        {/* Feature Highlights */}
+                        <div className="space-y-2 pt-1 border-t border-white/[0.06]">
+                            {featurePills.map((f, idx) => (
+                                <motion.div
+                                    key={f.label}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 + idx * 0.1 }}
+                                    className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04] text-xs text-slate-300 font-medium"
                                 >
-                                    {/* Button gradient overlay on hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-purple-100/0 via-purple-100/50 to-cyan-100/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+                                        <f.icon className="w-3.5 h-3.5" />
+                                    </div>
+                                    <span className="truncate">{f.label}</span>
+                                </motion.div>
+                            ))}
+                        </div>
 
-                                    <span className="relative flex items-center justify-center">
-                                        {signingIn ? (
-                                            <>
-                                                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                Signing in...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <svg
-                                                    className="mr-3 h-6 w-6"
-                                                    viewBox="0 0 24 24"
-                                                >
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                                    />
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                                    />
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                                    />
-                                                    <path
-                                                        fill="currentColor"
-                                                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                                    />
-                                                </svg>
-                                                Sign in with Google
-                                            </>
-                                        )}
-                                    </span>
-                                </Button>
-                            </motion.div>
-
-                            {/* Security text */}
-                            <motion.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.6, delay: 0.7 }}
-                                className="text-xs text-center text-slate-400"
+                        {/* Sign in Button */}
+                        <div className="space-y-3 pt-1">
+                            <Button
+                                onClick={handleSignIn}
+                                disabled={signingIn}
+                                className="w-full h-13 py-3.5 bg-white hover:bg-slate-100 text-slate-950 font-black text-sm rounded-2xl shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.35)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
                             >
-                                🔒 Secure authentication powered by Google
-                            </motion.p>
-                        </CardContent>
-                    </Card>
+                                {signingIn ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin text-slate-900" />
+                                        <span>Connecting to Google...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                                            <path
+                                                fill="#4285F4"
+                                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                            />
+                                            <path
+                                                fill="#34A853"
+                                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                            />
+                                            <path
+                                                fill="#FBBC05"
+                                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                            />
+                                            <path
+                                                fill="#EA4335"
+                                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                            />
+                                        </svg>
+                                        <span>Continue with Google</span>
+                                    </>
+                                )}
+                            </Button>
+
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
+                                <Lock className="w-3 h-3 text-emerald-400" />
+                                <span>End-to-end encrypted financial data</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Bottom text */}
-                <motion.p
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
-                    className="text-center text-sm text-slate-300 mt-8 font-medium"
-                >
-                    ✨ Your financial data is private and secure
-                </motion.p>
+                {/* Footer Note */}
+                <div className="text-center mt-6">
+                    <p className="text-xs text-slate-400 font-medium">
+                        By continuing, you agree to MoneyView&apos;s Secure Access terms.
+                    </p>
+                </div>
             </motion.div>
         </div>
     );

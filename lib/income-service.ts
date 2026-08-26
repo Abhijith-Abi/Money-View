@@ -397,13 +397,16 @@ export async function getAllTimeStats(userId: string): Promise<AllTimeStats> {
 
     const stats = entries.reduce(
       (acc, entry) => {
-        // Default to received if no status (backward compatibility)
-        const status = entry.status || 'received'
-        
-        if (status === 'pending') {
-          acc.totalPending += entry.amount
-        } else {
-          acc.totalReceived += entry.amount
+        if (entry.type === 'credit') {
+          // Default to received if no status (backward compatibility)
+          const status = entry.status || 'received'
+          const amount = Number(entry.amount) || 0
+          
+          if (status === 'pending') {
+            acc.totalPending += amount
+          } else {
+            acc.totalReceived += amount
+          }
         }
         return acc
       },

@@ -25,6 +25,7 @@ import { BusinessProfileCard } from "@/components/business/business-profile-card
 import { CustomerForm } from "@/components/business/customer-form";
 import { ReportsView } from "@/components/business/reports-view";
 import { RemindersList } from "@/components/business/reminders-list";
+import { EMICalculatorDialog } from "@/components/business/emi-calculator-dialog";
 import { getAllCustomers, deleteCustomer } from "@/lib/customer-service";
 import { Customer } from "@/types/customer";
 import { useToast } from "@/hooks/use-toast";
@@ -152,6 +153,7 @@ export default function BusinessManagementPage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
+                        <EMICalculatorDialog />
                         <NotificationBell />
                         <ModeToggle />
                     </div>
@@ -164,40 +166,40 @@ export default function BusinessManagementPage() {
                     className="space-y-6"
                 >
                     <div className="overflow-x-auto pb-2 -mx-2 px-2 hide-scrollbar">
-                        <TabsList className="bg-muted/50 border border-border p-1 w-max md:w-auto">
+                        <TabsList className="bg-slate-900/60 backdrop-blur-2xl border border-white/[0.08] p-1.5 rounded-2xl w-max md:w-auto h-auto gap-1">
                             <TabsTrigger
                                 value="dashboard"
-                                className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
                             >
-                                <LayoutDashboard className="h-4 w-4 mr-2" />
+                                <LayoutDashboard className="h-3.5 w-3.5 mr-2" />
                                 Dashboard
                             </TabsTrigger>
                             <TabsTrigger
                                 value="customers"
-                                className="data-[state=active]:bg-purple-600"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
                             >
-                                <Users className="h-4 w-4 mr-2" />
+                                <Users className="h-3.5 w-3.5 mr-2" />
                                 Customers
                             </TabsTrigger>
                             <TabsTrigger
                                 value="reports"
-                                className="data-[state=active]:bg-purple-600"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
                             >
-                                <BarChart3 className="h-4 w-4 mr-2" />
+                                <BarChart3 className="h-3.5 w-3.5 mr-2" />
                                 Reports
                             </TabsTrigger>
                             <TabsTrigger
                                 value="reminders"
-                                className="data-[state=active]:bg-purple-600"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
                             >
-                                <Bell className="h-4 w-4 mr-2" />
+                                <Bell className="h-3.5 w-3.5 mr-2" />
                                 Reminders
                             </TabsTrigger>
                             <TabsTrigger
                                 value="settings"
-                                className="data-[state=active]:bg-purple-600"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
                             >
-                                <Settings className="h-4 w-4 mr-2" />
+                                <Settings className="h-3.5 w-3.5 mr-2" />
                                 Settings
                             </TabsTrigger>
                         </TabsList>

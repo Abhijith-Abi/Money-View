@@ -161,11 +161,11 @@ export async function getCustomerStats(userId: string): Promise<CustomerStats> {
       activeCustomers: customers.filter((c) => c.status === 'active').length,
       inactiveCustomers: customers.filter((c) => c.status === 'inactive').length,
       totalReceivables: customers
-        .filter((c) => c.currentBalance > 0)
-        .reduce((sum, c) => sum + c.currentBalance, 0),
-      totalPayables: customers
         .filter((c) => c.currentBalance < 0)
         .reduce((sum, c) => sum + Math.abs(c.currentBalance), 0),
+      totalPayables: customers
+        .filter((c) => c.currentBalance > 0)
+        .reduce((sum, c) => sum + c.currentBalance, 0),
     }
     
     return stats
