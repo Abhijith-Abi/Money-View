@@ -121,16 +121,16 @@ export function AIAssistantWidget() {
     return (
         <>
             {/* Floating Trigger Button */}
-            <div className="fixed bottom-8 left-8 z-50">
+            <div className="fixed bottom-6 left-6 z-50">
                 <motion.button
                     whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.94 }}
                     onClick={() => setIsOpen(!isOpen)}
                     className={cn(
-                        "relative h-14 w-14 rounded-2xl shadow-2xl flex items-center justify-center transition-all duration-300",
+                        "relative h-13 w-13 p-3.5 rounded-2xl shadow-xl flex items-center justify-center transition-all duration-300",
                         isOpen
                             ? "bg-rose-500 text-white shadow-rose-500/30"
-                            : "bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 text-white shadow-purple-500/40"
+                            : "bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 text-white shadow-indigo-500/35 hover:shadow-indigo-500/50"
                     )}
                     aria-label="Toggle AI Assistant"
                 >
@@ -139,9 +139,9 @@ export function AIAssistantWidget() {
                     ) : (
                         <>
                             <Bot className="h-6 w-6" />
-                            <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-cyan-500"></span>
+                                <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400 border-2 border-background"></span>
                             </span>
                         </>
                     )}
@@ -156,22 +156,22 @@ export function AIAssistantWidget() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ duration: 0.25, ease: "easeOut" }}
-                        className="fixed bottom-24 left-4 sm:left-8 z-50 w-[92vw] sm:w-[420px] h-[550px] max-h-[82vh] rounded-[2rem] glass-gold border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden backdrop-blur-2xl"
+                        className="fixed bottom-22 left-4 sm:left-6 z-50 w-[92vw] sm:w-[420px] h-[550px] max-h-[82vh] rounded-[2rem] glass bg-card/95 text-card-foreground border border-border shadow-[0_20px_50px_rgba(0,0,0,0.35)] flex flex-col overflow-hidden backdrop-blur-2xl"
                     >
                         {/* Header */}
-                        <div className="p-4 px-5 border-b border-white/10 bg-gradient-to-r from-purple-900/40 via-indigo-900/30 to-black/60 flex items-center justify-between">
+                        <div className="p-4 px-5 border-b border-border/80 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 text-white flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                                <div className="p-2 rounded-xl bg-white/20 text-white border border-white/30 backdrop-blur-md">
                                     <Bot className="h-5 w-5" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-sm text-white flex items-center gap-1.5">
                                         MoneyView AI
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-extrabold uppercase tracking-widest border border-emerald-500/30">
+                                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 font-extrabold uppercase tracking-widest border border-emerald-400/30">
                                             Groq Fast
                                         </span>
                                     </h3>
-                                    <p className="text-[10px] text-gray-400">
+                                    <p className="text-[10px] text-white/80 font-medium">
                                         EMI & Financial Intelligence
                                     </p>
                                 </div>
@@ -180,7 +180,7 @@ export function AIAssistantWidget() {
                                 size="icon"
                                 variant="ghost"
                                 onClick={() => setIsOpen(false)}
-                                className="h-8 w-8 text-gray-400 hover:text-white rounded-lg"
+                                className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/10 rounded-lg"
                             >
                                 <X className="h-4 w-4" />
                             </Button>
@@ -194,14 +194,14 @@ export function AIAssistantWidget() {
                                     className={cn(
                                         "flex flex-col max-w-[85%] rounded-2xl p-3 space-y-1",
                                         msg.role === "user"
-                                            ? "ml-auto bg-purple-600 text-white rounded-br-none shadow-md"
-                                            : "mr-auto bg-white/5 border border-white/10 text-gray-200 rounded-bl-none shadow-sm"
+                                            ? "ml-auto bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-br-none shadow-md"
+                                            : "mr-auto bg-muted/80 text-foreground border border-border/60 rounded-bl-none shadow-sm"
                                     )}
                                 >
                                     <div className="whitespace-pre-wrap leading-relaxed">
                                         {msg.content}
                                     </div>
-                                    <span className="text-[9px] opacity-40 self-end">
+                                    <span className="text-[9px] opacity-60 self-end">
                                         {msg.timestamp.toLocaleTimeString([], {
                                             hour: "2-digit",
                                             minute: "2-digit",
@@ -210,8 +210,8 @@ export function AIAssistantWidget() {
                                 </div>
                             ))}
                             {loading && (
-                                <div className="mr-auto bg-white/5 border border-white/10 rounded-2xl rounded-bl-none p-3 flex items-center gap-2 text-gray-400">
-                                    <Loader2 className="h-4 w-4 animate-spin text-purple-400" />
+                                <div className="mr-auto bg-muted/80 border border-border/60 rounded-2xl rounded-bl-none p-3 flex items-center gap-2 text-muted-foreground">
+                                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
                                     <span>Calculating with Groq AI...</span>
                                 </div>
                             )}
@@ -220,12 +220,12 @@ export function AIAssistantWidget() {
 
                         {/* Quick Prompts */}
                         {messages.length <= 2 && (
-                            <div className="px-4 py-2 flex flex-wrap gap-1.5 border-t border-white/5 bg-black/20">
+                            <div className="px-4 py-2 flex flex-wrap gap-1.5 border-t border-border/60 bg-muted/30">
                                 {quickPrompts.map((prompt) => (
                                     <button
                                         key={prompt}
                                         onClick={() => handleSendMessage(prompt)}
-                                        className="text-[10px] px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-purple-300 border border-white/10 transition-colors truncate max-w-full text-left"
+                                        className="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 transition-colors truncate max-w-full text-left font-semibold"
                                     >
                                         💡 {prompt}
                                     </button>
@@ -234,7 +234,7 @@ export function AIAssistantWidget() {
                         )}
 
                         {/* Input Footer */}
-                        <div className="p-3 border-t border-white/10 bg-black/40">
+                        <div className="p-3 border-t border-border/80 bg-card">
                             <form
                                 onSubmit={(e) => {
                                     e.preventDefault();
@@ -246,14 +246,14 @@ export function AIAssistantWidget() {
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     placeholder="Ask anything about EMI, loans, or finances..."
-                                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 text-xs h-10 rounded-xl focus:border-purple-500"
+                                    className="bg-muted/60 border-border text-foreground placeholder:text-muted-foreground text-xs h-10 rounded-xl focus:border-primary"
                                     disabled={loading}
                                 />
                                 <Button
                                     type="submit"
                                     size="icon"
                                     disabled={!inputValue.trim() || loading}
-                                    className="h-10 w-10 shrink-0 bg-purple-600 hover:bg-purple-700 text-white rounded-xl shadow-lg transition-all"
+                                    className="h-10 w-10 shrink-0 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 hover:from-violet-500 hover:to-cyan-500 text-white rounded-xl shadow-md shadow-indigo-500/20 transition-all"
                                 >
                                     <Send className="h-4 w-4" />
                                 </Button>

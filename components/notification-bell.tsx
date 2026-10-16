@@ -75,12 +75,12 @@ export function NotificationBell() {
             {/* Bell Button */}
             <button
                 onClick={() => setOpen((prev) => !prev)}
-                className="relative p-2 rounded-full hover:bg-purple-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                className="relative glass h-9 w-9 rounded-xl border border-border/80 flex items-center justify-center hover:bg-accent transition-colors"
                 aria-label="Notifications"
             >
-                <Bell className="h-5 w-5 text-purple-500" />
+                <Bell className="h-4 w-4 text-foreground" />
                 {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[10px] font-bold text-white">
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-[9px] font-bold text-white shadow-sm">
                         {unreadCount > 9 ? "9+" : unreadCount}
                     </span>
                 )}
@@ -88,7 +88,7 @@ export function NotificationBell() {
 
             {/* Dropdown Panel */}
             {open && (
-                <div className="fixed inset-x-3 top-[72px] md:absolute md:inset-auto md:right-0 md:top-11 z-[100] md:w-[360px] max-h-[80vh] md:max-h-[520px] flex flex-col rounded-xl border bg-popover text-popover-foreground shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="fixed inset-x-3 top-[72px] md:absolute md:inset-auto md:right-0 md:top-11 z-[100] md:w-[360px] max-h-[80vh] md:max-h-[520px] flex flex-col rounded-2xl border border-border/80 glass bg-popover/95 text-popover-foreground shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b">
                         <div className="flex items-center gap-2">

@@ -99,14 +99,18 @@ export function IncomeCharts({
     const yearlyData = annualStats.filter((stat) => stat.year >= 2020);
 
     return (
-        <Card className="glass relative overflow-hidden rounded-2xl border-border/70 shadow-sm dark:shadow-2xl">
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2">
+        <Card className="glass relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/[0.08] shadow-sm dark:shadow-2xl">
+            {/* Top Gradient Accent */}
+            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 pt-5">
                 <div>
                     <CardTitle className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                        <TrendingUp className="w-5 h-5 text-primary" />
+                        <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                            <TrendingUp className="w-4 h-4" />
+                        </div>
                         Income Trends & Analytics
                     </CardTitle>
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-muted-foreground mt-0.5 font-medium">
                         {viewMode === "month"
                             ? `Monthly overview for year ${selectedYear}`
                             : "Year-over-year annual income comparison"}
@@ -114,15 +118,15 @@ export function IncomeCharts({
                 </div>
 
                 {/* View Mode Toggle: Monthly vs Yearly */}
-                <div className="flex bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border w-fit">
+                <div className="flex bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border/70 w-fit">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setViewMode("month")}
-                        className={`text-xs h-7 px-3 rounded-lg font-semibold transition-all ${
+                        className={`text-xs h-7 px-3 rounded-lg font-bold transition-all ${
                             viewMode === "month"
-                                ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary"
-                                : "text-muted-foreground hover:text-foreground"
+                                ? "bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/20"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         }`}
                     >
                         <Calendar className="w-3.5 h-3.5 mr-1.5" />
@@ -132,10 +136,10 @@ export function IncomeCharts({
                         variant="ghost"
                         size="sm"
                         onClick={() => setViewMode("year")}
-                        className={`text-xs h-7 px-3 rounded-lg font-semibold transition-all ${
+                        className={`text-xs h-7 px-3 rounded-lg font-bold transition-all ${
                             viewMode === "year"
-                                ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary"
-                                : "text-muted-foreground hover:text-foreground"
+                                ? "bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/20"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                         }`}
                     >
                         <BarChart3 className="w-3.5 h-3.5 mr-1.5" />
@@ -175,12 +179,12 @@ export function IncomeCharts({
                                         >
                                             <stop
                                                 offset="5%"
-                                                stopColor="#9333ea"
-                                                stopOpacity={0.4}
+                                                stopColor="#6366f1"
+                                                stopOpacity={0.45}
                                             />
                                             <stop
                                                 offset="95%"
-                                                stopColor="#9333ea"
+                                                stopColor="#6366f1"
                                                 stopOpacity={0.0}
                                             />
                                         </linearGradient>
@@ -245,7 +249,7 @@ export function IncomeCharts({
                                         type="monotone"
                                         dataKey="received"
                                         name="Received (Paid)"
-                                        stroke="#9333ea"
+                                        stroke="#6366f1"
                                         strokeWidth={2.5}
                                         fillOpacity={1}
                                         fill="url(#receivedGrad)"

@@ -56,41 +56,41 @@ export function BusinessDashboard() {
             title: "Total Customers",
             value: stats?.totalCustomers || 0,
             icon: Users,
-            color: "text-white",
-            border: "hover:border-blue-500/40",
-            iconBg: "bg-blue-500/20 text-blue-400 border border-blue-500/30",
+            color: "text-foreground",
+            topGradient: "from-violet-500 to-indigo-600",
+            iconBg: "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20",
             badge: "Customer Base",
-            badgeColor: "bg-blue-500/10 text-blue-300 border-blue-500/20",
+            badgeColor: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/25",
         },
         {
             title: "Total Receivables",
             value: formatCurrency(stats?.totalReceivables || 0),
             icon: ArrowDownCircle,
-            color: "text-emerald-400",
-            border: "hover:border-emerald-500/40",
-            iconBg: "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30",
+            color: "text-emerald-600 dark:text-emerald-400",
+            topGradient: "from-emerald-500 to-teal-500",
+            iconBg: "bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20",
             badge: "Due From Customers",
-            badgeColor: "bg-emerald-500/10 text-emerald-300 border-emerald-500/20",
+            badgeColor: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25",
         },
         {
             title: "Total Payables",
             value: formatCurrency(stats?.totalPayables || 0),
             icon: ArrowUpCircle,
-            color: "text-rose-400",
-            border: "hover:border-rose-500/40",
-            iconBg: "bg-rose-500/20 text-rose-400 border border-rose-500/30",
+            color: "text-rose-600 dark:text-rose-400",
+            topGradient: "from-rose-500 to-pink-500",
+            iconBg: "bg-gradient-to-tr from-rose-500 to-pink-600 text-white shadow-md shadow-rose-500/20",
             badge: "Advance Held",
-            badgeColor: "bg-rose-500/10 text-rose-300 border-rose-500/20",
+            badgeColor: "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/25",
         },
         {
             title: "Active Accounts",
             value: stats?.activeCustomers || 0,
             icon: Activity,
-            color: "text-purple-400",
-            border: "hover:border-purple-500/40",
-            iconBg: "bg-purple-500/20 text-purple-400 border border-purple-500/30",
+            color: "text-foreground",
+            topGradient: "from-cyan-500 to-blue-600",
+            iconBg: "bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-500/20",
             badge: "Transacting",
-            badgeColor: "bg-purple-500/10 text-purple-300 border-purple-500/20",
+            badgeColor: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/25",
         },
     ];
 
@@ -150,24 +150,21 @@ export function BusinessDashboard() {
                         transition={{ delay: index * 0.08 }}
                         whileHover={{ y: -3 }}
                     >
-                        <div
-                            className={cn(
-                                "p-5 rounded-2xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] backdrop-blur-2xl border border-white/[0.08] shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all duration-300 relative overflow-hidden",
-                                stat.border
-                            )}
-                        >
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-xs font-semibold text-slate-400 tracking-tight">
+                        <div className="glass-card relative overflow-hidden rounded-2xl p-5 border border-slate-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md dark:shadow-2xl transition-all duration-300">
+                            {/* Top Gradient Accent */}
+                            <div className={`absolute inset-x-0 top-0 h-[2.5px] bg-gradient-to-r ${stat.topGradient}`} />
+                            <div className="flex items-center justify-between mb-3 relative z-10">
+                                <span className="text-xs font-bold text-muted-foreground tracking-tight">
                                     {stat.title}
                                 </span>
-                                <div className={cn("p-2 rounded-xl", stat.iconBg)}>
+                                <div className={cn("p-2 rounded-xl shrink-0", stat.iconBg)}>
                                     <stat.icon className="h-4 w-4" />
                                 </div>
                             </div>
-                            <div className={cn("text-2xl font-black tracking-tight", stat.color)}>
+                            <div className={cn("text-2xl font-black tracking-tight relative z-10", stat.color)}>
                                 {loading ? "..." : stat.value}
                             </div>
-                            <div className="mt-3 flex items-center justify-between pt-1 border-t border-white/[0.04]">
+                            <div className="mt-3 flex items-center justify-between pt-1 border-t border-border/50 relative z-10">
                                 <span
                                     className={cn(
                                         "text-[9px] font-extrabold px-2 py-0.5 rounded-full border uppercase tracking-wider",
@@ -176,8 +173,8 @@ export function BusinessDashboard() {
                                 >
                                     {stat.badge}
                                 </span>
-                                <span className="text-[10px] text-slate-400 flex items-center gap-0.5">
-                                    <Sparkles className="w-2.5 h-2.5 text-purple-400" /> Active
+                                <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-semibold">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active
                                 </span>
                             </div>
                         </div>

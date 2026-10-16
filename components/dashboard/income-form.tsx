@@ -146,7 +146,7 @@ export function IncomeForm({
                 {trigger || (
                     <Button
                         size="icon"
-                        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold z-50 transition-all hover:scale-105 active:scale-95 group"
+                        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold z-50 transition-all hover:scale-105 active:scale-95 group shadow-indigo-500/35 hover:shadow-indigo-500/50"
                     >
                         <Plus className="h-6 w-6 transition-transform group-hover:rotate-90" />
                         <span className="sr-only">Add Income Entry</span>
@@ -154,6 +154,8 @@ export function IncomeForm({
                 )}
             </DialogTrigger>
             <DialogContent className="glass bg-card/95 text-card-foreground border-border sm:max-w-[440px] p-0 overflow-hidden rounded-2xl shadow-2xl">
+                {/* Top Gradient Accent */}
+                <div className="h-[3px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
                 <div className="p-6 pb-2">
                     <DialogHeader className="space-y-1">
                         <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
@@ -368,7 +370,7 @@ export function IncomeForm({
 
                         <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold h-11 rounded-xl shadow-md transition-all mt-2"
+                            className="w-full bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold h-11 rounded-xl shadow-lg shadow-indigo-500/25 transition-all mt-2"
                             disabled={loading}
                         >
                             {loading ? (

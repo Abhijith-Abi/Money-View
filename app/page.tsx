@@ -202,11 +202,11 @@ export default function Home() {
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4 }}
                 >
-                    {/* Subtle ambient lighting background */}
+                    {/* Subtle modern ambient background mesh */}
                     <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-                        <div className="absolute -top-[15%] -left-[10%] w-[45vw] h-[45vw] bg-purple-500/10 dark:bg-purple-600/15 blur-[120px] rounded-full animate-float-slow" />
-                        <div className="absolute top-[30%] -right-[10%] w-[40vw] h-[40vw] bg-cyan-500/10 dark:bg-cyan-600/15 blur-[130px] rounded-full animate-pulse-glow" />
-                        <div className="absolute -bottom-[15%] left-[25%] w-[40vw] h-[40vw] bg-emerald-500/10 dark:bg-emerald-600/10 blur-[130px] rounded-full" />
+                        <div className="absolute -top-[15%] -left-[10%] w-[50vw] h-[50vw] bg-indigo-500/10 dark:bg-indigo-600/15 blur-[140px] rounded-full animate-float-slow" />
+                        <div className="absolute top-[25%] -right-[10%] w-[45vw] h-[45vw] bg-cyan-500/10 dark:bg-cyan-600/15 blur-[140px] rounded-full animate-pulse-glow" />
+                        <div className="absolute -bottom-[15%] left-[20%] w-[45vw] h-[45vw] bg-violet-500/10 dark:bg-violet-600/10 blur-[140px] rounded-full" />
                     </div>
 
                     <div className="p-4 sm:p-6 lg:p-8">
@@ -220,16 +220,16 @@ export default function Home() {
                                 {/* Brand & User Greeting */}
                                 <div className="flex items-center gap-3.5 sm:gap-4">
                                     <div className="relative">
-                                        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-2xl blur-md opacity-50" />
-                                        <div className="relative p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 shadow-md">
+                                        <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 rounded-2xl blur-md opacity-40" />
+                                        <div className="relative p-2.5 sm:p-3 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 shadow-lg shadow-indigo-500/25">
                                             <Wallet className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
                                         </div>
                                     </div>
                                     <div>
-                                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-foreground bg-gradient-to-r from-purple-600 via-primary to-cyan-600 dark:from-purple-300 dark:via-white dark:to-cyan-300 gradient-text">
+                                        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight gradient-text">
                                             Money View
                                         </h1>
-                                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 font-medium">
                                             Welcome back,{" "}
                                             <span className="text-primary font-bold">
                                                 {user?.displayName?.split(" ")[0] || "there"}
@@ -242,7 +242,7 @@ export default function Home() {
                                 {/* Controls Toolbar */}
                                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                                     {/* Year Selector */}
-                                    <div className="flex items-center gap-1.5 glass rounded-xl px-2.5 py-1 border-border">
+                                    <div className="flex items-center gap-1.5 glass rounded-xl px-2.5 py-1 border border-border/80">
                                         <span className="text-xs text-muted-foreground font-semibold">
                                             Year:
                                         </span>
@@ -284,7 +284,7 @@ export default function Home() {
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            className="glass border-border hover:bg-accent font-semibold text-xs h-9"
+                                            className="glass border-border/80 hover:bg-accent font-semibold text-xs h-9"
                                             title="Business Management"
                                         >
                                             <Briefcase className="h-4 w-4 mr-1.5 text-primary" />
@@ -297,7 +297,7 @@ export default function Home() {
                                         onSuccess={() => fetchData(true)}
                                         defaultYear={effectiveYearNumber}
                                         trigger={
-                                            <Button className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl h-9 px-3.5 text-xs shadow-md transition-all flex items-center gap-1.5">
+                                            <Button className="bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold rounded-xl h-9 px-3.5 text-xs shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition-all flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]">
                                                 <Plus className="h-3.5 w-3.5" />
                                                 <span>Add Entry</span>
                                             </Button>

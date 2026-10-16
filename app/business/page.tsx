@@ -139,15 +139,15 @@ export default function BusinessManagementPage() {
                             variant="ghost"
                             size="icon"
                             onClick={() => router.push("/")}
-                            className="glass hover:bg-white/10"
+                            className="glass border-border/80 hover:bg-accent"
                         >
                             <ChevronLeft className="h-5 w-5" />
                         </Button>
                         <div>
-                            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                            <h1 className="text-3xl font-black gradient-text tracking-tight">
                                 Business Management
                             </h1>
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-muted-foreground text-sm font-medium">
                                 Manage customers, ledgers, and reports
                             </p>
                         </div>
@@ -166,38 +166,38 @@ export default function BusinessManagementPage() {
                     className="space-y-6"
                 >
                     <div className="overflow-x-auto pb-2 -mx-2 px-2 hide-scrollbar">
-                        <TabsList className="bg-slate-900/60 backdrop-blur-2xl border border-white/[0.08] p-1.5 rounded-2xl w-max md:w-auto h-auto gap-1">
+                        <TabsList className="glass p-1.5 rounded-2xl w-max md:w-auto h-auto gap-1 border-border/80">
                             <TabsTrigger
                                 value="dashboard"
-                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:via-indigo-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-indigo-500/20 text-muted-foreground hover:text-foreground"
                             >
                                 <LayoutDashboard className="h-3.5 w-3.5 mr-2" />
                                 Dashboard
                             </TabsTrigger>
                             <TabsTrigger
                                 value="customers"
-                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:via-indigo-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-indigo-500/20 text-muted-foreground hover:text-foreground"
                             >
                                 <Users className="h-3.5 w-3.5 mr-2" />
                                 Customers
                             </TabsTrigger>
                             <TabsTrigger
                                 value="reports"
-                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:via-indigo-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-indigo-500/20 text-muted-foreground hover:text-foreground"
                             >
                                 <BarChart3 className="h-3.5 w-3.5 mr-2" />
                                 Reports
                             </TabsTrigger>
                             <TabsTrigger
                                 value="reminders"
-                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:via-indigo-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-indigo-500/20 text-muted-foreground hover:text-foreground"
                             >
                                 <Bell className="h-3.5 w-3.5 mr-2" />
                                 Reminders
                             </TabsTrigger>
                             <TabsTrigger
                                 value="settings"
-                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-[0_0_15px_rgba(168,85,247,0.35)] text-slate-400 hover:text-white"
+                                className="rounded-xl px-4 py-2 text-xs font-bold transition-all data-[state=active]:bg-gradient-to-r data-[state=active]:from-violet-600 data-[state=active]:via-indigo-600 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=active]:shadow-indigo-500/20 text-muted-foreground hover:text-foreground"
                             >
                                 <Settings className="h-3.5 w-3.5 mr-2" />
                                 Settings

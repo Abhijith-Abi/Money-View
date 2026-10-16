@@ -72,9 +72,11 @@ export default function LoginPage() {
                     <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 via-indigo-500/20 to-cyan-500/30 rounded-[2.5rem] blur-xl opacity-60 pointer-events-none" />
 
                     {/* Card Container */}
-                    <div className="relative rounded-[2rem] glass bg-card/90 backdrop-blur-2xl border border-border p-7 sm:p-9 shadow-2xl overflow-hidden space-y-6">
+                    <div className="relative rounded-[2rem] glass bg-card/95 backdrop-blur-2xl border border-border p-7 sm:p-9 shadow-2xl overflow-hidden space-y-6">
+                        {/* Top Gradient Accent */}
+                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
                         {/* Header & Logo */}
-                        <div className="text-center space-y-3">
+                        <div className="text-center space-y-3 pt-2">
                             <motion.div
                                 className="flex justify-center"
                                 initial={{ opacity: 0, scale: 0.8 }}
@@ -82,7 +84,7 @@ export default function LoginPage() {
                                 transition={{ duration: 0.5, delay: 0.1 }}
                             >
                                 <div className="relative">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 p-0.5 shadow-lg">
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 p-0.5 shadow-lg shadow-indigo-500/30">
                                         <div className="w-full h-full bg-card rounded-[14px] flex items-center justify-center">
                                             <Wallet className="w-8 h-8 text-primary" />
                                         </div>
@@ -99,7 +101,7 @@ export default function LoginPage() {
                                     <Sparkles className="w-3 h-3 text-amber-500" />
                                     Financial Operating System
                                 </div>
-                                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground pt-1 bg-gradient-to-r from-purple-600 via-primary to-cyan-600 dark:from-purple-300 dark:via-white dark:to-cyan-300 gradient-text">
+                                <h1 className="text-3xl sm:text-4xl font-black tracking-tight gradient-text pt-1">
                                     Money View
                                 </h1>
                                 <p className="text-muted-foreground text-xs font-medium">
@@ -131,7 +133,7 @@ export default function LoginPage() {
                             <Button
                                 onClick={handleSignIn}
                                 disabled={signingIn}
-                                className="w-full h-12 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-3"
+                                className="w-full h-12 py-3 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3"
                             >
                                 {signingIn ? (
                                     <>

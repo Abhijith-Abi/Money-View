@@ -30,13 +30,14 @@ import {
     TrendingUp,
     TrendingDown,
     Hourglass,
-    CheckCircle,
+    CheckCircle2,
     Pencil,
     ArrowUp,
     ArrowDown,
     Calendar,
     ArrowDownLeft,
     ArrowUpRight,
+    Wallet,
 } from "lucide-react";
 import { IncomeForm } from "./income-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -205,7 +206,7 @@ export function IncomeTable({
                 description: `Transaction marked as ${newStatus}`,
                 duration: 1500,
             });
-            onDelete(); // Refresh data
+            onDelete();
         } catch (error) {
             toast({
                 title: "Error",
@@ -261,25 +262,25 @@ export function IncomeTable({
     }
 
     return (
-        <Card className="glass relative overflow-hidden rounded-2xl border-border/70 shadow-sm dark:shadow-2xl">
-            <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4 space-y-4">
+        <Card className="glass relative overflow-hidden rounded-2xl border border-border/80 shadow-sm dark:shadow-2xl">
+            <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4 space-y-5">
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                     <div>
-                        <CardTitle className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                        <CardTitle className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
                             Recent Transactions
-                            <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold">
+                            <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold">
                                 {filteredAndSortedEntries.length} Records
                             </span>
                         </CardTitle>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                            Track, filter, and manage your income and expenses
+                        <p className="text-xs text-muted-foreground mt-0.5 font-medium">
+                            Track, filter, and manage your income streams and expenditures
                         </p>
                     </div>
 
                     {/* Filter and Sorting Toolbar */}
                     <div className="flex flex-wrap items-center gap-2">
-                        {/* Year Filter */}
-                        <div className="flex items-center gap-1.5 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border">
+                        {/* Year Selector */}
+                        <div className="flex items-center gap-1.5 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border/70">
                             <Calendar className="w-3.5 h-3.5 text-muted-foreground ml-1.5" />
                             <Select
                                 value={tableYearFilter}
@@ -290,18 +291,18 @@ export function IncomeTable({
                                     }
                                 }}
                             >
-                                <SelectTrigger className="h-7 border-none bg-transparent shadow-none text-xs font-semibold focus:ring-0 w-[100px]">
+                                <SelectTrigger className="h-7 border-none bg-transparent shadow-none text-xs font-bold focus:ring-0 w-[100px]">
                                     <SelectValue placeholder="Year" />
                                 </SelectTrigger>
                                 <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                    <SelectItem value="all" className="text-xs font-medium">
+                                    <SelectItem value="all" className="text-xs font-semibold">
                                         All Years
                                     </SelectItem>
                                     {availableYears.map((y) => (
                                         <SelectItem
                                             key={y}
                                             value={y.toString()}
-                                            className="text-xs font-medium"
+                                            className="text-xs font-semibold"
                                         >
                                             {y}
                                         </SelectItem>
@@ -311,16 +312,16 @@ export function IncomeTable({
                         </div>
 
                         {/* Status Filter */}
-                        <div className="flex items-center gap-1 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border">
+                        <div className="flex items-center gap-1 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border/70">
                             {(["all", "received", "pending"] as StatusFilter[]).map((status) => (
                                 <button
                                     key={status}
                                     type="button"
                                     onClick={() => setStatusFilter(status)}
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all ${
+                                    className={`px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
                                         statusFilter === status
-                                            ? "bg-primary text-primary-foreground shadow-sm"
-                                            : "text-muted-foreground hover:text-foreground"
+                                            ? "bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/20"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                                     }`}
                                 >
                                     {status}
@@ -329,16 +330,16 @@ export function IncomeTable({
                         </div>
 
                         {/* Category Filter */}
-                        <div className="flex items-center gap-1 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border">
+                        <div className="flex items-center gap-1 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border/70">
                             {(["all", "primary", "secondary"] as CategoryFilter[]).map((category) => (
                                 <button
                                     key={category}
                                     type="button"
                                     onClick={() => setCategoryFilter(category)}
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold capitalize transition-all ${
+                                    className={`px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
                                         categoryFilter === category
-                                            ? "bg-primary text-primary-foreground shadow-sm"
-                                            : "text-muted-foreground hover:text-foreground"
+                                            ? "bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-500/20"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
                                     }`}
                                 >
                                     {category}
@@ -359,17 +360,17 @@ export function IncomeTable({
                                             : "desc",
                                 }))
                             }
-                            className={`h-8 rounded-xl text-xs font-semibold border-border transition-all ${
+                            className={`h-8 rounded-xl text-xs font-bold border-border/70 transition-all ${
                                 sortConfig.key === "amount"
                                     ? "bg-primary/10 text-primary border-primary/30"
-                                    : "text-muted-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
                             }`}
                         >
-                            Sort Amount:{" "}
+                            Amount:{" "}
                             {sortConfig.key === "amount"
                                 ? sortConfig.direction === "desc"
-                                    ? "High → Low"
-                                    : "Low → High"
+                                ? "Highest"
+                                : "Lowest"
                                 : "Default"}
                         </Button>
 
@@ -386,10 +387,10 @@ export function IncomeTable({
                                             : "desc",
                                 }))
                             }
-                            className={`h-8 rounded-xl text-xs font-semibold border-border transition-all ${
+                            className={`h-8 rounded-xl text-xs font-bold border-border/70 transition-all ${
                                 sortConfig.key === "date"
                                     ? "bg-primary/10 text-primary border-primary/30"
-                                    : "text-muted-foreground"
+                                    : "text-muted-foreground hover:text-foreground"
                             }`}
                         >
                             <span className="flex items-center gap-1">
@@ -405,34 +406,39 @@ export function IncomeTable({
                     </div>
                 </div>
 
-                {/* Filtered Totals & Summary Strip */}
+                {/* Filtered Totals & Summary Strip - Modern Matching Glass & Gradient Design */}
                 <motion.div
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
                     key={`${statusFilter}-${categoryFilter}-${tableYearFilter}`}
-                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-2"
+                    className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-1"
                 >
                     {/* Credits */}
-                    <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                        <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[11px] text-emerald-700 dark:text-emerald-300 uppercase tracking-wider font-bold">
+                    <div className="glass-card relative overflow-hidden rounded-xl p-4 border border-slate-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md transition-all group">
+                        {/* Top Gradient Accent */}
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 Credits
                             </span>
-                            <TrendingUp className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                <TrendingUp className="h-3.5 w-3.5" />
+                            </div>
                         </div>
-                        <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                        <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight relative z-10">
                             {formatCurrency(totals.credits)}
                         </p>
-                        <div className="mt-1 text-[10px] space-y-0.5 text-muted-foreground">
+                        <div className="mt-2.5 pt-2 border-t border-border/50 text-[10px] space-y-0.5 text-muted-foreground relative z-10">
                             <div className="flex justify-between">
                                 <span>Primary:</span>
-                                <span className="font-semibold text-foreground">
+                                <span className="font-bold text-foreground">
                                     {formatCurrency(totals.primaryCredits)}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Secondary:</span>
-                                <span className="font-semibold text-foreground">
+                                <span className="font-bold text-foreground">
                                     {formatCurrency(totals.secondaryCredits)}
                                 </span>
                             </div>
@@ -440,26 +446,31 @@ export function IncomeTable({
                     </div>
 
                     {/* Debits */}
-                    <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                        <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[11px] text-rose-700 dark:text-rose-300 uppercase tracking-wider font-bold">
+                    <div className="glass-card relative overflow-hidden rounded-xl p-4 border border-slate-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md transition-all group">
+                        {/* Top Gradient Accent */}
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-rose-500 via-pink-500 to-red-500" />
+                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                                 Debits
                             </span>
-                            <TrendingDown className="h-3.5 w-3.5 text-rose-600 dark:text-rose-400" />
+                            <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                <TrendingDown className="h-3.5 w-3.5" />
+                            </div>
                         </div>
-                        <p className="text-lg font-black text-rose-600 dark:text-rose-400">
+                        <p className="text-xl font-black text-rose-600 dark:text-rose-400 tracking-tight relative z-10">
                             {formatCurrency(totals.debits)}
                         </p>
-                        <div className="mt-1 text-[10px] space-y-0.5 text-muted-foreground">
+                        <div className="mt-2.5 pt-2 border-t border-border/50 text-[10px] space-y-0.5 text-muted-foreground relative z-10">
                             <div className="flex justify-between">
                                 <span>Primary:</span>
-                                <span className="font-semibold text-foreground">
+                                <span className="font-bold text-foreground">
                                     {formatCurrency(totals.primaryDebits)}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span>Secondary:</span>
-                                <span className="font-semibold text-foreground">
+                                <span className="font-bold text-foreground">
                                     {formatCurrency(totals.secondaryDebits)}
                                 </span>
                             </div>
@@ -467,48 +478,68 @@ export function IncomeTable({
                     </div>
 
                     {/* Net Balance */}
-                    <div className="p-3.5 rounded-xl bg-purple-500/10 border border-purple-500/20 flex flex-col justify-center">
-                        <span className="text-[11px] text-purple-700 dark:text-purple-300 uppercase tracking-wider font-bold mb-0.5">
-                            Net Balance
-                        </span>
-                        <p className="text-lg font-black text-purple-600 dark:text-purple-400">
-                            {formatCurrency(totals.net)}
+                    <div className="glass-card relative overflow-hidden rounded-xl p-4 border border-slate-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
+                        {/* Top Gradient Accent */}
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
+                        <div className="relative z-10">
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                    Net Balance
+                                </span>
+                                <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                                    <Wallet className="h-3.5 w-3.5" />
+                                </div>
+                            </div>
+                            <p className="text-xl font-black text-foreground tracking-tight">
+                                {formatCurrency(totals.net)}
+                            </p>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground font-medium mt-2.5 pt-2 border-t border-border/50 relative z-10">
+                            Filtered Inflow vs Outflow
                         </p>
-                        <span className="text-[10px] text-muted-foreground mt-1">
-                            Filtered Income vs Expenses
-                        </span>
                     </div>
 
                     {/* Year Pending */}
-                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                        <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[11px] text-amber-700 dark:text-amber-300 uppercase tracking-wider font-bold">
-                                Year Pending
+                    <div className="glass-card relative overflow-hidden rounded-xl p-4 border border-slate-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md transition-all group">
+                        {/* Top Gradient Accent */}
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500" />
+                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                Pending
                             </span>
-                            <Hourglass className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                            <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                <Hourglass className="h-3.5 w-3.5" />
+                            </div>
                         </div>
-                        <p className="text-lg font-black text-amber-600 dark:text-amber-400">
+                        <p className="text-xl font-black text-amber-600 dark:text-amber-400 tracking-tight relative z-10">
                             {formatCurrency(yearTotals.pending)}
                         </p>
-                        <span className="text-[10px] text-muted-foreground mt-1 block">
-                            Total Uncollected
-                        </span>
+                        <p className="text-[10px] text-muted-foreground font-medium mt-2.5 pt-2 border-t border-border/50 relative z-10">
+                            Uncollected in this view
+                        </p>
                     </div>
 
                     {/* Year Received */}
-                    <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 col-span-2 sm:col-span-1">
-                        <div className="flex items-center justify-between mb-0.5">
-                            <span className="text-[11px] text-emerald-700 dark:text-emerald-300 uppercase tracking-wider font-bold">
-                                Year Received
+                    <div className="glass-card relative overflow-hidden rounded-xl p-4 border border-slate-200/90 dark:border-white/[0.08] shadow-sm hover:shadow-md transition-all group col-span-2 sm:col-span-1">
+                        {/* Top Gradient Accent */}
+                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                Received
                             </span>
-                            <CheckCircle className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <div className="p-1.5 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20">
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                            </div>
                         </div>
-                        <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                        <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight relative z-10">
                             {formatCurrency(yearTotals.received)}
                         </p>
-                        <span className="text-[10px] text-muted-foreground mt-1 block">
-                            Total Collected
-                        </span>
+                        <p className="text-[10px] text-muted-foreground font-medium mt-2.5 pt-2 border-t border-border/50 relative z-10">
+                            Settled in this view
+                        </p>
                     </div>
                 </motion.div>
             </CardHeader>
@@ -523,9 +554,9 @@ export function IncomeTable({
                 ) : (
                     <>
                         {/* Mobile List View */}
-                        <div className="block md:hidden divide-y divide-border/40">
+                        <div className="block md:hidden divide-y divide-border/50">
                             <AnimatePresence mode="popLayout">
-                                {filteredAndSortedEntries.map((entry, index) => {
+                                {filteredAndSortedEntries.map((entry) => {
                                     const isReceived = entry.status === "received";
                                     const isCredit = entry.type === "credit";
                                     return (
@@ -583,10 +614,10 @@ export function IncomeTable({
                                                             handleStatusUpdate(entry.id, entry.status)
                                                         }
                                                         disabled={updatingId === entry.id}
-                                                        className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-transform active:scale-95 ${
+                                                        className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border transition-transform active:scale-95 ${
                                                             isReceived
-                                                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                                                                : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                                                                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+                                                                : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30"
                                                         }`}
                                                     >
                                                         {isReceived ? "Received" : "Pending"}
@@ -600,7 +631,7 @@ export function IncomeTable({
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                className="h-7 w-7 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-lg"
+                                                                className="h-7 w-7 text-primary hover:bg-primary/10 rounded-lg"
                                                             >
                                                                 <Pencil className="h-3.5 w-3.5" />
                                                             </Button>
@@ -628,7 +659,7 @@ export function IncomeTable({
                         <div className="hidden md:block overflow-x-auto">
                             <Table>
                                 <TableHeader>
-                                    <TableRow className="border-b border-border/60 hover:bg-transparent">
+                                    <TableRow className="border-b border-border/60 hover:bg-transparent bg-muted/20">
                                         <TableHead className="w-[50px] text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
                                             #
                                         </TableHead>
@@ -692,7 +723,7 @@ export function IncomeTable({
                                                             <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                                                             <span>
                                                                 {entry.month}{" "}
-                                                                <span className="text-primary font-bold">
+                                                                <span className="font-bold text-foreground">
                                                                     {entry.year}
                                                                 </span>
                                                             </span>
@@ -704,10 +735,10 @@ export function IncomeTable({
                                                     <TableCell>
                                                         <Badge
                                                             variant="outline"
-                                                            className={`text-[10px] capitalize font-semibold rounded-md border ${
+                                                            className={`text-[10px] capitalize font-bold rounded-lg border ${
                                                                 entry.category === "primary"
-                                                                    ? "bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-500/30"
-                                                                    : "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/30"
+                                                                    ? "bg-violet-500/10 text-violet-700 dark:text-violet-300 border-violet-500/25"
+                                                                    : "bg-cyan-500/10 text-cyan-700 dark:text-cyan-300 border-cyan-500/25"
                                                             }`}
                                                         >
                                                             {entry.category}
@@ -716,10 +747,10 @@ export function IncomeTable({
                                                     <TableCell>
                                                         <Badge
                                                             variant="outline"
-                                                            className={`text-[10px] uppercase font-bold rounded-md border ${
+                                                            className={`text-[10px] uppercase font-bold rounded-lg border ${
                                                                 isCredit
-                                                                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
-                                                                    : "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30"
+                                                                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25"
+                                                                    : "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/25"
                                                             }`}
                                                         >
                                                             {entry.type}
@@ -733,14 +764,14 @@ export function IncomeTable({
                                                             }
                                                             disabled={updatingId === entry.id}
                                                             title="Click to toggle status"
-                                                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border cursor-pointer hover:scale-105 active:scale-95 transition-all ${
+                                                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border cursor-pointer hover:scale-105 active:scale-95 transition-all ${
                                                                 isReceived
-                                                                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20"
-                                                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20"
+                                                                    ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20"
+                                                                    : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20"
                                                             }`}
                                                         >
                                                             {isReceived ? (
-                                                                <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                                                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                                                             ) : (
                                                                 <Hourglass className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                                                             )}
@@ -767,7 +798,7 @@ export function IncomeTable({
                                                                     <Button
                                                                         variant="ghost"
                                                                         size="icon"
-                                                                        className="h-8 w-8 text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-lg"
+                                                                        className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
                                                                     >
                                                                         <Pencil className="h-3.5 w-3.5" />
                                                                     </Button>
