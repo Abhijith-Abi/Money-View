@@ -4,32 +4,31 @@
 
 html {
     scroll-behavior: smooth;
-    color-scheme: dark;
 }
 
 @layer base {
     :root {
-        --background: 224 71% 4%;
-        --foreground: 210 40% 98%;
-        --card: 224 71% 6%;
-        --card-foreground: 210 40% 98%;
-        --popover: 224 71% 5%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 263 70% 50%;
+        --background: 210 40% 98%;
+        --foreground: 222.2 47.4% 11.2%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 47.4% 11.2%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 47.4% 11.2%;
+        --primary: 262.1 83.3% 57.8%;
         --primary-foreground: 210 40% 98%;
-        --secondary: 217 33% 17%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 217 33% 14%;
-        --muted-foreground: 215 20% 65%;
-        --accent: 263 70% 50%;
-        --accent-foreground: 210 40% 98%;
-        --destructive: 0 72% 51%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 94%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 210 40% 98%;
-        --border: 217 33% 16%;
-        --input: 217 33% 16%;
-        --ring: 263 70% 50%;
+        --border: 214.3 31.8% 88%;
+        --input: 214.3 31.8% 88%;
+        --ring: 262.1 83.3% 57.8%;
         --radius: 1rem;
-        --chart-1: 263 70% 58%;
+        --chart-1: 262.1 83.3% 57.8%;
         --chart-2: 160 84% 39%;
         --chart-3: 199 89% 48%;
         --chart-4: 43 96% 56%;
@@ -37,24 +36,24 @@ html {
     }
 
     .dark {
-        --background: 224 71% 3%;
+        --background: 224 71% 4%;
         --foreground: 210 40% 98%;
-        --card: 224 71% 5%;
+        --card: 224 71% 6%;
         --card-foreground: 210 40% 98%;
-        --popover: 224 71% 4%;
+        --popover: 224 71% 5%;
         --popover-foreground: 210 40% 98%;
         --primary: 263 70% 58%;
         --primary-foreground: 210 40% 98%;
-        --secondary: 217 33% 14%;
+        --secondary: 217 33% 15%;
         --secondary-foreground: 210 40% 98%;
         --muted: 217 33% 12%;
-        --muted-foreground: 215 20% 60%;
-        --accent: 263 70% 58%;
+        --muted-foreground: 215 20% 65%;
+        --accent: 217 33% 15%;
         --accent-foreground: 210 40% 98%;
         --destructive: 0 72% 51%;
         --destructive-foreground: 210 40% 98%;
-        --border: 217 33% 14%;
-        --input: 217 33% 14%;
+        --border: 217 33% 16%;
+        --input: 217 33% 16%;
         --ring: 263 70% 58%;
         --chart-1: 263 70% 58%;
         --chart-2: 160 84% 39%;
@@ -69,7 +68,7 @@ html {
         @apply border-border;
     }
     body {
-        @apply bg-[#030712] text-slate-100 antialiased selection:bg-purple-500/30 selection:text-purple-200;
+        @apply bg-background text-foreground transition-colors duration-300 antialiased;
         font-feature-settings:
             "rlig" 1,
             "calt" 1;
@@ -81,75 +80,79 @@ html {
         text-wrap: balance;
     }
 
-    /* Modern Glassmorphism Surfaces */
+    /* Modern Glassmorphism Surfaces - Supports both Light & Dark */
     .glass {
-        @apply bg-slate-900/40 backdrop-blur-2xl border border-white/10 shadow-2xl;
+        @apply bg-card/85 backdrop-blur-xl border border-border/70 shadow-sm dark:bg-card/40 dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-2xl;
     }
 
     .glass-card {
-        @apply bg-slate-900/50 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:border-white/20 transition-all duration-300;
+        @apply bg-card/90 backdrop-blur-xl border border-border/80 shadow-md dark:bg-card/50 dark:backdrop-blur-xl dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] hover:border-primary/40 transition-all duration-300;
     }
 
     .glass-premium {
-        @apply bg-gradient-to-b from-white/[0.07] to-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] hover:border-purple-500/30 transition-all duration-500;
+        @apply bg-card/90 backdrop-blur-2xl border border-border shadow-lg dark:bg-gradient-to-b dark:from-white/[0.07] dark:to-white/[0.02] dark:backdrop-blur-2xl dark:border-white/10 dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] hover:border-purple-500/40 transition-all duration-500;
     }
 
     .glass-gold {
-        @apply bg-gradient-to-b from-amber-500/[0.08] via-slate-900/50 to-slate-950/80 backdrop-blur-2xl border border-amber-500/20 hover:border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.06)] transition-all duration-500;
+        @apply bg-amber-500/[0.04] border border-amber-500/20 shadow-sm dark:bg-gradient-to-b dark:from-amber-500/[0.08] dark:via-slate-900/50 dark:to-slate-950/80 dark:backdrop-blur-2xl dark:border-amber-500/20 hover:border-amber-500/40 dark:shadow-[0_0_30px_rgba(245,158,11,0.06)] transition-all duration-500;
     }
 
     .glass-emerald {
-        @apply bg-gradient-to-b from-emerald-500/[0.08] via-slate-900/50 to-slate-950/80 backdrop-blur-2xl border border-emerald-500/20 hover:border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.06)] transition-all duration-500;
+        @apply bg-emerald-500/[0.04] border border-emerald-500/20 shadow-sm dark:bg-gradient-to-b dark:from-emerald-500/[0.08] dark:via-slate-900/50 dark:to-slate-950/80 dark:backdrop-blur-2xl dark:border-emerald-500/20 hover:border-emerald-500/40 dark:shadow-[0_0_30px_rgba(16,185,129,0.06)] transition-all duration-500;
     }
 
     .glass-violet {
-        @apply bg-gradient-to-b from-purple-500/[0.08] via-slate-900/50 to-slate-950/80 backdrop-blur-2xl border border-purple-500/20 hover:border-purple-500/40 shadow-[0_0_30px_rgba(168,85,247,0.06)] transition-all duration-500;
+        @apply bg-purple-500/[0.04] border border-purple-500/20 shadow-sm dark:bg-gradient-to-b dark:from-purple-500/[0.08] dark:via-slate-900/50 dark:to-slate-950/80 dark:backdrop-blur-2xl dark:border-purple-500/20 hover:border-purple-500/40 dark:shadow-[0_0_30px_rgba(168,85,247,0.06)] transition-all duration-500;
     }
 
     .glass-cyan {
-        @apply bg-gradient-to-b from-cyan-500/[0.08] via-slate-900/50 to-slate-950/80 backdrop-blur-2xl border border-cyan-500/20 hover:border-cyan-500/40 shadow-[0_0_30px_rgba(6,182,212,0.06)] transition-all duration-500;
+        @apply bg-cyan-500/[0.04] border border-cyan-500/20 shadow-sm dark:bg-gradient-to-b dark:from-cyan-500/[0.08] dark:via-slate-900/50 dark:to-slate-950/80 dark:backdrop-blur-2xl dark:border-cyan-500/20 hover:border-cyan-500/40 dark:shadow-[0_0_30px_rgba(6,182,212,0.06)] transition-all duration-500;
     }
 
     .glass-rose {
-        @apply bg-gradient-to-b from-rose-500/[0.08] via-slate-900/50 to-slate-950/80 backdrop-blur-2xl border border-rose-500/20 hover:border-rose-500/40 shadow-[0_0_30px_rgba(244,63,94,0.06)] transition-all duration-500;
+        @apply bg-rose-500/[0.04] border border-rose-500/20 shadow-sm dark:bg-gradient-to-b dark:from-rose-500/[0.08] dark:via-slate-900/50 dark:to-slate-950/80 dark:backdrop-blur-2xl dark:border-rose-500/20 hover:border-rose-500/40 dark:shadow-[0_0_30px_rgba(244,63,94,0.06)] transition-all duration-500;
     }
 
     .glass-hover {
-        @apply transition-all duration-300 hover:bg-white/[0.06] hover:border-white/20 hover:shadow-[0_0_25px_rgba(255,255,255,0.05)];
+        @apply transition-all duration-300 hover:bg-accent/60 hover:border-primary/30 dark:hover:bg-white/[0.06] dark:hover:border-white/20 dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.05)];
     }
 
     /* Glow Effects */
     .glow-violet {
-        @apply shadow-[0_0_30px_rgba(168,85,247,0.35)];
+        @apply shadow-[0_0_25px_rgba(168,85,247,0.25)] dark:shadow-[0_0_30px_rgba(168,85,247,0.35)];
     }
 
     .glow-emerald {
-        @apply shadow-[0_0_30px_rgba(16,185,129,0.35)];
+        @apply shadow-[0_0_25px_rgba(16,185,129,0.25)] dark:shadow-[0_0_30px_rgba(16,185,129,0.35)];
     }
 
     .glow-gold {
-        @apply shadow-[0_0_30px_rgba(245,158,11,0.35)];
+        @apply shadow-[0_0_25px_rgba(245,158,11,0.25)] dark:shadow-[0_0_30px_rgba(245,158,11,0.35)];
     }
 
     .glow-cyan {
-        @apply shadow-[0_0_30px_rgba(6,182,212,0.35)];
+        @apply shadow-[0_0_25px_rgba(6,182,212,0.25)] dark:shadow-[0_0_30px_rgba(6,182,212,0.35)];
     }
 
     /* Gradients */
     .gradient-text-gold {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-200 via-amber-400 to-amber-500;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-600 dark:from-amber-200 dark:via-amber-400 dark:to-amber-500;
     }
 
     .gradient-text-violet {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-300 via-indigo-300 to-cyan-300;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 dark:from-purple-300 dark:via-indigo-300 dark:to-cyan-300;
     }
 
     .gradient-text-emerald {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 dark:from-emerald-300 dark:via-teal-300 dark:to-cyan-300;
     }
 
     .gradient-text-silver {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-slate-400;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-500 dark:from-white dark:via-slate-200 dark:to-slate-400;
+    }
+
+    .gradient-text {
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-600 dark:from-purple-300 dark:via-indigo-200 dark:to-cyan-300;
     }
 }
 
@@ -160,16 +163,11 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(3, 7, 18, 0.6);
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
+    @apply bg-border rounded-full hover:bg-muted-foreground/40;
 }
 
 .hide-scrollbar::-webkit-scrollbar {
@@ -208,4 +206,16 @@ html {
 
 .animate-pulse-glow {
     animation: pulseGlow 6s ease-in-out infinite;
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }

@@ -8,7 +8,6 @@ import {
     Wallet,
     Loader2,
     Sparkles,
-    ShieldCheck,
     TrendingUp,
     Calculator,
     Zap,
@@ -41,7 +40,7 @@ export default function LoginPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#030712]">
+            <div className="min-h-screen flex items-center justify-center bg-background">
                 <MoneyLoader />
             </div>
         );
@@ -54,28 +53,26 @@ export default function LoginPage() {
     ];
 
     return (
-        <div className="min-h-screen relative overflow-hidden bg-[#030712] text-white flex items-center justify-center p-4 sm:p-6">
+        <div className="min-h-screen relative overflow-hidden bg-background text-foreground flex items-center justify-center p-4 sm:p-6">
             {/* Ambient Background Mesh & Lighting */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] bg-gradient-to-br from-purple-600/20 via-indigo-600/10 to-transparent blur-[140px] rounded-full animate-float-slow" />
-                <div className="absolute top-[30%] -right-[15%] w-[50vw] h-[50vw] bg-gradient-to-bl from-cyan-500/15 via-blue-600/10 to-transparent blur-[150px] rounded-full animate-pulse-glow" />
-                <div className="absolute -bottom-[20%] left-[25%] w-[45vw] h-[45vw] bg-gradient-to-tr from-emerald-500/15 via-purple-900/15 to-transparent blur-[140px] rounded-full" />
-                <div className="absolute inset-0 bg-[radial-gradient(#ffffff0d_1px,transparent_1px)] [background-size:28px_28px] opacity-60" />
+            <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+                <div className="absolute -top-[20%] -left-[10%] w-[55vw] h-[55vw] bg-purple-500/10 dark:bg-purple-600/20 blur-[140px] rounded-full animate-float-slow" />
+                <div className="absolute top-[30%] -right-[15%] w-[50vw] h-[50vw] bg-cyan-500/10 dark:bg-cyan-600/15 blur-[150px] rounded-full animate-pulse-glow" />
+                <div className="absolute -bottom-[20%] left-[25%] w-[45vw] h-[45vw] bg-emerald-500/10 dark:bg-emerald-600/15 blur-[140px] rounded-full" />
             </div>
 
             {/* Main Center Card */}
             <motion.div
                 initial={{ opacity: 0, scale: 0.95, y: 15 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
                 className="w-full max-w-[440px] relative z-10"
             >
-                {/* Outer Glow Halo */}
                 <div className="relative">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/40 via-indigo-500/30 to-cyan-500/40 rounded-[2.5rem] blur-xl opacity-60 pointer-events-none" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-purple-600/30 via-indigo-500/20 to-cyan-500/30 rounded-[2.5rem] blur-xl opacity-60 pointer-events-none" />
 
                     {/* Card Container */}
-                    <div className="relative rounded-[2.2rem] bg-slate-950/80 backdrop-blur-3xl border border-white/10 p-7 sm:p-9 shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden space-y-7">
+                    <div className="relative rounded-[2rem] glass bg-card/90 backdrop-blur-2xl border border-border p-7 sm:p-9 shadow-2xl overflow-hidden space-y-6">
                         {/* Header & Logo */}
                         <div className="text-center space-y-3">
                             <motion.div
@@ -85,9 +82,9 @@ export default function LoginPage() {
                                 transition={{ duration: 0.5, delay: 0.1 }}
                             >
                                 <div className="relative">
-                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-400 p-0.5 shadow-[0_0_30px_rgba(168,85,247,0.5)]">
-                                        <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center">
-                                            <Wallet className="w-8 h-8 text-purple-400" />
+                                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-cyan-500 p-0.5 shadow-lg">
+                                        <div className="w-full h-full bg-card rounded-[14px] flex items-center justify-center">
+                                            <Wallet className="w-8 h-8 text-primary" />
                                         </div>
                                     </div>
                                     <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
@@ -98,30 +95,30 @@ export default function LoginPage() {
                             </motion.div>
 
                             <div className="space-y-1 pt-1">
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[10px] font-extrabold uppercase tracking-widest">
-                                    <Sparkles className="w-3 h-3 text-amber-400" />
+                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-[10px] font-extrabold uppercase tracking-widest">
+                                    <Sparkles className="w-3 h-3 text-amber-500" />
                                     Financial Operating System
                                 </div>
-                                <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight pt-1">
-                                    MoneyView
+                                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground pt-1 bg-gradient-to-r from-purple-600 via-primary to-cyan-600 dark:from-purple-300 dark:via-white dark:to-cyan-300 gradient-text">
+                                    Money View
                                 </h1>
-                                <p className="text-slate-400 text-xs font-medium">
+                                <p className="text-muted-foreground text-xs font-medium">
                                     Intelligent income tracking, ledgers & EMI analytics
                                 </p>
                             </div>
                         </div>
 
                         {/* Feature Highlights */}
-                        <div className="space-y-2 pt-1 border-t border-white/[0.06]">
+                        <div className="space-y-2 pt-1 border-t border-border/60">
                             {featurePills.map((f, idx) => (
                                 <motion.div
                                     key={f.label}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.2 + idx * 0.1 }}
-                                    className="flex items-center gap-3 p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.04] text-xs text-slate-300 font-medium"
+                                    className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 border border-border text-xs text-foreground font-medium"
                                 >
-                                    <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+                                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary border border-primary/20 shrink-0">
                                         <f.icon className="w-3.5 h-3.5" />
                                     </div>
                                     <span className="truncate">{f.label}</span>
@@ -134,11 +131,11 @@ export default function LoginPage() {
                             <Button
                                 onClick={handleSignIn}
                                 disabled={signingIn}
-                                className="w-full h-13 py-3.5 bg-white hover:bg-slate-100 text-slate-950 font-black text-sm rounded-2xl shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.35)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+                                className="w-full h-12 py-3 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-3"
                             >
                                 {signingIn ? (
                                     <>
-                                        <Loader2 className="w-5 h-5 animate-spin text-slate-900" />
+                                        <Loader2 className="w-5 h-5 animate-spin" />
                                         <span>Connecting to Google...</span>
                                     </>
                                 ) : (
@@ -166,8 +163,8 @@ export default function LoginPage() {
                                 )}
                             </Button>
 
-                            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-                                <Lock className="w-3 h-3 text-emerald-400" />
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground">
+                                <Lock className="w-3 h-3 text-emerald-500" />
                                 <span>End-to-end encrypted financial data</span>
                             </div>
                         </div>
@@ -176,7 +173,7 @@ export default function LoginPage() {
 
                 {/* Footer Note */}
                 <div className="text-center mt-6">
-                    <p className="text-xs text-slate-400 font-medium">
+                    <p className="text-xs text-muted-foreground font-medium">
                         By continuing, you agree to MoneyView&apos;s Secure Access terms.
                     </p>
                 </div>

@@ -13,13 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import {
     Table,
     TableBody,
     TableCell,
@@ -33,7 +26,6 @@ import {
     Calendar,
     CheckCircle2,
     Clock,
-    AlertCircle,
     Download,
     TrendingUp,
     Wallet,
@@ -78,7 +70,7 @@ export function EMICalculatorDialog({
 
     // Track which months are marked as paid
     const [paidMonthIndices, setPaidMonthIndices] = useState<Set<number>>(
-        new Set()
+        new Set<number>()
     );
 
     const effectiveTenureMonths = useMemo(() => {
@@ -113,7 +105,7 @@ export function EMICalculatorDialog({
         }));
     }, [paidMonthIndices, emiPlan]);
 
-    // Summary calculation
+    // Calculate plan details and amortization schedule
     const summary = useMemo(() => {
         return calculateEMISummary(emiPlan, payments, new Date());
     }, [emiPlan, payments]);
@@ -138,42 +130,61 @@ export function EMICalculatorDialog({
         setPaidMonthIndices(allIndices);
     };
 
+
     const resetPaid = () => {
         setPaidMonthIndices(new Set());
     };
 
     const downloadAmortizationPDF = () => {
         const doc = new jsPDF();
+
         doc.setFontSize(18);
-        doc.text("EMI Amortization & Repayment Schedule", 14, 20);
+        doc.text("MoneyView - Loan EMI Amortization Schedule", 14, 20);
 
         doc.setFontSize(10);
-        doc.setTextColor(100);
-        doc.text(`Principal: Rs. ${summary.totalPrincipal.toLocaleString()}`, 14, 28);
-        doc.text(`Interest Rate: ${rate}% p.a. (${interestType})`, 14, 34);
-        doc.text(`Tenure: ${effectiveTenureMonths} Months`, 14, 40);
-        doc.text(`Monthly EMI: Rs. ${summary.monthlyEMI.toLocaleString()}`, 110, 28);
-        doc.text(`Total Paid: Rs. ${summary.totalPaid.toLocaleString()} (${summary.paidMonthsCount} mos)`, 110, 34);
-        doc.text(`Total Pending: Rs. ${summary.totalPending.toLocaleString()} (${summary.pendingMonthsCount} mos)`, 110, 40);
+        doc.text(`Generated on: ${format(new Date(), "dd MMM yyyy, hh:mm a")}`, 14, 28);
+        doc.text(`Loan Principal: Rs. ${principal.toLocaleString("en-IN")}`, 14, 34);
+        doc.text(`Interest Rate: ${rate}% p.a. (${interestType} balance)`, 14, 40);
+        doc.text(`Tenure: ${effectiveTenureMonths} months`, 14, 46);
+        doc.text(`Monthly EMI: Rs. ${summary.monthlyEMI.toLocaleString("en-IN")}`, 14, 52);
+        doc.text(
+            `Total Paid: Rs. ${summary.totalPaid.toLocaleString("en-IN")} | Pending: Rs. ${summary.totalPending.toLocaleString("en-IN")}`,
+            14,
+            58
+        );
+
+        const tableColumn = [
+            "#",
+            "Month",
+            "Due Date",
+            "EMI (Rs)",
+            "Principal (Rs)",
+            "Interest (Rs)",
+            "Remaining (Rs)",
+            "Status",
+        ];
+
+        const tableRows = summary.schedule.map((row) => [
+            row.monthIndex,
+            row.monthName,
+            format(row.dueDate, "dd MMM yyyy"),
+            row.emiAmount.toLocaleString("en-IN"),
+            row.principalComponent.toLocaleString("en-IN"),
+            row.interestComponent.toLocaleString("en-IN"),
+            row.remainingBalance.toLocaleString("en-IN"),
+            row.status.toUpperCase(),
+        ]);
 
         autoTable(doc, {
-            startY: 48,
-            head: [["#", "Month / Year", "Due Date", "EMI Amount", "Principal", "Interest", "Balance", "Status"]],
-            body: summary.schedule.map((row) => [
-                row.monthIndex,
-                row.monthName,
-                format(row.dueDate, "dd-MMM-yyyy"),
-                `Rs. ${row.emiAmount.toLocaleString()}`,
-                `Rs. ${row.principalComponent.toLocaleString()}`,
-                `Rs. ${row.interestComponent.toLocaleString()}`,
-                `Rs. ${row.remainingBalance.toLocaleString()}`,
-                row.status.toUpperCase(),
-            ]),
+            head: [tableColumn],
+            body: tableRows,
+            startY: 65,
+            theme: "striped",
+            headStyles: { fillColor: [147, 51, 234] },
             styles: { fontSize: 8 },
-            headStyles: { fillColor: [88, 28, 135] },
         });
 
-        doc.save(`EMI_Schedule_${format(new Date(), "yyyyMMdd_HHmm")}.pdf`);
+        doc.save(`EMI_Schedule_${format(new Date(), "yyyyMMdd")}.pdf`);
     };
 
     return (
@@ -182,28 +193,29 @@ export function EMICalculatorDialog({
                 {trigger || (
                     <Button
                         variant="outline"
-                        className="glass border-purple-500/30 hover:bg-purple-500/10 text-purple-300 font-semibold gap-2"
+                        size="sm"
+                        className="glass border-border hover:bg-accent font-semibold text-xs h-9 gap-1.5"
                     >
-                        <Calculator className="h-4 w-4 text-purple-400" />
-                        EMI Helper
+                        <Calculator className="h-4 w-4 text-primary" />
+                        <span>EMI Helper</span>
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="glass-gold border-white/10 max-w-4xl max-h-[92vh] overflow-y-auto p-0">
+            <DialogContent className="glass bg-card/95 text-card-foreground border-border max-w-4xl max-h-[92vh] overflow-y-auto p-0 rounded-2xl shadow-2xl">
                 <div className="p-6 md:p-8 space-y-6">
                     {/* Header */}
                     <DialogHeader className="space-y-1 text-left">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="p-2.5 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
                                     <Calculator className="h-6 w-6" />
                                 </div>
                                 <div>
-                                    <DialogTitle className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+                                    <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight flex items-center gap-2">
                                         EMI & Loan Calculator
-                                        <Sparkles className="h-4 w-4 text-amber-400 animate-pulse" />
+                                        <Sparkles className="h-4 w-4 text-amber-500 animate-pulse" />
                                     </DialogTitle>
-                                    <DialogDescription className="text-gray-400 text-xs md:text-sm">
+                                    <DialogDescription className="text-muted-foreground text-xs md:text-sm">
                                         Automatic paid vs pending calculation with date-wise pending months tracking
                                     </DialogDescription>
                                 </div>
@@ -212,9 +224,9 @@ export function EMICalculatorDialog({
                     </DialogHeader>
 
                     {/* Input Controls Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/10">
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase font-bold tracking-wider text-gray-400">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-xl bg-muted/40 border border-border">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
                                 Principal (₹)
                             </Label>
                             <Input
@@ -222,13 +234,13 @@ export function EMICalculatorDialog({
                                 min={1}
                                 value={principal}
                                 onChange={(e) => setPrincipal(Number(e.target.value) || 0)}
-                                className="glass bg-black/40 border-white/10 text-white font-bold h-10"
+                                className="bg-background border-input text-foreground font-bold h-10 rounded-xl"
                                 placeholder="100000"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase font-bold tracking-wider text-gray-400">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
                                 Interest Rate (% p.a.)
                             </Label>
                             <div className="relative">
@@ -238,22 +250,22 @@ export function EMICalculatorDialog({
                                     min={0}
                                     value={rate}
                                     onChange={(e) => setRate(Number(e.target.value) || 0)}
-                                    className="glass bg-black/40 border-white/10 text-white font-bold h-10 pr-8"
+                                    className="bg-background border-input text-foreground font-bold h-10 pr-8 rounded-xl"
                                     placeholder="12"
                                 />
-                                <Percent className="h-3.5 w-3.5 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2" />
+                                <Percent className="h-3.5 w-3.5 text-muted-foreground absolute right-3 top-1/2 -translate-y-1/2" />
                             </div>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
-                                <Label className="text-xs uppercase font-bold tracking-wider text-gray-400">
+                                <Label className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
                                     Tenure
                                 </Label>
                                 <button
                                     type="button"
                                     onClick={() => setTenureUnit(tenureUnit === "months" ? "years" : "months")}
-                                    className="text-[10px] text-purple-400 hover:underline font-bold uppercase"
+                                    className="text-[10px] text-primary hover:underline font-bold uppercase"
                                 >
                                     In {tenureUnit === "months" ? "Years" : "Months"}
                                 </button>
@@ -263,33 +275,33 @@ export function EMICalculatorDialog({
                                 min={1}
                                 value={tenure}
                                 onChange={(e) => setTenure(Number(e.target.value) || 1)}
-                                className="glass bg-black/40 border-white/10 text-white font-bold h-10"
+                                className="bg-background border-input text-foreground font-bold h-10 rounded-xl"
                                 placeholder="12"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase font-bold tracking-wider text-gray-400">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs uppercase font-bold tracking-wider text-muted-foreground">
                                 Start Date
                             </Label>
                             <Input
                                 type="date"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                className="glass bg-black/40 border-white/10 text-white font-bold h-10"
+                                className="bg-background border-input text-foreground font-bold h-10 rounded-xl"
                             />
                         </div>
 
-                        <div className="md:col-span-4 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/5 text-xs text-gray-400">
+                        <div className="md:col-span-4 flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border text-xs text-muted-foreground">
                             <div className="flex items-center gap-4">
-                                <span className="font-bold">Method:</span>
+                                <span className="font-bold text-foreground">Method:</span>
                                 <label className="flex items-center gap-1.5 cursor-pointer">
                                     <input
                                         type="radio"
                                         name="interestType"
                                         checked={interestType === "reducing"}
                                         onChange={() => setInterestType("reducing")}
-                                        className="text-purple-600 focus:ring-purple-500"
+                                        className="text-primary focus:ring-primary"
                                     />
                                     <span>Reducing Balance</span>
                                 </label>
@@ -299,7 +311,7 @@ export function EMICalculatorDialog({
                                         name="interestType"
                                         checked={interestType === "flat"}
                                         onChange={() => setInterestType("flat")}
-                                        className="text-purple-600 focus:ring-purple-500"
+                                        className="text-primary focus:ring-primary"
                                     />
                                     <span>Flat Rate</span>
                                 </label>
@@ -310,7 +322,7 @@ export function EMICalculatorDialog({
                                     size="sm"
                                     variant="ghost"
                                     onClick={markAllPaid}
-                                    className="h-7 text-xs text-emerald-400 hover:bg-emerald-500/10"
+                                    className="h-7 text-xs text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 font-bold"
                                 >
                                     <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Mark All Paid
                                 </Button>
@@ -318,7 +330,7 @@ export function EMICalculatorDialog({
                                     size="sm"
                                     variant="ghost"
                                     onClick={resetPaid}
-                                    className="h-7 text-xs text-gray-400 hover:bg-white/5"
+                                    className="h-7 text-xs text-muted-foreground hover:bg-muted font-bold"
                                 >
                                     <RotateCcw className="h-3.5 w-3.5 mr-1" /> Reset
                                 </Button>
@@ -327,80 +339,80 @@ export function EMICalculatorDialog({
                     </div>
 
                     {/* KPI Stats Cards */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-500/10 to-transparent border border-purple-500/20">
-                            <div className="flex items-center justify-between text-purple-400 mb-1">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                        <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                            <div className="flex items-center justify-between text-purple-700 dark:text-purple-400 mb-1">
                                 <span className="text-[10px] font-bold uppercase tracking-wider">Monthly EMI</span>
                                 <TrendingUp className="h-4 w-4" />
                             </div>
-                            <p className="text-2xl font-black text-white">
+                            <p className="text-xl sm:text-2xl font-black text-foreground">
                                 ₹{summary.monthlyEMI.toLocaleString("en-IN")}
                             </p>
-                            <p className="text-[10px] text-gray-400 mt-1">
+                            <p className="text-[10px] text-muted-foreground mt-1">
                                 For {summary.totalMonths} total installments
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20">
-                            <div className="flex items-center justify-between text-emerald-400 mb-1">
+                        <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                            <div className="flex items-center justify-between text-emerald-700 dark:text-emerald-400 mb-1">
                                 <span className="text-[10px] font-bold uppercase tracking-wider">Total Paid</span>
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
-                            <p className="text-2xl font-black text-emerald-400">
+                            <p className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
                                 ₹{summary.totalPaid.toLocaleString("en-IN")}
                             </p>
-                            <p className="text-[10px] text-gray-400 mt-1">
+                            <p className="text-[10px] text-muted-foreground mt-1">
                                 {summary.paidMonthsCount} of {summary.totalMonths} months paid
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-rose-500/10 to-transparent border border-rose-500/20">
-                            <div className="flex items-center justify-between text-rose-400 mb-1">
+                        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+                            <div className="flex items-center justify-between text-rose-700 dark:text-rose-400 mb-1">
                                 <span className="text-[10px] font-bold uppercase tracking-wider">Total Pending</span>
                                 <Wallet className="h-4 w-4" />
                             </div>
-                            <p className="text-2xl font-black text-rose-400">
+                            <p className="text-xl sm:text-2xl font-black text-rose-600 dark:text-rose-400">
                                 ₹{summary.totalPending.toLocaleString("en-IN")}
                             </p>
-                            <p className="text-[10px] text-gray-400 mt-1">
+                            <p className="text-[10px] text-muted-foreground mt-1">
                                 {summary.pendingMonthsCount} pending months
                             </p>
                         </div>
 
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20">
-                            <div className="flex items-center justify-between text-amber-400 mb-1">
+                        <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                            <div className="flex items-center justify-between text-amber-700 dark:text-amber-400 mb-1">
                                 <span className="text-[10px] font-bold uppercase tracking-wider">Overdue Months</span>
                                 <Clock className="h-4 w-4" />
                             </div>
-                            <p className="text-2xl font-black text-amber-400">
+                            <p className="text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400">
                                 {summary.overdueMonthsCount}{" "}
-                                <span className="text-sm font-normal text-gray-400">months</span>
+                                <span className="text-xs font-normal text-muted-foreground">months</span>
                             </p>
-                            <p className="text-[10px] text-gray-400 mt-1">
+                            <p className="text-[10px] text-muted-foreground mt-1">
                                 {summary.nextDueDate ? `Next: ${format(summary.nextDueDate, "dd MMM yyyy")}` : "Fully settled"}
                             </p>
                         </div>
                     </div>
 
                     {/* Progress Bar */}
-                    <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/10 space-y-2">
+                    <div className="p-4 rounded-xl bg-muted/30 border border-border space-y-2">
                         <div className="flex justify-between text-xs">
-                            <span className="text-gray-400 font-bold uppercase tracking-wider">
+                            <span className="text-muted-foreground font-bold uppercase tracking-wider">
                                 Repayment Progress ({summary.paidPercentage}%)
                             </span>
-                            <span className="text-white font-medium">
+                            <span className="text-foreground font-semibold">
                                 ₹{summary.totalPaid.toLocaleString("en-IN")} / ₹{summary.totalPayable.toLocaleString("en-IN")}
                             </span>
                         </div>
-                        <div className="h-3 w-full bg-white/5 rounded-full overflow-hidden p-0.5 border border-white/5">
+                        <div className="h-2.5 w-full bg-muted rounded-full overflow-hidden p-0.5 border border-border">
                             <motion.div
-                                className="h-full bg-gradient-to-r from-purple-500 via-emerald-400 to-emerald-500 rounded-full"
+                                className="h-full bg-gradient-to-r from-purple-500 via-indigo-500 to-emerald-500 rounded-full"
                                 initial={{ width: 0 }}
                                 animate={{ width: `${summary.paidPercentage}%` }}
                                 transition={{ duration: 0.6, ease: "easeOut" }}
                             />
                         </div>
-                        <div className="flex justify-between text-[11px] text-gray-400 pt-1">
+                        <div className="flex justify-between text-[11px] text-muted-foreground pt-1">
                             <span>Principal: ₹{summary.totalPrincipal.toLocaleString("en-IN")}</span>
                             <span>Total Interest: ₹{summary.totalInterest.toLocaleString("en-IN")}</span>
                             <span>Total Payable: ₹{summary.totalPayable.toLocaleString("en-IN")}</span>
@@ -411,10 +423,10 @@ export function EMICalculatorDialog({
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h4 className="text-base font-bold text-white tracking-tight">
+                                <h4 className="text-base font-bold text-foreground tracking-tight">
                                     Monthly Amortization Schedule
                                 </h4>
-                                <p className="text-xs text-gray-400">
+                                <p className="text-xs text-muted-foreground">
                                     Click any row to toggle Paid / Pending status
                                 </p>
                             </div>
@@ -422,39 +434,39 @@ export function EMICalculatorDialog({
                                 size="sm"
                                 variant="outline"
                                 onClick={downloadAmortizationPDF}
-                                className="glass border-white/10 h-8 text-xs font-bold gap-1.5"
+                                className="glass border-border h-8 text-xs font-bold gap-1.5"
                             >
                                 <Download className="h-3.5 w-3.5" />
                                 Export PDF
                             </Button>
                         </div>
 
-                        <div className="rounded-xl border border-white/10 overflow-hidden glass max-h-[300px] overflow-y-auto">
+                        <div className="rounded-xl border border-border overflow-hidden glass max-h-[300px] overflow-y-auto">
                             <Table>
-                                <TableHeader className="bg-white/5 sticky top-0 z-10 backdrop-blur-md">
-                                    <TableRow className="border-white/10 hover:bg-transparent">
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400 w-12 text-center">
+                                <TableHeader className="bg-muted/60 sticky top-0 z-10 backdrop-blur-md">
+                                    <TableRow className="border-b border-border hover:bg-transparent">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground w-12 text-center">
                                             #
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground">
                                             Month / Year
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground">
                                             Due Date
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400 text-right">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground text-right">
                                             EMI Amount
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400 text-right">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground text-right">
                                             Principal
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400 text-right">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground text-right">
                                             Interest
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400 text-right">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground text-right">
                                             Remaining
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-bold uppercase text-gray-400 text-center">
+                                        <TableHead className="text-[10px] font-bold uppercase text-muted-foreground text-center">
                                             Status
                                         </TableHead>
                                     </TableRow>
@@ -469,44 +481,44 @@ export function EMICalculatorDialog({
                                                 key={row.monthIndex}
                                                 onClick={() => toggleMonthPaid(row.monthIndex)}
                                                 className={cn(
-                                                    "border-white/5 cursor-pointer transition-colors",
+                                                    "border-b border-border/40 cursor-pointer transition-colors",
                                                     isPaid
                                                         ? "bg-emerald-500/5 hover:bg-emerald-500/10"
                                                         : isOverdue
                                                           ? "bg-rose-500/5 hover:bg-rose-500/10"
-                                                          : "hover:bg-white/5"
+                                                          : "hover:bg-muted/40"
                                                 )}
                                             >
-                                                <TableCell className="text-center font-bold text-xs text-gray-400">
+                                                <TableCell className="text-center font-bold text-xs text-muted-foreground">
                                                     {row.monthIndex}
                                                 </TableCell>
-                                                <TableCell className="font-semibold text-xs text-white">
+                                                <TableCell className="font-semibold text-xs text-foreground">
                                                     {row.monthName}
                                                 </TableCell>
-                                                <TableCell className="text-xs text-gray-400">
+                                                <TableCell className="text-xs text-muted-foreground">
                                                     {format(row.dueDate, "dd MMM yyyy")}
                                                 </TableCell>
-                                                <TableCell className="text-right font-bold text-xs text-white">
+                                                <TableCell className="text-right font-bold text-xs text-foreground">
                                                     ₹{row.emiAmount.toLocaleString("en-IN")}
                                                 </TableCell>
-                                                <TableCell className="text-right text-xs text-emerald-400/80">
+                                                <TableCell className="text-right text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
                                                     ₹{row.principalComponent.toLocaleString("en-IN")}
                                                 </TableCell>
-                                                <TableCell className="text-right text-xs text-amber-400/80">
+                                                <TableCell className="text-right text-xs text-amber-600 dark:text-amber-400 font-semibold">
                                                     ₹{row.interestComponent.toLocaleString("en-IN")}
                                                 </TableCell>
-                                                <TableCell className="text-right font-bold text-xs text-gray-300">
+                                                <TableCell className="text-right font-bold text-xs text-muted-foreground">
                                                     ₹{row.remainingBalance.toLocaleString("en-IN")}
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <Badge
                                                         className={cn(
-                                                            "text-[10px] font-bold uppercase tracking-wider border-none",
+                                                            "text-[10px] font-bold uppercase tracking-wider border",
                                                             isPaid
-                                                                ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                                                ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30"
                                                                 : isOverdue
-                                                                  ? "bg-rose-500/20 text-rose-400 hover:bg-rose-500/30"
-                                                                  : "bg-white/10 text-gray-400 hover:bg-white/20"
+                                                                  ? "bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/30"
+                                                                  : "bg-muted text-muted-foreground border-border"
                                                         )}
                                                     >
                                                         {isPaid ? "Paid" : isOverdue ? "Overdue" : "Pending"}

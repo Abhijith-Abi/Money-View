@@ -265,6 +265,26 @@ export async function getIncomeByYear(year: number, userId: string): Promise<Inc
   }
 }
 
+export async function getAllIncome(userId: string): Promise<IncomeEntry[]> {
+  try {
+    const q = query(
+      collection(db, COLLECTION_NAME),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    )
+    const querySnapshot = await getDocs(q)
+    return querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      createdAt: doc.data().createdAt?.toDate() || new Date(),
+    })) as IncomeEntry[]
+  } catch (error) {
+    console.error('Error fetching all income:', error)
+    return []
+  }
+}
+
+
 export async function getMonthlyStats(year: number, userId: string): Promise<MonthlyStats[]> {
   const entries = await getIncomeByYear(year, userId)
   
