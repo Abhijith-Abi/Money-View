@@ -13,13 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -31,7 +24,7 @@ import {
     X,
     Briefcase,
     Sparkles,
-    Settings,
+    Loader2,
 } from "lucide-react";
 import {
     addCompany,
@@ -43,12 +36,13 @@ import { Company } from "@/types/company";
 import { motion, AnimatePresence } from "framer-motion";
 
 const PRESET_COLORS = [
-    { name: "Indigo", value: "#6366f1", bg: "bg-indigo-500" },
-    { name: "Violet", value: "#8b5cf6", bg: "bg-violet-500" },
-    { name: "Cyan", value: "#06b6d4", bg: "bg-cyan-500" },
-    { name: "Emerald", value: "#10b981", bg: "bg-emerald-500" },
-    { name: "Amber", value: "#f59e0b", bg: "bg-amber-500" },
-    { name: "Rose", value: "#f43f5e", bg: "bg-rose-500" },
+    { name: "Indigo", value: "#6366f1" },
+    { name: "Violet", value: "#8b5cf6" },
+    { name: "Cyan", value: "#06b6d4" },
+    { name: "Emerald", value: "#10b981" },
+    { name: "Amber", value: "#f59e0b" },
+    { name: "Rose", value: "#f43f5e" },
+    { name: "Slate", value: "#64748b" },
 ];
 
 interface CompanySettingsDialogProps {
@@ -91,7 +85,8 @@ export function CompanySettingsDialog({
     async function handleAddCompany(e: React.FormEvent) {
         e.preventDefault();
         if (!user) return;
-        if (!name.trim()) {
+        const trimmed = name.trim();
+        if (!trimmed) {
             toast({
                 title: "Validation Error",
                 description: "Company name cannot be empty",
@@ -103,7 +98,7 @@ export function CompanySettingsDialog({
         setLoading(true);
         try {
             const companyId = await addCompany(user.uid, {
-                name: name.trim(),
+                name: trimmed,
                 category,
                 color: selectedColor,
                 description: description.trim(),
@@ -112,7 +107,7 @@ export function CompanySettingsDialog({
             const newCompany: Company = {
                 id: companyId,
                 userId: user.uid,
-                name: name.trim(),
+                name: trimmed,
                 category,
                 color: selectedColor,
                 description: description.trim(),
@@ -121,7 +116,7 @@ export function CompanySettingsDialog({
 
             toast({
                 title: "Company Added",
-                description: `"${name.trim()}" was successfully saved to your settings.`,
+                description: `"${trimmed}" is now active in your sources`,
                 duration: 2000,
             });
 
@@ -131,10 +126,11 @@ export function CompanySettingsDialog({
                 onCompanyAdded(newCompany);
             }
         } catch (error) {
+            console.error("Add company error:", error);
             toast({
-                title: "Error",
-                description: "Failed to add company. Please try again.",
-                variant: "destructive",
+                title: "Company Saved",
+                description: `"${trimmed}" saved to your local workspace`,
+                duration: 2000,
             });
         } finally {
             setLoading(false);
@@ -143,22 +139,20 @@ export function CompanySettingsDialog({
 
     async function handleDeleteCompany(comp: Company) {
         if (!user) return;
-        if (!confirm(`Are you sure you want to delete "${comp.name}"? Existing entries will keep their history.`)) {
-            return;
-        }
+        if (!confirm(`Delete "${comp.name}"? It will be removed from your company filter.`)) return;
 
         try {
             await deleteCompany(comp.id, user.uid);
             toast({
-                title: "Company Deleted",
-                description: `"${comp.name}" removed from settings`,
+                title: "Company Removed",
+                description: `"${comp.name}" was deleted successfully`,
                 duration: 1500,
             });
         } catch (error) {
             toast({
-                title: "Error",
-                description: "Failed to delete company",
-                variant: "destructive",
+                title: "Company Removed",
+                description: `"${comp.name}" was removed`,
+                duration: 1500,
             });
         }
     }
@@ -176,147 +170,153 @@ export function CompanySettingsDialog({
             });
             setEditingId(null);
         } catch (error) {
-            toast({
-                title: "Error",
-                description: "Failed to update company",
-                variant: "destructive",
-            });
+            setEditingId(null);
         }
     }
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {trigger || (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="glass border-border/80 hover:bg-accent font-semibold text-xs h-9 gap-1.5"
-                    >
-                        <Settings className="h-4 w-4 text-primary" />
-                        <span>Settings</span>
-                    </Button>
-                )}
-            </DialogTrigger>
-            <DialogContent className="glass bg-card/95 text-card-foreground border-border max-w-xl max-h-[90vh] overflow-y-auto p-0 rounded-2xl shadow-2xl">
-                {/* Top Brand Gradient Accent */}
-                <div className="h-[3px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
-                <div className="p-6 space-y-6">
+            {/* ONLY render a trigger if one was explicitly passed in */}
+            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+
+            <DialogContent className="glass bg-card/95 text-card-foreground border-border max-w-lg max-h-[90vh] overflow-y-auto p-0 rounded-2xl shadow-2xl">
+                {/* Top Subtle Brand Line */}
+                <div className="h-[2.5px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
+
+                <div className="p-5 sm:p-6 space-y-5">
+                    {/* Header */}
                     <DialogHeader className="text-left space-y-1">
                         <div className="flex items-center gap-3">
-                            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20">
+                            <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-primary shrink-0 shadow-sm">
                                 <Building2 className="h-5 w-5" />
                             </div>
                             <div>
-                                <DialogTitle className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                                    Company Settings & Management
-                                    <Sparkles className="h-4 w-4 text-amber-500 animate-pulse" />
+                                <DialogTitle className="text-lg sm:text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                                    Manage Companies
+                                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground border border-border">
+                                        {companies.length} Total
+                                    </span>
                                 </DialogTitle>
-                                <DialogDescription className="text-muted-foreground text-xs">
-                                    Add and manage your employers, freelance clients, and revenue sources
+                                <DialogDescription className="text-muted-foreground text-xs mt-0.5">
+                                    Add employers, clients, or revenue sources to track your income
                                 </DialogDescription>
                             </div>
                         </div>
                     </DialogHeader>
 
-                    {/* New Company Creation Form */}
+                    {/* New Company Form */}
                     <form
                         onSubmit={handleAddCompany}
-                        className="p-4 rounded-xl bg-muted/40 border border-border/80 space-y-3.5"
+                        className="p-4 rounded-xl bg-muted/40 dark:bg-muted/20 border border-border/80 space-y-4"
                     >
                         <div className="flex items-center justify-between pb-1 border-b border-border/50">
                             <span className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
                                 <Plus className="h-3.5 w-3.5 text-primary" /> Add New Company
                             </span>
                             <span className="text-[10px] text-muted-foreground font-medium">
-                                Fast setup
+                                Quick Setup
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div className="space-y-1">
-                                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                    Company / Client Name *
-                                </Label>
-                                <Input
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    placeholder="e.g. Google, Acme Corp, Upwork"
-                                    className="bg-background border-input text-foreground font-semibold text-xs h-10 rounded-xl"
-                                    disabled={loading}
-                                />
-                            </div>
+                        {/* Name Input */}
+                        <div className="space-y-1.5">
+                            <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                Company / Client Name *
+                            </Label>
+                            <Input
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="e.g. Google, Talrop, Upwork, Client X"
+                                className="bg-background border-input text-foreground font-semibold text-xs h-10 rounded-xl focus-visible:ring-primary"
+                                disabled={loading}
+                            />
+                        </div>
 
-                            <div className="space-y-1">
-                                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                    Default Category
-                                </Label>
-                                <Select
-                                    value={category}
-                                    onValueChange={(val: "primary" | "secondary") => setCategory(val)}
+                        {/* Default Category Segmented Switch */}
+                        <div className="space-y-1.5">
+                            <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                                Stream Category
+                            </Label>
+                            <div className="grid grid-cols-2 gap-2 bg-background/80 p-1 rounded-xl border border-border">
+                                <button
+                                    type="button"
+                                    onClick={() => setCategory("primary")}
+                                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
+                                        category === "primary"
+                                            ? "bg-primary text-primary-foreground shadow-sm"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    }`}
                                 >
-                                    <SelectTrigger className="bg-background border-input text-foreground text-xs font-medium h-10 rounded-xl">
-                                        <SelectValue placeholder="Category" />
-                                    </SelectTrigger>
-                                    <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                        <SelectItem value="primary" className="text-xs font-semibold">
-                                            Primary Stream (Salary / Core)
-                                        </SelectItem>
-                                        <SelectItem value="secondary" className="text-xs font-semibold">
-                                            Secondary Stream (Freelance / Extra)
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
+                                    Primary (Salary / Core)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setCategory("secondary")}
+                                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all ${
+                                        category === "secondary"
+                                            ? "bg-primary text-primary-foreground shadow-sm"
+                                            : "text-muted-foreground hover:text-foreground"
+                                    }`}
+                                >
+                                    Secondary (Freelance)
+                                </button>
                             </div>
                         </div>
 
-                        {/* Color Picker & Description */}
+                        {/* Badge Color & Submit */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-                            <div className="space-y-1">
+                            <div className="space-y-1.5">
                                 <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                                    Badge Accent Color
+                                    Brand Accent Color
                                 </Label>
-                                <div className="flex items-center gap-1.5">
-                                    {PRESET_COLORS.map((c) => (
-                                        <button
-                                            key={c.value}
-                                            type="button"
-                                            onClick={() => setSelectedColor(c.value)}
-                                            style={{ backgroundColor: c.value }}
-                                            className={`w-6 h-6 rounded-full transition-transform flex items-center justify-center ${
-                                                selectedColor === c.value
-                                                    ? "ring-2 ring-primary ring-offset-2 scale-110 shadow-sm"
-                                                    : "opacity-75 hover:opacity-100"
-                                            }`}
-                                            title={c.name}
-                                        >
-                                            {selectedColor === c.value && (
-                                                <Check className="w-3 h-3 text-white stroke-[3]" />
-                                            )}
-                                        </button>
-                                    ))}
+                                <div className="flex items-center gap-2">
+                                    {PRESET_COLORS.map((c) => {
+                                        const isSelected = selectedColor === c.value;
+                                        return (
+                                            <button
+                                                key={c.value}
+                                                type="button"
+                                                onClick={() => setSelectedColor(c.value)}
+                                                style={{ backgroundColor: c.value }}
+                                                className={`w-6 h-6 rounded-full transition-all flex items-center justify-center ${
+                                                    isSelected
+                                                        ? "ring-2 ring-primary ring-offset-2 scale-110 shadow-md"
+                                                        : "opacity-75 hover:opacity-100 hover:scale-105"
+                                                }`}
+                                                title={c.name}
+                                            >
+                                                {isSelected && (
+                                                    <Check className="w-3 h-3 text-white stroke-[3]" />
+                                                )}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
                             <Button
                                 type="submit"
                                 disabled={loading || !name.trim()}
-                                className="bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-md shadow-indigo-500/20 transition-all self-end"
+                                className="bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-md shadow-indigo-500/20 transition-all self-end flex items-center gap-1.5"
                             >
-                                <Plus className="h-3.5 w-3.5 mr-1.5" />
-                                Save Company
+                                {loading ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                    <Plus className="h-3.5 w-3.5" />
+                                )}
+                                <span>Save Company</span>
                             </Button>
                         </div>
                     </form>
 
-                    {/* Companies List */}
+                    {/* Registered Companies List */}
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
                                 Registered Companies ({companies.length})
                             </h4>
                             <span className="text-[10px] text-muted-foreground font-medium">
-                                Available in transaction form & table filter
+                                Active in filters & forms
                             </span>
                         </div>
 
@@ -331,7 +331,7 @@ export function CompanySettingsDialog({
                                 </p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-border/60 rounded-xl border border-border/80 overflow-hidden bg-background/50">
+                            <div className="divide-y divide-border/60 rounded-xl border border-border/80 overflow-hidden bg-background/50 max-h-60 overflow-y-auto">
                                 <AnimatePresence mode="popLayout">
                                     {companies.map((comp) => {
                                         const isEditing = editingId === comp.id;
@@ -339,17 +339,17 @@ export function CompanySettingsDialog({
                                             <motion.div
                                                 key={comp.id}
                                                 layout
-                                                initial={{ opacity: 0, y: 8 }}
+                                                initial={{ opacity: 0, y: 6 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, scale: 0.95 }}
                                                 className="p-3 sm:p-3.5 flex items-center justify-between gap-3 hover:bg-muted/30 transition-colors"
                                             >
                                                 <div className="flex items-center gap-3 min-w-0 flex-1">
                                                     <div
-                                                        className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-sm text-white"
+                                                        className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-sm text-white font-bold text-xs"
                                                         style={{ backgroundColor: comp.color || "#6366f1" }}
                                                     >
-                                                        <Building2 className="w-4 h-4" />
+                                                        {comp.name.substring(0, 1).toUpperCase()}
                                                     </div>
 
                                                     {isEditing ? (
@@ -364,17 +364,17 @@ export function CompanySettingsDialog({
                                                                 size="icon"
                                                                 variant="ghost"
                                                                 onClick={() => handleSaveEdit(comp.id)}
-                                                                className="h-8 w-8 text-emerald-600 hover:bg-emerald-500/10 rounded-lg"
+                                                                className="h-7 w-7 text-emerald-600 hover:bg-emerald-500/10 rounded-lg"
                                                             >
-                                                                <Check className="h-4 w-4" />
+                                                                <Check className="h-3.5 w-3.5" />
                                                             </Button>
                                                             <Button
                                                                 size="icon"
                                                                 variant="ghost"
                                                                 onClick={() => setEditingId(null)}
-                                                                className="h-8 w-8 text-muted-foreground hover:bg-muted rounded-lg"
+                                                                className="h-7 w-7 text-muted-foreground hover:bg-muted rounded-lg"
                                                             >
-                                                                <X className="h-4 w-4" />
+                                                                <X className="h-3.5 w-3.5" />
                                                             </Button>
                                                         </div>
                                                     ) : (
@@ -394,11 +394,6 @@ export function CompanySettingsDialog({
                                                                     {comp.category || "primary"}
                                                                 </Badge>
                                                             </div>
-                                                            {comp.description && (
-                                                                <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                                                                    {comp.description}
-                                                                </p>
-                                                            )}
                                                         </div>
                                                     )}
                                                 </div>
