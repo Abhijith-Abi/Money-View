@@ -202,8 +202,6 @@ export function EMICalculatorDialog({
                 )}
             </DialogTrigger>
             <DialogContent className="glass bg-card/95 text-card-foreground border-border max-w-4xl max-h-[92vh] overflow-y-auto p-0 rounded-2xl shadow-2xl">
-                {/* Top Gradient Accent */}
-                <div className="h-[3px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
                 <div className="p-6 md:p-8 space-y-6">
                     {/* Header */}
                     <DialogHeader className="space-y-1 text-left">

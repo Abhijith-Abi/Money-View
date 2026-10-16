@@ -37,7 +37,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Loader2, Building2 } from "lucide-react";
+import {
+    Plus,
+    Loader2,
+    Building2,
+    Calendar,
+    Sparkles,
+    Check,
+    Coins,
+} from "lucide-react";
+import {
+    AnimatedTrendUpIcon,
+    AnimatedTrendDownIcon,
+    AnimatedClockIcon,
+    AnimatedCheckIcon,
+    AnimatedRupeeIcon,
+} from "@/components/ui/animated-icons";
 
 const formSchema = z.object({
     amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -103,6 +118,22 @@ export function IncomeForm({
         },
     });
 
+    // Update form when editing initialData changes
+    useEffect(() => {
+        if (initialData) {
+            form.reset({
+                amount: initialData.amount.toString(),
+                category: initialData.category,
+                month: initialData.month,
+                year: initialData.year.toString(),
+                type: initialData.type,
+                status: initialData.status,
+                companyId: initialData.companyId || "none",
+                description: initialData.description || "",
+            });
+        }
+    }, [initialData, form]);
+
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (!user) return;
 
@@ -127,14 +158,14 @@ export function IncomeForm({
                 await updateIncome(initialData.id, user.uid, formData);
                 toast({
                     title: "Success!",
-                    description: "Entry updated successfully",
+                    description: "Transaction updated successfully",
                     duration: 1500,
                 });
             } else {
                 await addIncome(formData, user.uid);
                 toast({
                     title: "Success!",
-                    description: "Income entry added successfully",
+                    description: "Transaction recorded successfully",
                     duration: 1500,
                 });
             }
@@ -160,314 +191,499 @@ export function IncomeForm({
 
     const availableYears = [2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030];
 
+    // Quick increment helper
+    const handleQuickAdd = (increment: number) => {
+        const current = Number(form.getValues("amount")) || 0;
+        form.setValue("amount", (current + increment).toString(), { shouldValidate: true });
+    };
+
+    const watchType = form.watch("type");
+    const watchStatus = form.watch("status");
+    const watchCategory = form.watch("category");
+
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
                     <Button
                         size="icon"
-                        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold z-50 transition-all hover:scale-105 active:scale-95 group shadow-indigo-500/35 hover:shadow-indigo-500/50"
+                        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold z-50 transition-all hover:scale-105 active:scale-95 group shadow-violet-500/30 hover:shadow-violet-500/50"
                     >
                         <Plus className="h-6 w-6 transition-transform group-hover:rotate-90" />
-                        <span className="sr-only">Add Income Entry</span>
+                        <span className="sr-only">Add Transaction</span>
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="glass bg-card/95 text-card-foreground border-border sm:max-w-[440px] p-0 overflow-hidden rounded-2xl shadow-2xl">
-                {/* Top Gradient Accent */}
-                <div className="h-[3px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
-                <div className="p-6 pb-2">
+
+            {/* 70% Width Modal with modern light/sleek aesthetic */}
+            <DialogContent className="glass bg-card/98 text-card-foreground border-border w-[95vw] md:w-[85vw] lg:w-[70vw] sm:max-w-[70vw] max-w-[70vw] max-h-[92vh] overflow-y-auto p-0 rounded-3xl shadow-2xl">
+                {/* Modern Header */}
+                <div className="p-6 sm:p-7 pb-4 border-b border-border/50">
                     <DialogHeader className="space-y-1">
-                        <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
-                            {isEditing ? "Edit Entry" : "Record Transaction"}
-                        </DialogTitle>
-                        <DialogDescription className="text-muted-foreground font-medium text-xs">
-                            {isEditing
-                                ? "Update the details of this financial record"
-                                : "Add a new income or expense entry to your ledger"}
-                        </DialogDescription>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                            <div className="flex items-center gap-3.5">
+                                <div className="p-2.5 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-violet-500/20 shrink-0">
+                                    <AnimatedRupeeIcon size={24} />
+                                </div>
+                                <div>
+                                    <DialogTitle className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2">
+                                        {isEditing ? "Edit Transaction" : "Record Transaction"}
+                                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">
+                                            70% Width Ledger
+                                        </span>
+                                    </DialogTitle>
+                                    <DialogDescription className="text-muted-foreground font-medium text-xs sm:text-sm mt-0.5">
+                                        {isEditing
+                                            ? "Update details for this financial record in your ledger"
+                                            : "Add a new income inflow or business expenditure to your ledger"}
+                                    </DialogDescription>
+                                </div>
+                            </div>
+
+                            <div className="hidden sm:flex items-center gap-2">
+                                <span className="text-xs font-bold px-3 py-1 rounded-xl bg-muted/60 text-muted-foreground border border-border/60">
+                                    FY {form.watch("year") || defaultYear}
+                                </span>
+                            </div>
+                        </div>
                     </DialogHeader>
                 </div>
 
+                {/* Form Body - 2 Columns Layout for 70% Width */}
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="p-6 pt-2 space-y-4"
+                        className="p-6 sm:p-7 pt-4 space-y-6"
                     >
-                        <FormField
-                            control={form.control}
-                            name="amount"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                        Amount (₹)
-                                    </FormLabel>
-                                    <FormControl>
-                                        <div className="relative">
-                                            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary font-bold text-base">
-                                                ₹
-                                            </span>
-                                            <Input
-                                                placeholder="0.00"
-                                                inputMode="numeric"
-                                                {...field}
-                                                className="pl-8 h-11 bg-background/50 border-input text-foreground font-bold text-lg rounded-xl focus-visible:ring-primary"
-                                            />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {/* LEFT COLUMN: Numbers, Date & Entity */}
+                            <div className="space-y-5">
+                                {/* Hero Amount Card */}
+                                <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="amount"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className="flex items-center justify-between">
+                                                    <FormLabel className="text-muted-foreground text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                                        <Coins className="w-3.5 h-3.5 text-primary" />
+                                                        Transaction Amount (₹) *
+                                                    </FormLabel>
+                                                    <span className="text-[11px] font-semibold text-primary">
+                                                        Direct Value
+                                                    </span>
+                                                </div>
+                                                <FormControl>
+                                                    <div className="relative mt-1">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-black text-2xl select-none">
+                                                            ₹
+                                                        </span>
+                                                        <Input
+                                                            placeholder="0.00"
+                                                            inputMode="numeric"
+                                                            {...field}
+                                                            className="pl-10 h-14 bg-background/80 border-input text-foreground font-black text-2xl sm:text-3xl rounded-2xl focus-visible:ring-primary shadow-inner"
+                                                        />
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* Quick Increment Chips */}
+                                    <div className="pt-1">
+                                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-2">
+                                            <Sparkles className="w-3 h-3 text-amber-500" />
+                                            Quick Presets:
                                         </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <FormField
-                                control={form.control}
-                                name="month"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                            Month
-                                        </FormLabel>
-                                        <Select
-                                            onValueChange={field.onChange}
-                                            value={field.value}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                    <SelectValue placeholder="Select Month" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass bg-popover text-popover-foreground border-border max-h-56">
-                                                {MONTHS.map((m) => (
-                                                    <SelectItem key={m} value={m} className="text-xs">
-                                                        {m}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="year"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                            Year
-                                        </FormLabel>
-                                        <Select
-                                            onValueChange={(val) => field.onChange(val)}
-                                            value={field.value?.toString()}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                    <SelectValue placeholder="Year" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                                {availableYears.map((y) => (
-                                                    <SelectItem key={y} value={y.toString()} className="text-xs">
-                                                        {y}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3">
-                            <FormField
-                                control={form.control}
-                                name="type"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                            Type
-                                        </FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                    <SelectValue placeholder="Type" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                                <SelectItem value="credit" className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
-                                                    Credit (Income)
-                                                </SelectItem>
-                                                <SelectItem value="debit" className="text-rose-600 dark:text-rose-400 font-semibold text-xs">
-                                                    Debit (Expense)
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-
-                            <FormField
-                                control={form.control}
-                                name="status"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                            Status
-                                        </FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                    <SelectValue placeholder="Status" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                                <SelectItem value="received" className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
-                                                    Received (Paid)
-                                                </SelectItem>
-                                                <SelectItem value="pending" className="text-amber-600 dark:text-amber-400 font-semibold text-xs">
-                                                    Pending (Unpaid)
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <FormField
-                                control={form.control}
-                                name="companyId"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <div className="flex items-center justify-between">
-                                            <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                                                <Building2 className="w-3 h-3 text-primary" />
-                                                Company / Source
-                                            </FormLabel>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {[1000, 5000, 10000, 25000, 50000].map((val) => (
+                                                <button
+                                                    key={val}
+                                                    type="button"
+                                                    onClick={() => handleQuickAdd(val)}
+                                                    className="px-2.5 py-1 text-xs font-bold rounded-xl border border-border/70 bg-background/80 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all active:scale-95"
+                                                >
+                                                    +₹{val >= 1000 ? `${val / 1000}k` : val}
+                                                </button>
+                                            ))}
                                             <button
                                                 type="button"
-                                                onClick={() => setShowCompanySettings(true)}
-                                                className="text-[10px] text-primary hover:underline font-bold"
+                                                onClick={() => form.setValue("amount", "", { shouldValidate: true })}
+                                                className="px-2.5 py-1 text-xs font-bold rounded-xl border border-border/50 text-muted-foreground hover:text-rose-500 hover:border-rose-500/30 transition-all"
                                             >
-                                                + Manage
+                                                Clear
                                             </button>
                                         </div>
-                                        <Select
-                                            onValueChange={(val) => {
-                                                if (val === "manage_companies") {
-                                                    setShowCompanySettings(true);
-                                                    return;
-                                                }
-                                                field.onChange(val);
-                                                const comp = companies.find((c) => c.id === val);
-                                                if (comp?.category) {
-                                                    form.setValue("category", comp.category);
-                                                }
-                                            }}
-                                            value={field.value || "none"}
-                                        >
-                                            <FormControl>
-                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                    <SelectValue placeholder="Select Company" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass bg-popover text-popover-foreground border-border max-h-56">
-                                                <SelectItem value="none" className="text-xs">
-                                                    — Personal / None —
-                                                </SelectItem>
-                                                {companies.map((c) => (
-                                                    <SelectItem key={c.id} value={c.id} className="text-xs font-semibold">
-                                                        <div className="flex items-center gap-2">
-                                                            <span
-                                                                className="w-2 h-2 rounded-full shrink-0"
-                                                                style={{ backgroundColor: c.color || "#6366f1" }}
-                                                            />
-                                                            <span>{c.name}</span>
-                                                        </div>
-                                                    </SelectItem>
-                                                ))}
-                                                <SelectItem
-                                                    value="manage_companies"
-                                                    className="text-xs text-primary font-bold border-t border-border/60 cursor-pointer"
-                                                >
-                                                    + Add / Manage in Settings...
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                    </div>
+                                </div>
 
-                            <FormField
-                                control={form.control}
-                                name="category"
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                            Category
-                                        </FormLabel>
-                                        <Select onValueChange={field.onChange} value={field.value}>
-                                            <FormControl>
-                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                    <SelectValue placeholder="Category" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                                <SelectItem value="primary" className="text-xs">
-                                                    Primary / Salary
-                                                </SelectItem>
-                                                <SelectItem value="secondary" className="text-xs">
-                                                    Secondary / Freelance
-                                                </SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                {/* Date Period: Month & Year */}
+                                <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-4">
+                                    <div className="flex items-center justify-between pb-1 border-b border-border/40">
+                                        <span className="text-xs font-bold text-foreground flex items-center gap-1.5 uppercase tracking-wider">
+                                            <Calendar className="w-3.5 h-3.5 text-primary" />
+                                            Timeline & Period
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground font-semibold">
+                                            Accounting Month
+                                        </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <FormField
+                                            control={form.control}
+                                            name="month"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                        Month
+                                                    </FormLabel>
+                                                    <Select
+                                                        onValueChange={field.onChange}
+                                                        value={field.value}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger className="bg-background/80 border-input text-foreground h-11 rounded-xl text-xs font-semibold">
+                                                                <SelectValue placeholder="Select Month" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="glass bg-popover text-popover-foreground border-border max-h-56">
+                                                            {MONTHS.map((m) => (
+                                                                <SelectItem key={m} value={m} className="text-xs">
+                                                                    {m}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+
+                                        <FormField
+                                            control={form.control}
+                                            name="year"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                        Year
+                                                    </FormLabel>
+                                                    <Select
+                                                        onValueChange={(val) => field.onChange(val)}
+                                                        value={field.value?.toString()}
+                                                    >
+                                                        <FormControl>
+                                                            <SelectTrigger className="bg-background/80 border-input text-foreground h-11 rounded-xl text-xs font-semibold">
+                                                                <SelectValue placeholder="Year" />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent className="glass bg-popover text-popover-foreground border-border">
+                                                            {availableYears.map((y) => (
+                                                                <SelectItem key={y} value={y.toString()} className="text-xs">
+                                                                    {y}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Company / Client Source */}
+                                <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-3">
+                                    <FormField
+                                        control={form.control}
+                                        name="companyId"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className="flex items-center justify-between">
+                                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                                        <Building2 className="w-3.5 h-3.5 text-primary" />
+                                                        Company / Client Source
+                                                    </FormLabel>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowCompanySettings(true)}
+                                                        className="text-xs text-primary hover:underline font-bold flex items-center gap-1"
+                                                    >
+                                                        + Manage Companies
+                                                    </button>
+                                                </div>
+                                                <Select
+                                                    onValueChange={(val) => {
+                                                        if (val === "manage_companies") {
+                                                            setShowCompanySettings(true);
+                                                            return;
+                                                        }
+                                                        field.onChange(val);
+                                                        const comp = companies.find((c) => c.id === val);
+                                                        if (comp?.category) {
+                                                            form.setValue("category", comp.category);
+                                                        }
+                                                    }}
+                                                    value={field.value || "none"}
+                                                >
+                                                    <FormControl>
+                                                        <SelectTrigger className="bg-background/80 border-input text-foreground h-11 rounded-xl text-xs font-semibold">
+                                                            <SelectValue placeholder="Select Company or Source" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent className="glass bg-popover text-popover-foreground border-border max-h-56">
+                                                        <SelectItem value="none" className="text-xs">
+                                                            — Personal / None —
+                                                        </SelectItem>
+                                                        {companies.map((c) => (
+                                                            <SelectItem key={c.id} value={c.id} className="text-xs font-semibold">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span
+                                                                        className="w-2.5 h-2.5 rounded-full shrink-0"
+                                                                        style={{ backgroundColor: c.color || "#6366f1" }}
+                                                                    />
+                                                                    <span>{c.name}</span>
+                                                                    <span className="text-[10px] text-muted-foreground uppercase ml-1">
+                                                                        ({c.category || "primary"})
+                                                                    </span>
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))}
+                                                        <SelectItem
+                                                            value="manage_companies"
+                                                            className="text-xs text-primary font-bold border-t border-border/60 cursor-pointer"
+                                                        >
+                                                            + Add / Manage in Settings...
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* RIGHT COLUMN: Classification, Type, Status & Notes */}
+                            <div className="space-y-5">
+                                {/* Interactive Transaction Type Selector */}
+                                <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-3">
+                                    <div className="flex items-center justify-between pb-1 border-b border-border/40">
+                                        <span className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                            Transaction Type *
+                                        </span>
+                                        <span className="text-[10px] text-muted-foreground font-semibold">
+                                            Flow Direction
+                                        </span>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {/* Credit Card */}
+                                        <div
+                                            role="button"
+                                            onClick={() => form.setValue("type", "credit", { shouldValidate: true })}
+                                            className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between ${
+                                                watchType === "credit"
+                                                    ? "border-emerald-500/80 bg-emerald-500/10 dark:bg-emerald-500/15 ring-2 ring-emerald-500/30 shadow-md"
+                                                    : "border-border/80 bg-background/60 hover:bg-muted/40 opacity-80 hover:opacity-100"
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                                    <AnimatedTrendUpIcon size={16} />
+                                                </div>
+                                                {watchType === "credit" && (
+                                                    <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                                                        <Check className="w-3 h-3 stroke-[3]" />
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-black text-emerald-700 dark:text-emerald-300">
+                                                    Credit (Income)
+                                                </h4>
+                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                                    Money inflow, salary, payments
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Debit Card */}
+                                        <div
+                                            role="button"
+                                            onClick={() => form.setValue("type", "debit", { shouldValidate: true })}
+                                            className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between ${
+                                                watchType === "debit"
+                                                    ? "border-rose-500/80 bg-rose-500/10 dark:bg-rose-500/15 ring-2 ring-rose-500/30 shadow-md"
+                                                    : "border-border/80 bg-background/60 hover:bg-muted/40 opacity-80 hover:opacity-100"
+                                            }`}
+                                        >
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="p-2 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                                    <AnimatedTrendDownIcon size={16} />
+                                                </div>
+                                                {watchType === "debit" && (
+                                                    <span className="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center">
+                                                        <Check className="w-3 h-3 stroke-[3]" />
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-sm font-black text-rose-700 dark:text-rose-300">
+                                                    Debit (Expense)
+                                                </h4>
+                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                                    Money outflow, equipment, cost
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Status & Category Controls */}
+                                <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-4">
+                                    {/* Status Switch */}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                Settlement Status *
+                                            </FormLabel>
+                                            <span className="text-[10px] text-muted-foreground font-semibold">
+                                                Realized vs Receivable
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 bg-background/80 p-1.5 rounded-2xl border border-border">
+                                            <button
+                                                type="button"
+                                                onClick={() => form.setValue("status", "received", { shouldValidate: true })}
+                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                                    watchStatus === "received"
+                                                        ? "bg-emerald-600 text-white shadow-sm shadow-emerald-500/25"
+                                                        : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                <AnimatedCheckIcon size={14} />
+                                                <span>Received (Paid)</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => form.setValue("status", "pending", { shouldValidate: true })}
+                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                                    watchStatus === "pending"
+                                                        ? "bg-amber-600 text-white shadow-sm shadow-amber-500/25"
+                                                        : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                <AnimatedClockIcon size={14} />
+                                                <span>Pending (Unpaid)</span>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Stream Category Switch */}
+                                    <div className="space-y-2 pt-1 border-t border-border/40">
+                                        <div className="flex items-center justify-between">
+                                            <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                Stream Classification *
+                                            </FormLabel>
+                                            <span className="text-[10px] text-muted-foreground font-semibold">
+                                                Income Stream
+                                            </span>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2 bg-background/80 p-1.5 rounded-2xl border border-border">
+                                            <button
+                                                type="button"
+                                                onClick={() => form.setValue("category", "primary", { shouldValidate: true })}
+                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                                                    watchCategory === "primary"
+                                                        ? "bg-primary text-primary-foreground shadow-sm"
+                                                        : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                Primary (Salary / Core)
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => form.setValue("category", "secondary", { shouldValidate: true })}
+                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                                                    watchCategory === "secondary"
+                                                        ? "bg-primary text-primary-foreground shadow-sm"
+                                                        : "text-muted-foreground hover:text-foreground"
+                                                }`}
+                                            >
+                                                Secondary (Freelance / Extra)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Description Input */}
+                                <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm">
+                                    <FormField
+                                        control={form.control}
+                                        name="description"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                    Transaction Description / Notes (Optional)
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        placeholder="e.g. Monthly salary payout, Client retainership, MacBook Pro..."
+                                                        {...field}
+                                                        className="bg-background/80 border-input text-foreground h-11 rounded-xl text-xs font-medium focus-visible:ring-primary mt-1"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                            </div>
                         </div>
 
-                        <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                        Description (Optional)
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="e.g. Salary, Consulting, Bonus, Equipment"
-                                            {...field}
-                                            className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs focus-visible:ring-primary"
-                                        />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
-                        <Button
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold h-11 rounded-xl shadow-lg shadow-indigo-500/25 transition-all mt-2"
-                            disabled={loading}
-                        >
-                            {loading ? (
-                                <Loader2 className="h-5 w-5 animate-spin" />
-                            ) : isEditing ? (
-                                "Update Transaction"
-                            ) : (
-                                "Save Transaction"
-                            )}
-                        </Button>
+                        {/* Modal Action Bar */}
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-border/50">
+                            <span className="text-xs text-muted-foreground font-medium hidden sm:inline">
+                                Ledger entry will update your dashboard metrics instantly
+                            </span>
+                            <div className="flex items-center gap-3 w-full sm:w-auto">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={() => setOpen(false)}
+                                    className="w-1/2 sm:w-auto h-11 px-5 rounded-xl border-border text-xs font-bold"
+                                    disabled={loading}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="w-1/2 sm:w-auto min-w-[180px] bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold h-11 px-6 rounded-xl shadow-lg shadow-violet-500/25 transition-all text-xs flex items-center justify-center gap-2 hover:scale-[1.01] active:scale-[0.99]"
+                                    disabled={loading}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <span>Processing...</span>
+                                        </>
+                                    ) : isEditing ? (
+                                        <>
+                                            <Check className="h-4 w-4" />
+                                            <span>Update Transaction</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Plus className="h-4 w-4" />
+                                            <span>Save Transaction</span>
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        </div>
                     </form>
                 </Form>
             </DialogContent>

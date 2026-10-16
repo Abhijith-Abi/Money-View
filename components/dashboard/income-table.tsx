@@ -42,6 +42,14 @@ import {
     Wallet,
     Building2,
 } from "lucide-react";
+import {
+    AnimatedTrendUpIcon,
+    AnimatedTrendDownIcon,
+    AnimatedWalletIcon,
+    AnimatedClockIcon,
+    AnimatedCheckIcon,
+    AnimatedPulseRing,
+} from "@/components/ui/animated-icons";
 import { IncomeForm } from "./income-form";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -425,21 +433,20 @@ export function IncomeTable({
                     className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-1"
                 >
                     {/* Credits */}
-                    <div className="relative overflow-hidden rounded-xl p-3.5 border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/50 dark:bg-slate-900/40 shadow-sm transition-all group">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-500 to-teal-500" />
-                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                    <div className="relative overflow-hidden rounded-2xl p-4 border border-slate-200/90 dark:border-white/[0.08] bg-white/90 dark:bg-zinc-900/70 shadow-sm hover:shadow-md transition-all group">
+                        <div className="flex items-center justify-between mb-2 relative z-10">
                             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 Credits
                             </span>
-                            <div className="p-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                <TrendingUp className="h-3.5 w-3.5" />
+                            <div className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-sm">
+                                <AnimatedTrendUpIcon size={14} />
                             </div>
                         </div>
                         <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight relative z-10">
                             {formatCurrency(totals.credits)}
                         </p>
-                        <div className="mt-2 pt-2 border-t border-border/40 text-[10px] space-y-0.5 text-muted-foreground relative z-10">
+                        <div className="mt-2.5 pt-2 border-t border-border/40 text-[10px] space-y-0.5 text-muted-foreground relative z-10">
                             <div className="flex justify-between">
                                 <span>Primary:</span>
                                 <span className="font-bold text-foreground">
@@ -456,21 +463,20 @@ export function IncomeTable({
                     </div>
 
                     {/* Debits */}
-                    <div className="relative overflow-hidden rounded-xl p-3.5 border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/50 dark:bg-slate-900/40 shadow-sm transition-all group">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-rose-500 to-pink-500" />
-                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                    <div className="relative overflow-hidden rounded-2xl p-4 border border-slate-200/90 dark:border-white/[0.08] bg-white/90 dark:bg-zinc-900/70 shadow-sm hover:shadow-md transition-all group">
+                        <div className="flex items-center justify-between mb-2 relative z-10">
                             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                                 Debits
                             </span>
-                            <div className="p-1 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                                <TrendingDown className="h-3.5 w-3.5" />
+                            <div className="p-1.5 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 shadow-sm">
+                                <AnimatedTrendDownIcon size={14} />
                             </div>
                         </div>
                         <p className="text-xl font-black text-rose-600 dark:text-rose-400 tracking-tight relative z-10">
                             {formatCurrency(totals.debits)}
                         </p>
-                        <div className="mt-2 pt-2 border-t border-border/40 text-[10px] space-y-0.5 text-muted-foreground relative z-10">
+                        <div className="mt-2.5 pt-2 border-t border-border/40 text-[10px] space-y-0.5 text-muted-foreground relative z-10">
                             <div className="flex justify-between">
                                 <span>Primary:</span>
                                 <span className="font-bold text-foreground">
@@ -487,63 +493,60 @@ export function IncomeTable({
                     </div>
 
                     {/* Net Balance */}
-                    <div className="relative overflow-hidden rounded-xl p-3.5 border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/50 dark:bg-slate-900/40 shadow-sm transition-all group flex flex-col justify-between">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-indigo-500 to-violet-500" />
+                    <div className="relative overflow-hidden rounded-2xl p-4 border border-slate-200/90 dark:border-white/[0.08] bg-white/90 dark:bg-zinc-900/70 shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
                         <div className="relative z-10">
-                            <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center justify-between mb-2">
                                 <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
                                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                                     Net Balance
                                 </span>
-                                <div className="p-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
-                                    <Wallet className="h-3.5 w-3.5" />
+                                <div className="p-1.5 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-sm">
+                                    <AnimatedWalletIcon size={14} />
                                 </div>
                             </div>
                             <p className="text-xl font-black text-foreground tracking-tight">
                                 {formatCurrency(totals.net)}
                             </p>
                         </div>
-                        <p className="text-[10px] text-muted-foreground font-medium mt-2 pt-2 border-t border-border/40 relative z-10">
+                        <p className="text-[10px] text-muted-foreground font-medium mt-2.5 pt-2 border-t border-border/40 relative z-10">
                             Filtered Inflow vs Outflow
                         </p>
                     </div>
 
                     {/* Year Pending */}
-                    <div className="relative overflow-hidden rounded-xl p-3.5 border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/50 dark:bg-slate-900/40 shadow-sm transition-all group">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-500 to-orange-500" />
-                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                    <div className="relative overflow-hidden rounded-2xl p-4 border border-slate-200/90 dark:border-white/[0.08] bg-white/90 dark:bg-zinc-900/70 shadow-sm hover:shadow-md transition-all group">
+                        <div className="flex items-center justify-between mb-2 relative z-10">
                             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
                                 Pending
                             </span>
-                            <div className="p-1 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                                <Hourglass className="h-3.5 w-3.5" />
+                            <div className="p-1.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-sm">
+                                <AnimatedClockIcon size={14} />
                             </div>
                         </div>
                         <p className="text-xl font-black text-amber-600 dark:text-amber-400 tracking-tight relative z-10">
                             {formatCurrency(yearTotals.pending)}
                         </p>
-                        <p className="text-[10px] text-muted-foreground font-medium mt-2 pt-2 border-t border-border/40 relative z-10">
+                        <p className="text-[10px] text-muted-foreground font-medium mt-2.5 pt-2 border-t border-border/40 relative z-10">
                             Uncollected in this view
                         </p>
                     </div>
 
                     {/* Year Received */}
-                    <div className="relative overflow-hidden rounded-xl p-3.5 border border-slate-200/80 dark:border-white/[0.06] bg-slate-50/50 dark:bg-slate-900/40 shadow-sm transition-all group col-span-2 sm:col-span-1">
-                        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-emerald-500 to-teal-500" />
-                        <div className="flex items-center justify-between mb-1.5 relative z-10">
+                    <div className="relative overflow-hidden rounded-2xl p-4 border border-slate-200/90 dark:border-white/[0.08] bg-white/90 dark:bg-zinc-900/70 shadow-sm hover:shadow-md transition-all group col-span-2 sm:col-span-1">
+                        <div className="flex items-center justify-between mb-2 relative z-10">
                             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold flex items-center gap-1.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                 Received
                             </span>
-                            <div className="p-1 rounded-lg bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20">
-                                <CheckCircle2 className="h-3.5 w-3.5" />
+                            <div className="p-1.5 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 shadow-sm">
+                                <AnimatedCheckIcon size={14} />
                             </div>
                         </div>
                         <p className="text-xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight relative z-10">
                             {formatCurrency(yearTotals.received)}
                         </p>
-                        <p className="text-[10px] text-muted-foreground font-medium mt-2 pt-2 border-t border-border/40 relative z-10">
+                        <p className="text-[10px] text-muted-foreground font-medium mt-2.5 pt-2 border-t border-border/40 relative z-10">
                             Settled in this view
                         </p>
                     </div>

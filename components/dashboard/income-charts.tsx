@@ -100,8 +100,6 @@ export function IncomeCharts({
 
     return (
         <Card className="glass relative overflow-hidden rounded-2xl border border-slate-200/90 dark:border-white/[0.08] shadow-sm dark:shadow-2xl">
-            {/* Top Gradient Accent */}
-            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-2 pt-5">
                 <div>
                     <CardTitle className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">

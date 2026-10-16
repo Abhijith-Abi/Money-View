@@ -73,8 +73,6 @@ export default function LoginPage() {
 
                     {/* Card Container */}
                     <div className="relative rounded-[2rem] glass bg-card/95 backdrop-blur-2xl border border-border p-7 sm:p-9 shadow-2xl overflow-hidden space-y-6">
-                        {/* Top Gradient Accent */}
-                        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
                         {/* Header & Logo */}
                         <div className="text-center space-y-3 pt-2">
                             <motion.div

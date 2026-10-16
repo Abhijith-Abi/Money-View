@@ -180,9 +180,6 @@ export function CompanySettingsDialog({
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
 
             <DialogContent className="glass bg-card/95 text-card-foreground border-border max-w-lg max-h-[90vh] overflow-y-auto p-0 rounded-2xl shadow-2xl">
-                {/* Top Subtle Brand Line */}
-                <div className="h-[2.5px] bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500" />
-
                 <div className="p-5 sm:p-6 space-y-5">
                     {/* Header */}
                     <DialogHeader className="text-left space-y-1">
@@ -297,7 +294,7 @@ export function CompanySettingsDialog({
                             <Button
                                 type="submit"
                                 disabled={loading || !name.trim()}
-                                className="bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-md shadow-indigo-500/20 transition-all self-end flex items-center gap-1.5"
+                                className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold text-xs h-9 px-4 rounded-xl shadow-md shadow-violet-500/20 transition-all self-end flex items-center gap-1.5"
                             >
                                 {loading ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

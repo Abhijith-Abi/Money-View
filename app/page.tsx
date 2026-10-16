@@ -230,9 +230,9 @@ export default function Home() {
                 >
                     {/* Subtle modern ambient background mesh */}
                     <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
-                        <div className="absolute -top-[15%] -left-[10%] w-[50vw] h-[50vw] bg-indigo-500/10 dark:bg-indigo-600/15 blur-[140px] rounded-full animate-float-slow" />
-                        <div className="absolute top-[25%] -right-[10%] w-[45vw] h-[45vw] bg-cyan-500/10 dark:bg-cyan-600/15 blur-[140px] rounded-full animate-pulse-glow" />
-                        <div className="absolute -bottom-[15%] left-[20%] w-[45vw] h-[45vw] bg-violet-500/10 dark:bg-violet-600/10 blur-[140px] rounded-full" />
+                        <div className="absolute -top-[15%] -left-[10%] w-[45vw] h-[45vw] bg-violet-500/8 dark:bg-violet-600/10 blur-[130px] rounded-full animate-float-slow" />
+                        <div className="absolute top-[25%] -right-[10%] w-[40vw] h-[40vw] bg-indigo-500/8 dark:bg-indigo-600/10 blur-[130px] rounded-full animate-pulse-glow" />
+                        <div className="absolute -bottom-[15%] left-[20%] w-[40vw] h-[40vw] bg-emerald-500/5 dark:bg-emerald-600/5 blur-[140px] rounded-full" />
                     </div>
 
                     <div className="p-4 sm:p-6 lg:p-8">
@@ -246,9 +246,9 @@ export default function Home() {
                                 {/* Brand & User Greeting */}
                                 <div className="flex items-center gap-3.5 sm:gap-4">
                                     <div className="relative">
-                                        <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 rounded-2xl blur-md opacity-40" />
-                                        <div className="relative p-2.5 sm:p-3 rounded-2xl bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 shadow-lg shadow-indigo-500/25">
-                                            <Wallet className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
+                                        <div className="absolute -inset-1 bg-gradient-to-r from-violet-600 to-indigo-600 rounded-2xl blur-md opacity-30" />
+                                        <div className="relative p-2.5 sm:p-3 rounded-2xl bg-gradient-to-tr from-violet-600 to-indigo-600 shadow-lg shadow-violet-500/20 text-white">
+                                            <Wallet className="h-6 w-6 sm:h-7 sm:w-7" />
                                         </div>
                                     </div>
                                     <div>
@@ -338,7 +338,7 @@ export default function Home() {
                                         onSuccess={() => fetchData(true)}
                                         defaultYear={effectiveYearNumber}
                                         trigger={
-                                            <Button className="bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 hover:from-violet-500 hover:to-cyan-400 text-white font-bold rounded-xl h-9 px-3.5 text-xs shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition-all flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]">
+                                            <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-bold rounded-xl h-9 px-4 text-xs shadow-md shadow-violet-500/20 hover:shadow-violet-500/35 transition-all flex items-center gap-1.5 hover:scale-[1.02] active:scale-[0.98]">
                                                 <Plus className="h-3.5 w-3.5" />
                                                 <span>Add Entry</span>
                                             </Button>

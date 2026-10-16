@@ -8,27 +8,27 @@ html {
 
 @layer base {
     :root {
-        --background: 220 33% 98%;
-        --foreground: 222 47% 11%;
+        --background: 0 0% 99%;
+        --foreground: 240 10% 12%;
         --card: 0 0% 100%;
-        --card-foreground: 222 47% 11%;
+        --card-foreground: 240 10% 12%;
         --popover: 0 0% 100%;
-        --popover-foreground: 222 47% 11%;
-        --primary: 246 80% 60%;
+        --popover-foreground: 240 10% 12%;
+        --primary: 250 84% 58%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 220 20% 95%;
-        --secondary-foreground: 222 47% 15%;
-        --muted: 220 20% 93%;
-        --muted-foreground: 220 15% 45%;
-        --accent: 220 25% 92%;
-        --accent-foreground: 222 47% 11%;
+        --secondary: 240 5% 96%;
+        --secondary-foreground: 240 6% 15%;
+        --muted: 240 5% 95%;
+        --muted-foreground: 240 4% 46%;
+        --accent: 240 5% 95%;
+        --accent-foreground: 240 6% 15%;
         --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 220 20% 88%;
-        --input: 220 20% 88%;
-        --ring: 246 80% 60%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 6% 91%;
+        --input: 240 6% 91%;
+        --ring: 250 84% 58%;
         --radius: 1rem;
-        --chart-1: 246 80% 60%;
+        --chart-1: 250 84% 58%;
         --chart-2: 160 84% 39%;
         --chart-3: 199 89% 48%;
         --chart-4: 43 96% 56%;
@@ -36,28 +36,28 @@ html {
     }
 
     .dark {
-        --background: 224 45% 5%;
-        --foreground: 210 40% 98%;
-        --card: 224 35% 8%;
-        --card-foreground: 210 40% 98%;
-        --popover: 224 35% 7%;
-        --popover-foreground: 210 40% 98%;
-        --primary: 246 80% 68%;
-        --primary-foreground: 224 45% 6%;
-        --secondary: 224 25% 13%;
-        --secondary-foreground: 210 40% 98%;
-        --muted: 224 25% 12%;
-        --muted-foreground: 217 20% 65%;
-        --accent: 224 25% 15%;
-        --accent-foreground: 210 40% 98%;
+        --background: 240 6% 7%;
+        --foreground: 0 0% 98%;
+        --card: 240 5% 9.5%;
+        --card-foreground: 0 0% 98%;
+        --popover: 240 5% 9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 250 84% 65%;
+        --primary-foreground: 240 6% 7%;
+        --secondary: 240 5% 14%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 240 5% 13%;
+        --muted-foreground: 240 5% 65%;
+        --accent: 240 5% 15%;
+        --accent-foreground: 0 0% 98%;
         --destructive: 0 72% 51%;
-        --destructive-foreground: 210 40% 98%;
-        --border: 224 25% 15%;
-        --input: 224 25% 15%;
-        --ring: 246 80% 68%;
-        --chart-1: 246 80% 68%;
-        --chart-2: 160 84% 39%;
-        --chart-3: 199 89% 48%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5% 16%;
+        --input: 240 5% 16%;
+        --ring: 250 84% 65%;
+        --chart-1: 250 84% 65%;
+        --chart-2: 160 84% 42%;
+        --chart-3: 199 89% 52%;
         --chart-4: 43 96% 56%;
         --chart-5: 346 87% 57%;
     }
@@ -82,11 +82,11 @@ html {
 
     /* Modern Harmonious Glass Surfaces */
     .glass {
-        @apply bg-white/85 backdrop-blur-xl border border-slate-200/90 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.05)] dark:bg-slate-900/65 dark:backdrop-blur-2xl dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.36)];
+        @apply bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.05)] dark:bg-zinc-900/70 dark:backdrop-blur-2xl dark:border-white/[0.08] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.36)];
     }
 
     .glass-card {
-        @apply bg-white/90 backdrop-blur-xl border border-slate-200/90 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06)] dark:bg-slate-900/70 dark:backdrop-blur-2xl dark:border-white/[0.08] dark:shadow-[0_6px_28px_rgba(0,0,0,0.45)] hover:border-indigo-400/50 dark:hover:border-indigo-500/40 transition-all duration-300;
+        @apply bg-white/95 backdrop-blur-xl border border-slate-200/90 shadow-[0_4px_24px_-4px_rgba(15,23,42,0.06)] dark:bg-zinc-900/75 dark:backdrop-blur-2xl dark:border-white/[0.08] dark:shadow-[0_6px_28px_rgba(0,0,0,0.45)] hover:border-slate-300 dark:hover:border-white/[0.16] transition-all duration-300;
     }
 
     .glass-card-interactive {
@@ -95,19 +95,19 @@ html {
 
     /* Premium Modern Fintech Gradients */
     .gradient-brand {
-        @apply bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500;
+        @apply bg-gradient-to-r from-violet-600 to-indigo-600;
     }
 
     .gradient-brand-subtle {
-        @apply bg-gradient-to-r from-violet-500/10 via-indigo-500/10 to-cyan-500/10;
+        @apply bg-gradient-to-r from-violet-500/10 to-indigo-500/10;
     }
 
     .gradient-brand-hover {
-        @apply hover:from-violet-500 hover:via-indigo-500 hover:to-cyan-400;
+        @apply hover:from-violet-500 hover:to-indigo-500;
     }
 
     .gradient-text {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 dark:from-violet-400 dark:via-indigo-300 dark:to-cyan-400;
+        @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600 dark:from-violet-400 dark:to-indigo-300;
     }
 
     .gradient-text-subtle {
