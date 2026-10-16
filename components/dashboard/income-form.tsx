@@ -197,10 +197,6 @@ export function IncomeForm({
         form.setValue("amount", (current + increment).toString(), { shouldValidate: true });
     };
 
-    const watchType = form.watch("type");
-    const watchStatus = form.watch("status");
-    const watchCategory = form.watch("category");
-
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
@@ -471,153 +467,182 @@ export function IncomeForm({
                             <div className="space-y-5">
                                 {/* Interactive Transaction Type Selector */}
                                 <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-3">
-                                    <div className="flex items-center justify-between pb-1 border-b border-border/40">
-                                        <span className="text-xs font-bold text-foreground uppercase tracking-wider">
-                                            Transaction Type *
-                                        </span>
-                                        <span className="text-[10px] text-muted-foreground font-semibold">
-                                            Flow Direction
-                                        </span>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {/* Credit Card */}
-                                        <div
-                                            role="button"
-                                            onClick={() => form.setValue("type", "credit", { shouldValidate: true })}
-                                            className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between ${
-                                                watchType === "credit"
-                                                    ? "border-emerald-500/80 bg-emerald-500/10 dark:bg-emerald-500/15 ring-2 ring-emerald-500/30 shadow-md"
-                                                    : "border-border/80 bg-background/60 hover:bg-muted/40 opacity-80 hover:opacity-100"
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                                                    <AnimatedTrendUpIcon size={16} />
-                                                </div>
-                                                {watchType === "credit" && (
-                                                    <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center">
-                                                        <Check className="w-3 h-3 stroke-[3]" />
+                                    <FormField
+                                        control={form.control}
+                                        name="type"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <div className="flex items-center justify-between pb-1 border-b border-border/40">
+                                                    <FormLabel className="text-xs font-bold text-foreground uppercase tracking-wider">
+                                                        Transaction Type *
+                                                    </FormLabel>
+                                                    <span className="text-[10px] text-muted-foreground font-semibold">
+                                                        Flow Direction
                                                     </span>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <h4 className="text-sm font-black text-emerald-700 dark:text-emerald-300">
-                                                    Credit (Income)
-                                                </h4>
-                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
-                                                    Money inflow, salary, payments
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {/* Debit Card */}
-                                        <div
-                                            role="button"
-                                            onClick={() => form.setValue("type", "debit", { shouldValidate: true })}
-                                            className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between ${
-                                                watchType === "debit"
-                                                    ? "border-rose-500/80 bg-rose-500/10 dark:bg-rose-500/15 ring-2 ring-rose-500/30 shadow-md"
-                                                    : "border-border/80 bg-background/60 hover:bg-muted/40 opacity-80 hover:opacity-100"
-                                            }`}
-                                        >
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="p-2 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                                                    <AnimatedTrendDownIcon size={16} />
                                                 </div>
-                                                {watchType === "debit" && (
-                                                    <span className="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center">
-                                                        <Check className="w-3 h-3 stroke-[3]" />
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div>
-                                                <h4 className="text-sm font-black text-rose-700 dark:text-rose-300">
-                                                    Debit (Expense)
-                                                </h4>
-                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
-                                                    Money outflow, equipment, cost
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
+
+                                                <FormControl>
+                                                    <div className="grid grid-cols-2 gap-3 pt-2">
+                                                        {/* Credit Card */}
+                                                        <div
+                                                            role="button"
+                                                            onClick={() => field.onChange("credit")}
+                                                            className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between ${
+                                                                field.value === "credit"
+                                                                    ? "border-emerald-500/80 bg-emerald-500/10 dark:bg-emerald-500/15 ring-2 ring-emerald-500/30 shadow-md"
+                                                                    : "border-border/80 bg-background/60 hover:bg-muted/40 opacity-80 hover:opacity-100"
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                                                                    <AnimatedTrendUpIcon size={16} />
+                                                                </div>
+                                                                {field.value === "credit" && (
+                                                                    <span className="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center">
+                                                                        <Check className="w-3 h-3 stroke-[3]" />
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="text-sm font-black text-emerald-700 dark:text-emerald-300">
+                                                                    Credit (Income)
+                                                                </h4>
+                                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                                                    Money inflow, salary, payments
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Debit Card */}
+                                                        <div
+                                                            role="button"
+                                                            onClick={() => field.onChange("debit")}
+                                                            className={`cursor-pointer rounded-2xl p-4 border transition-all duration-200 flex flex-col justify-between ${
+                                                                field.value === "debit"
+                                                                    ? "border-rose-500/80 bg-rose-500/10 dark:bg-rose-500/15 ring-2 ring-rose-500/30 shadow-md"
+                                                                    : "border-border/80 bg-background/60 hover:bg-muted/40 opacity-80 hover:opacity-100"
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <div className="p-2 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                                                                    <AnimatedTrendDownIcon size={16} />
+                                                                </div>
+                                                                {field.value === "debit" && (
+                                                                    <span className="w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center">
+                                                                        <Check className="w-3 h-3 stroke-[3]" />
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div>
+                                                                <h4 className="text-sm font-black text-rose-700 dark:text-rose-300">
+                                                                    Debit (Expense)
+                                                                </h4>
+                                                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
+                                                                    Money outflow, equipment, cost
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
 
                                 {/* Status & Category Controls */}
                                 <div className="p-5 rounded-2xl border border-slate-200/90 dark:border-white/[0.08] bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-sm space-y-4">
                                     {/* Status Switch */}
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                                Settlement Status *
-                                            </FormLabel>
-                                            <span className="text-[10px] text-muted-foreground font-semibold">
-                                                Realized vs Receivable
-                                            </span>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2 bg-background/80 p-1.5 rounded-2xl border border-border">
-                                            <button
-                                                type="button"
-                                                onClick={() => form.setValue("status", "received", { shouldValidate: true })}
-                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                                                    watchStatus === "received"
-                                                        ? "bg-emerald-600 text-white shadow-sm shadow-emerald-500/25"
-                                                        : "text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                <AnimatedCheckIcon size={14} />
-                                                <span>Received (Paid)</span>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => form.setValue("status", "pending", { shouldValidate: true })}
-                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                                                    watchStatus === "pending"
-                                                        ? "bg-amber-600 text-white shadow-sm shadow-amber-500/25"
-                                                        : "text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                <AnimatedClockIcon size={14} />
-                                                <span>Pending (Unpaid)</span>
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="status"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                        Settlement Status *
+                                                    </FormLabel>
+                                                    <span className="text-[10px] text-muted-foreground font-semibold">
+                                                        Realized vs Receivable
+                                                    </span>
+                                                </div>
+                                                <FormControl>
+                                                    <div className="grid grid-cols-2 gap-2 bg-background/80 p-1.5 rounded-2xl border border-border">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => field.onChange("received")}
+                                                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                                                field.value === "received"
+                                                                    ? "bg-emerald-600 text-white shadow-sm shadow-emerald-500/25"
+                                                                    : "text-muted-foreground hover:text-foreground"
+                                                            }`}
+                                                        >
+                                                            <AnimatedCheckIcon size={14} />
+                                                            <span>Received (Paid)</span>
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => field.onChange("pending")}
+                                                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                                                                field.value === "pending"
+                                                                    ? "bg-amber-600 text-white shadow-sm shadow-amber-500/25"
+                                                                    : "text-muted-foreground hover:text-foreground"
+                                                            }`}
+                                                        >
+                                                            <AnimatedClockIcon size={14} />
+                                                            <span>Pending (Unpaid)</span>
+                                                        </button>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
 
                                     {/* Stream Category Switch */}
-                                    <div className="space-y-2 pt-1 border-t border-border/40">
-                                        <div className="flex items-center justify-between">
-                                            <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                                Stream Classification *
-                                            </FormLabel>
-                                            <span className="text-[10px] text-muted-foreground font-semibold">
-                                                Income Stream
-                                            </span>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-2 bg-background/80 p-1.5 rounded-2xl border border-border">
-                                            <button
-                                                type="button"
-                                                onClick={() => form.setValue("category", "primary", { shouldValidate: true })}
-                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
-                                                    watchCategory === "primary"
-                                                        ? "bg-primary text-primary-foreground shadow-sm"
-                                                        : "text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                Primary (Salary / Core)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => form.setValue("category", "secondary", { shouldValidate: true })}
-                                                className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
-                                                    watchCategory === "secondary"
-                                                        ? "bg-primary text-primary-foreground shadow-sm"
-                                                        : "text-muted-foreground hover:text-foreground"
-                                                }`}
-                                            >
-                                                Secondary (Freelance / Extra)
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <FormField
+                                        control={form.control}
+                                        name="category"
+                                        render={({ field }) => (
+                                            <FormItem className="space-y-2 pt-1 border-t border-border/40">
+                                                <div className="flex items-center justify-between">
+                                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                                        Stream Classification *
+                                                    </FormLabel>
+                                                    <span className="text-[10px] text-muted-foreground font-semibold">
+                                                        Income Stream
+                                                    </span>
+                                                </div>
+                                                <FormControl>
+                                                    <div className="grid grid-cols-2 gap-2 bg-background/80 p-1.5 rounded-2xl border border-border">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => field.onChange("primary")}
+                                                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                                                                field.value === "primary"
+                                                                    ? "bg-primary text-primary-foreground shadow-sm"
+                                                                    : "text-muted-foreground hover:text-foreground"
+                                                            }`}
+                                                        >
+                                                            Primary (Salary / Core)
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => field.onChange("secondary")}
+                                                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                                                                field.value === "secondary"
+                                                                    ? "bg-primary text-primary-foreground shadow-sm"
+                                                                    : "text-muted-foreground hover:text-foreground"
+                                                            }`}
+                                                        >
+                                                            Secondary (Freelance / Extra)
+                                                        </button>
+                                                    </div>
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 </div>
 
                                 {/* Description Input */}
