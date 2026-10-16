@@ -17,17 +17,29 @@ interface StatsCardsProps {
     stats: YearlyStats | null;
     allTimeStats: AllTimeStats | null;
     loading: boolean;
+    selectedYear?: number | "all";
 }
 
-export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
+export function StatsCards({ stats, allTimeStats, loading, selectedYear }: StatsCardsProps) {
+    const isAll = selectedYear === "all";
+    const yearLabel = isAll ? "All Time" : (selectedYear ? `${selectedYear}` : "Annual");
+
+    const pendingValue = isAll
+        ? (allTimeStats?.totalPending ?? stats?.totalPending ?? 0)
+        : (stats?.totalPending ?? 0);
+
+    const receivedValue = isAll
+        ? (allTimeStats?.totalReceived ?? stats?.totalReceived ?? 0)
+        : (stats?.totalReceived ?? 0);
+
     const cards = [
         {
             title: "Total Income",
-            subtitle: "Selected Year Inflow",
+            subtitle: `${yearLabel} Inflow`,
             value: stats?.totalIncome || 0,
             icon: Wallet,
             iconBg: "bg-gradient-to-tr from-violet-600 to-indigo-600 text-white shadow-md shadow-indigo-500/20",
-            badge: "Annual Total",
+            badge: `${yearLabel} Total`,
             badgeStyle: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/25",
             topGradient: "from-violet-500 via-indigo-500 to-cyan-500",
             glowColor: "from-indigo-500/20",
@@ -35,7 +47,7 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
         },
         {
             title: "Primary Income",
-            subtitle: "Salary / Core Streams",
+            subtitle: `${yearLabel} Primary Stream`,
             value: stats?.totalPrimary || 0,
             icon: TrendingUp,
             iconBg: "bg-gradient-to-tr from-purple-600 to-violet-600 text-white shadow-md shadow-purple-500/20",
@@ -47,7 +59,7 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
         },
         {
             title: "Secondary Income",
-            subtitle: "Freelance / Extra",
+            subtitle: `${yearLabel} Extra Streams`,
             value: stats?.totalSecondary || 0,
             icon: Layers,
             iconBg: "bg-gradient-to-tr from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-500/20",
@@ -59,11 +71,11 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
         },
         {
             title: "Total Pending",
-            subtitle: "All Time Receivable",
-            value: allTimeStats?.totalPending ?? (stats?.totalPending || 0),
+            subtitle: `${yearLabel} Receivable`,
+            value: pendingValue,
             icon: Clock,
             iconBg: "bg-gradient-to-tr from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/20",
-            badge: "Receivable",
+            badge: "Unpaid / Pending",
             badgeStyle: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/25",
             topGradient: "from-amber-500 via-orange-500 to-yellow-500",
             glowColor: "from-amber-500/20",
@@ -71,11 +83,11 @@ export function StatsCards({ stats, allTimeStats, loading }: StatsCardsProps) {
         },
         {
             title: "Total Received",
-            subtitle: "All Time Settled",
-            value: allTimeStats?.totalReceived ?? (stats?.totalReceived || 0),
+            subtitle: `${yearLabel} Settled`,
+            value: receivedValue,
             icon: CheckCircle2,
             iconBg: "bg-gradient-to-tr from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20",
-            badge: "Settled",
+            badge: "Fully Settled",
             badgeStyle: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/25",
             topGradient: "from-emerald-500 via-teal-500 to-cyan-500",
             glowColor: "from-emerald-500/20",

@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/lib/auth-context";
 import { addIncome, updateIncome } from "@/lib/income-service";
+import { subscribeToCompanies } from "@/lib/company-service";
+import { Company } from "@/types/company";
+import { CompanySettingsDialog } from "./company-settings-dialog";
 import { MONTHS } from "@/lib/utils";
 import { IncomeEntry } from "@/types/income";
 import {
@@ -34,7 +37,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Building2 } from "lucide-react";
 
 const formSchema = z.object({
     amount: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
@@ -50,6 +53,7 @@ const formSchema = z.object({
         }),
     type: z.enum(["credit", "debit"]),
     status: z.enum(["pending", "received"]),
+    companyId: z.string().optional(),
     description: z.string().optional(),
 });
 
@@ -69,10 +73,21 @@ export function IncomeForm({
     const { user } = useAuth();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [showCompanySettings, setShowCompanySettings] = useState(false);
     const { toast } = useToast();
 
     const isEditing = !!initialData;
     const currentMonthName = MONTHS[new Date().getMonth()];
+
+    // Subscribe to real-time companies
+    useEffect(() => {
+        if (!user) return;
+        const unsub = subscribeToCompanies(user.uid, (list) => {
+            setCompanies(list);
+        });
+        return () => unsub();
+    }, [user]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -83,6 +98,7 @@ export function IncomeForm({
             year: (initialData?.year || defaultYear || new Date().getFullYear()).toString(),
             type: initialData?.type || "credit",
             status: initialData?.status || "received",
+            companyId: initialData?.companyId || "none",
             description: initialData?.description || "",
         },
     });
@@ -92,6 +108,8 @@ export function IncomeForm({
 
         setLoading(true);
 
+        const selectedCompany = companies.find((c) => c.id === values.companyId);
+
         const formData = {
             amount: Number(values.amount),
             category: values.category,
@@ -99,6 +117,8 @@ export function IncomeForm({
             year: Number(values.year),
             type: values.type,
             status: values.status,
+            companyId: values.companyId && values.companyId !== "none" ? values.companyId : null,
+            companyName: selectedCompany ? selectedCompany.name : null,
             description: values.description,
         };
 
@@ -320,33 +340,100 @@ export function IncomeForm({
                             />
                         </div>
 
-                        <FormField
-                            control={form.control}
-                            name="category"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
-                                        Category
-                                    </FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                            <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
-                                                <SelectValue placeholder="Category" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent className="glass bg-popover text-popover-foreground border-border">
-                                            <SelectItem value="primary" className="text-xs">
-                                                Primary / Salary
-                                            </SelectItem>
-                                            <SelectItem value="secondary" className="text-xs">
-                                                Secondary / Freelance
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <FormField
+                                control={form.control}
+                                name="companyId"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <div className="flex items-center justify-between">
+                                            <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                                                <Building2 className="w-3 h-3 text-primary" />
+                                                Company / Source
+                                            </FormLabel>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowCompanySettings(true)}
+                                                className="text-[10px] text-primary hover:underline font-bold"
+                                            >
+                                                + Manage
+                                            </button>
+                                        </div>
+                                        <Select
+                                            onValueChange={(val) => {
+                                                if (val === "manage_companies") {
+                                                    setShowCompanySettings(true);
+                                                    return;
+                                                }
+                                                field.onChange(val);
+                                                const comp = companies.find((c) => c.id === val);
+                                                if (comp?.category) {
+                                                    form.setValue("category", comp.category);
+                                                }
+                                            }}
+                                            value={field.value || "none"}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
+                                                    <SelectValue placeholder="Select Company" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="glass bg-popover text-popover-foreground border-border max-h-56">
+                                                <SelectItem value="none" className="text-xs">
+                                                    — Personal / None —
+                                                </SelectItem>
+                                                {companies.map((c) => (
+                                                    <SelectItem key={c.id} value={c.id} className="text-xs font-semibold">
+                                                        <div className="flex items-center gap-2">
+                                                            <span
+                                                                className="w-2 h-2 rounded-full shrink-0"
+                                                                style={{ backgroundColor: c.color || "#6366f1" }}
+                                                            />
+                                                            <span>{c.name}</span>
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                                <SelectItem
+                                                    value="manage_companies"
+                                                    className="text-xs text-primary font-bold border-t border-border/60 cursor-pointer"
+                                                >
+                                                    + Add / Manage in Settings...
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="category"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider">
+                                            Category
+                                        </FormLabel>
+                                        <Select onValueChange={field.onChange} value={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="bg-background/50 border-input text-foreground h-11 rounded-xl text-xs font-medium">
+                                                    <SelectValue placeholder="Category" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent className="glass bg-popover text-popover-foreground border-border">
+                                                <SelectItem value="primary" className="text-xs">
+                                                    Primary / Salary
+                                                </SelectItem>
+                                                <SelectItem value="secondary" className="text-xs">
+                                                    Secondary / Freelance
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
 
                         <FormField
                             control={form.control}
@@ -384,6 +471,18 @@ export function IncomeForm({
                     </form>
                 </Form>
             </DialogContent>
+
+            {/* Sub-dialog for company settings */}
+            <CompanySettingsDialog
+                open={showCompanySettings}
+                onOpenChange={setShowCompanySettings}
+                onCompanyAdded={(newComp) => {
+                    form.setValue("companyId", newComp.id);
+                    if (newComp.category) {
+                        form.setValue("category", newComp.category);
+                    }
+                }}
+            />
         </Dialog>
     );
 }

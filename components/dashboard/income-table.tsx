@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { IncomeEntry } from "@/types/income";
+import { Company } from "@/types/company";
 import { deleteIncome, updateIncome } from "@/lib/income-service";
+import { subscribeToCompanies } from "@/lib/company-service";
 import { formatCurrency, MONTHS } from "@/lib/utils";
 
 import {
@@ -38,6 +40,7 @@ import {
     ArrowDownLeft,
     ArrowUpRight,
     Wallet,
+    Building2,
 } from "lucide-react";
 import { IncomeForm } from "./income-form";
 import { motion, AnimatePresence } from "framer-motion";
@@ -66,9 +69,16 @@ export function IncomeTable({
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
     const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
-    const [tableYearFilter, setTableYearFilter] = useState<string>(
-        selectedYear ? selectedYear.toString() : "all"
-    );
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [companyFilter, setCompanyFilter] = useState<string>("all");
+
+    useEffect(() => {
+        if (!user) return;
+        const unsubscribe = subscribeToCompanies(user.uid, (list) => {
+            setCompanies(list);
+        });
+        return () => unsubscribe();
+    }, [user]);
 
     const [sortConfig, setSortConfig] = useState<{
         key: "amount" | "date";
@@ -78,27 +88,27 @@ export function IncomeTable({
         direction: "desc",
     });
 
-    // Extract all unique years present in entries
-    const availableYears = useMemo(() => {
-        const yearsSet = new Set<number>();
-        entries.forEach((e) => {
-            if (e.year) yearsSet.add(e.year);
-        });
-        const currentYear = new Date().getFullYear();
-        yearsSet.add(currentYear);
-        yearsSet.add(currentYear - 1);
-        yearsSet.add(currentYear - 2);
-        return Array.from(yearsSet).sort((a, b) => b - a);
-    }, [entries]);
-
     // Enhanced Filter and Sort logic
     const filteredAndSortedEntries = useMemo(() => {
         let result = [...entries];
 
-        // Year Filter
-        if (tableYearFilter !== "all") {
-            const yNum = Number(tableYearFilter);
+        // Year Filter from Master Selector
+        if (selectedYear && selectedYear !== "all") {
+            const yNum = Number(selectedYear);
             result = result.filter((entry) => entry.year === yNum);
+        }
+
+        // Company Filter
+        if (companyFilter !== "all") {
+            if (companyFilter === "none") {
+                result = result.filter((entry) => !entry.companyId || entry.companyId === "none");
+            } else {
+                result = result.filter(
+                    (entry) =>
+                        entry.companyId === companyFilter ||
+                        entry.companyName?.toLowerCase() === companyFilter.toLowerCase()
+                );
+            }
         }
 
         // Status Filter
@@ -138,7 +148,7 @@ export function IncomeTable({
         });
 
         return result;
-    }, [entries, tableYearFilter, statusFilter, categoryFilter, sortConfig]);
+    }, [entries, selectedYear, companyFilter, statusFilter, categoryFilter, sortConfig]);
 
     // Calculate totals for currently filtered view
     const totals = useMemo(() => {
@@ -181,19 +191,14 @@ export function IncomeTable({
 
     // Calculate totals for the entire filtered entries set
     const yearTotals = useMemo(() => {
-        const currentSet =
-            tableYearFilter === "all"
-                ? entries
-                : entries.filter((e) => e.year === Number(tableYearFilter));
-
-        const pending = currentSet
+        const pending = filteredAndSortedEntries
             .filter((e) => e.status === "pending" && e.type === "credit")
             .reduce((sum, e) => sum + e.amount, 0);
-        const received = currentSet
+        const received = filteredAndSortedEntries
             .filter((e) => e.status === "received" && e.type === "credit")
             .reduce((sum, e) => sum + e.amount, 0);
         return { pending, received };
-    }, [entries, tableYearFilter]);
+    }, [filteredAndSortedEntries]);
 
     async function handleStatusUpdate(id: string, currentStatus: string) {
         if (!user || updatingId) return;
@@ -266,11 +271,16 @@ export function IncomeTable({
             <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4 space-y-5">
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                     <div>
-                        <CardTitle className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+                        <CardTitle className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5 flex-wrap">
                             Recent Transactions
                             <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold">
                                 {filteredAndSortedEntries.length} Records
                             </span>
+                            {selectedYear && (
+                                <span className="text-xs px-2.5 py-0.5 rounded-full bg-muted/80 text-muted-foreground border border-border/80 font-bold">
+                                    {selectedYear === "all" ? "All Years" : `Year: ${selectedYear}`}
+                                </span>
+                            )}
                         </CardTitle>
                         <p className="text-xs text-muted-foreground mt-0.5 font-medium">
                             Track, filter, and manage your income streams and expenditures
@@ -279,32 +289,33 @@ export function IncomeTable({
 
                     {/* Filter and Sorting Toolbar */}
                     <div className="flex flex-wrap items-center gap-2">
-                        {/* Year Selector */}
+                        {/* Company Filter Dropdown */}
                         <div className="flex items-center gap-1.5 bg-muted/60 dark:bg-muted/30 p-1 rounded-xl border border-border/70">
-                            <Calendar className="w-3.5 h-3.5 text-muted-foreground ml-1.5" />
-                            <Select
-                                value={tableYearFilter}
-                                onValueChange={(val) => {
-                                    setTableYearFilter(val);
-                                    if (onYearChange && val !== "all") {
-                                        onYearChange(Number(val));
-                                    }
-                                }}
-                            >
-                                <SelectTrigger className="h-7 border-none bg-transparent shadow-none text-xs font-bold focus:ring-0 w-[100px]">
-                                    <SelectValue placeholder="Year" />
+                            <Building2 className="w-3.5 h-3.5 text-primary ml-1.5 shrink-0" />
+                            <Select value={companyFilter} onValueChange={setCompanyFilter}>
+                                <SelectTrigger className="h-7 border-none bg-transparent shadow-none text-xs font-bold focus:ring-0 w-[145px] truncate">
+                                    <SelectValue placeholder="All Companies" />
                                 </SelectTrigger>
-                                <SelectContent className="glass bg-popover text-popover-foreground border-border">
+                                <SelectContent className="glass bg-popover text-popover-foreground border-border max-h-60">
                                     <SelectItem value="all" className="text-xs font-semibold">
-                                        All Years
+                                        All Companies
                                     </SelectItem>
-                                    {availableYears.map((y) => (
+                                    <SelectItem value="none" className="text-xs font-semibold">
+                                        Personal / No Company
+                                    </SelectItem>
+                                    {companies.map((comp) => (
                                         <SelectItem
-                                            key={y}
-                                            value={y.toString()}
+                                            key={comp.id}
+                                            value={comp.id}
                                             className="text-xs font-semibold"
                                         >
-                                            {y}
+                                            <div className="flex items-center gap-2">
+                                                <span
+                                                    className="w-2 h-2 rounded-full shrink-0"
+                                                    style={{ backgroundColor: comp.color || "#6366f1" }}
+                                                />
+                                                <span className="truncate">{comp.name}</span>
+                                            </div>
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
@@ -410,7 +421,7 @@ export function IncomeTable({
                 <motion.div
                     initial={{ opacity: 0, y: -6 }}
                     animate={{ opacity: 1, y: 0 }}
-                    key={`${statusFilter}-${categoryFilter}-${tableYearFilter}`}
+                    key={`${statusFilter}-${categoryFilter}-${companyFilter}-${selectedYear}`}
                     className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-1"
                 >
                     {/* Credits */}
@@ -559,6 +570,17 @@ export function IncomeTable({
                                 {filteredAndSortedEntries.map((entry) => {
                                     const isReceived = entry.status === "received";
                                     const isCredit = entry.type === "credit";
+                                    const entryCompany = companies.find(
+                                        (c) =>
+                                            c.id === entry.companyId ||
+                                            (entry.companyName &&
+                                                c.name.toLowerCase() ===
+                                                    entry.companyName.toLowerCase())
+                                    );
+                                    const companyName =
+                                        entryCompany?.name || entry.companyName;
+                                    const companyColor =
+                                        entryCompany?.color || "#6366f1";
                                     return (
                                         <motion.div
                                             layout
@@ -586,12 +608,27 @@ export function IncomeTable({
                                                     <p className="font-bold text-sm text-foreground truncate">
                                                         {entry.description || entry.category}
                                                     </p>
-                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5 flex-wrap">
                                                         <span>
                                                             {entry.month} {entry.year}
                                                         </span>
                                                         <span>•</span>
                                                         <span className="capitalize">{entry.category}</span>
+                                                        {companyName && (
+                                                            <>
+                                                                <span>•</span>
+                                                                <span
+                                                                    className="inline-flex items-center gap-1 font-bold text-[11px]"
+                                                                    style={{ color: companyColor }}
+                                                                >
+                                                                    <span
+                                                                        className="w-1.5 h-1.5 rounded-full shrink-0"
+                                                                        style={{ backgroundColor: companyColor }}
+                                                                    />
+                                                                    {companyName}
+                                                                </span>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -660,7 +697,7 @@ export function IncomeTable({
                             <Table>
                                 <TableHeader>
                                     <TableRow className="border-b border-border/60 hover:bg-transparent bg-muted/20">
-                                        <TableHead className="w-[50px] text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+                                        <TableHead className="w-[45px] text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
                                             #
                                         </TableHead>
                                         <TableHead
@@ -684,6 +721,9 @@ export function IncomeTable({
                                                         <ArrowDown className="h-3 w-3 text-primary" />
                                                     ))}
                                             </div>
+                                        </TableHead>
+                                        <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
+                                            Company / Source
                                         </TableHead>
                                         <TableHead className="text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
                                             Description
@@ -710,6 +750,17 @@ export function IncomeTable({
                                         {filteredAndSortedEntries.map((entry, index) => {
                                             const isReceived = entry.status === "received";
                                             const isCredit = entry.type === "credit";
+                                            const entryCompany = companies.find(
+                                                (c) =>
+                                                    c.id === entry.companyId ||
+                                                    (entry.companyName &&
+                                                        c.name.toLowerCase() ===
+                                                            entry.companyName.toLowerCase())
+                                            );
+                                            const companyName =
+                                                entryCompany?.name || entry.companyName;
+                                            const companyColor =
+                                                entryCompany?.color || "#6366f1";
                                             return (
                                                 <TableRow
                                                     key={entry.id}
@@ -728,6 +779,28 @@ export function IncomeTable({
                                                                 </span>
                                                             </span>
                                                         </div>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {companyName ? (
+                                                            <Badge
+                                                                variant="outline"
+                                                                className="text-[10px] font-bold rounded-lg border inline-flex items-center gap-1.5 max-w-[140px] truncate"
+                                                                style={{
+                                                                    backgroundColor: `${companyColor}15`,
+                                                                    color: companyColor,
+                                                                    borderColor: `${companyColor}35`,
+                                                                }}
+                                                                title={companyName}
+                                                            >
+                                                                <span
+                                                                    className="w-1.5 h-1.5 rounded-full shrink-0"
+                                                                    style={{ backgroundColor: companyColor }}
+                                                                />
+                                                                <span className="truncate">{companyName}</span>
+                                                            </Badge>
+                                                        ) : (
+                                                            <span className="text-[11px] text-muted-foreground/60 italic font-medium">Personal</span>
+                                                        )}
                                                     </TableCell>
                                                     <TableCell className="font-semibold text-xs text-foreground max-w-[200px] truncate">
                                                         {entry.description || "—"}

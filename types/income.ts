@@ -7,6 +7,8 @@ export interface IncomeEntry {
   year: number
   type: 'credit' | 'debit'
   status: 'pending' | 'received'
+  companyId?: string | null
+  companyName?: string | null
   description?: string
   createdAt: Date
 }

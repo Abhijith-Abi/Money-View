@@ -65,10 +65,16 @@ export async function addIncome(
 
     const querySnapshot = await getDocs(q);
     
-    // If a matching entry exists, update it instead of creating new
-    if (!querySnapshot.empty) {
-      const existingDoc = querySnapshot.docs[0];
-      const existingData = existingDoc.data();
+    // If a matching entry exists with the exact same company, update it instead of creating new
+    const matchingDoc = querySnapshot.docs.find((d) => {
+      const dData = d.data();
+      const dComp = dData.companyId || "";
+      const eComp = entry.companyId || "";
+      return dComp === eComp;
+    });
+
+    if (matchingDoc) {
+      const existingData = matchingDoc.data();
       const existingAmount = existingData.amount || 0;
       const existingDescription = existingData.description || '';
       
@@ -87,25 +93,24 @@ export async function addIncome(
         }
       }
 
-      console.log('🔄 [addIncome] Found existing entry, aggregating...', {
-        id: existingDoc.id,
+      console.log('🔄 [addIncome] Found existing entry with matching company, aggregating...', {
+        id: matchingDoc.id,
+        company: entry.companyName || 'None',
         oldAmount: existingAmount,
         newAmount: newAmount
       });
 
-      await updateDoc(doc(db, COLLECTION_NAME, existingDoc.id), {
+      await updateDoc(doc(db, COLLECTION_NAME, matchingDoc.id), {
         amount: newAmount,
         description: newDescription,
-        // Update createdAt so it jumps to top/recent if sorted by date? 
-        // Or keep original date? Keeping original date is usually better for history, 
-        // but user might expect it to show as "recent". 
-        // For now, let's just update the content.
+        companyId: entry.companyId || null,
+        companyName: entry.companyName || null,
       });
 
       // Invalidate cache
       incomeCache.invalidate({ userId, year: entry.year });
       
-      return existingDoc.id;
+      return matchingDoc.id;
     }
 
     // No existing entry found, proceed to add new
@@ -192,8 +197,13 @@ export async function updateIncome(
 
           const querySnapshot = await getDocs(q);
           
-          // Filter out the current document itself
-          const otherDocs = querySnapshot.docs.filter(d => d.id !== id);
+          // Filter out the current document itself and ensure companyId matches
+          const otherDocs = querySnapshot.docs.filter(d => {
+            if (d.id === id) return false;
+            const dComp = d.data().companyId || '';
+            const eComp = effectiveEntry.companyId || '';
+            return dComp === eComp;
+          });
           
           if (otherDocs.length > 0) {
             const targetDoc = otherDocs[0];

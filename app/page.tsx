@@ -23,6 +23,7 @@ import { StatsCards } from "@/components/dashboard/stats-cards";
 import { IncomeCharts } from "@/components/dashboard/income-charts";
 import { IncomeTable } from "@/components/dashboard/income-table";
 import { IncomeForm } from "@/components/dashboard/income-form";
+import { CompanySettingsDialog } from "@/components/dashboard/company-settings-dialog";
 import { UserProfile } from "@/components/auth/user-profile";
 import { ModeToggle } from "@/components/mode-toggle";
 import { NotificationBell } from "@/components/notification-bell";
@@ -37,7 +38,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { MoneyLoader } from "@/components/ui/money-loader";
-import { Wallet, Briefcase, Plus } from "lucide-react";
+import { Wallet, Briefcase, Plus, Building2 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -113,11 +114,36 @@ export default function Home() {
                     status: entry.status || ("received" as "pending" | "received"),
                 }));
 
+                const allTimeTotalPrimary = normalizedEntries
+                    .filter((e) => e.type === "credit" && e.category === "primary")
+                    .reduce((sum, e) => sum + e.amount, 0);
+                const allTimeTotalSecondary = normalizedEntries
+                    .filter((e) => e.type === "credit" && e.category === "secondary")
+                    .reduce((sum, e) => sum + e.amount, 0);
+                const allTimeTotalIncome = allTimeTotalPrimary + allTimeTotalSecondary;
+                const allTimePending = normalizedEntries
+                    .filter((e) => e.type === "credit" && e.status === "pending")
+                    .reduce((sum, e) => sum + e.amount, 0);
+                const allTimeReceived = normalizedEntries
+                    .filter((e) => e.type === "credit" && e.status === "received")
+                    .reduce((sum, e) => sum + e.amount, 0);
+
+                const aggregateStats: YearlyStats = {
+                    total: allTimeTotalIncome,
+                    totalIncome: allTimeTotalIncome,
+                    totalPrimary: allTimeTotalPrimary,
+                    totalSecondary: allTimeTotalSecondary,
+                    totalPending: allTimePending,
+                    totalReceived: allTimeReceived,
+                    monthlyAverage: Math.round(allTimeTotalIncome / 12),
+                    highestMonth: yearlyData.highestMonth,
+                };
+
                 setEntries(normalizedEntries);
                 setAllTimeStats(allTimeData);
                 setAnnualStats(annualData);
                 setMonthlyStats(monthlyData);
-                setYearlyStats(yearlyData);
+                setYearlyStats(aggregateStats);
             } else {
                 const yearNum = selectedYear as number;
                 const [entriesData, monthlyData, yearlyData, allTimeData, annualData] =
@@ -279,6 +305,21 @@ export default function Home() {
                                     {/* EMI Helper Dialog */}
                                     <EMICalculatorDialog />
 
+                                    {/* Company Management in Settings */}
+                                    <CompanySettingsDialog
+                                        trigger={
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="glass border-border/80 hover:bg-accent font-semibold text-xs h-9"
+                                                title="Manage Companies & Sources"
+                                            >
+                                                <Building2 className="h-4 w-4 mr-1.5 text-primary" />
+                                                Companies
+                                            </Button>
+                                        }
+                                    />
+
                                     {/* Business Link */}
                                     <Link href="/business">
                                         <Button
@@ -320,6 +361,7 @@ export default function Home() {
                                 stats={yearlyStats}
                                 allTimeStats={allTimeStats}
                                 loading={loading}
+                                selectedYear={selectedYear}
                             />
 
                             {/* Transactions Table - Full Shadcn Table with Filtering & Totals */}
