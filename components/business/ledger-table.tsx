@@ -34,11 +34,11 @@ export function LedgerTable({ entries, loading }: LedgerTableProps) {
                             <TableHead className="font-bold text-center">
                                 Type
                             </TableHead>
-                            <TableHead className="font-bold text-right">
-                                Credit (In)
+                            <TableHead className="font-bold text-right text-emerald-400">
+                                Credit (Received / വരവ്)
                             </TableHead>
-                            <TableHead className="font-bold text-right">
-                                Debit (Out)
+                            <TableHead className="font-bold text-right text-rose-400">
+                                Debit (Given / കടം)
                             </TableHead>
                             <TableHead className="font-bold text-right">
                                 Running Balance
@@ -79,11 +79,11 @@ export function LedgerTable({ entries, loading }: LedgerTableProps) {
                                     <TableCell className="text-center">
                                         <div className="flex justify-center">
                                             {entry.credit > 0 ? (
-                                                <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400">
+                                                <div className="p-1 rounded-full bg-emerald-500/20 text-emerald-400" title="Credit / Received">
                                                     <ArrowDownLeft className="h-4 w-4" />
                                                 </div>
                                             ) : entry.debit > 0 ? (
-                                                <div className="p-1 rounded-full bg-rose-500/20 text-rose-400">
+                                                <div className="p-1 rounded-full bg-rose-500/20 text-rose-400" title="Debit / Given">
                                                     <ArrowUpRight className="h-4 w-4" />
                                                 </div>
                                             ) : (
@@ -91,12 +91,12 @@ export function LedgerTable({ entries, loading }: LedgerTableProps) {
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-right text-emerald-400">
+                                    <TableCell className="text-right text-emerald-400 font-semibold">
                                         {entry.credit > 0
                                             ? `+₹${entry.credit.toLocaleString("en-IN")}`
                                             : "-"}
                                     </TableCell>
-                                    <TableCell className="text-right text-rose-400">
+                                    <TableCell className="text-right text-rose-400 font-semibold">
                                         {entry.debit > 0
                                             ? `-₹${entry.debit.toLocaleString("en-IN")}`
                                             : "-"}
@@ -104,22 +104,22 @@ export function LedgerTable({ entries, loading }: LedgerTableProps) {
                                     <TableCell className="text-right font-bold">
                                         <span
                                             className={
-                                                entry.balance > 0
-                                                    ? "text-emerald-400"
-                                                    : entry.balance < 0
-                                                      ? "text-rose-400"
-                                                      : ""
+                                                entry.balance < 0
+                                                    ? "text-rose-400"
+                                                    : entry.balance > 0
+                                                      ? "text-emerald-400"
+                                                      : "text-muted-foreground"
                                             }
                                         >
                                             ₹
                                             {Math.abs(
                                                 entry.balance,
                                             ).toLocaleString("en-IN")}
-                                            {entry.balance > 0
-                                                ? " Dr"
-                                                : entry.balance < 0
-                                                  ? " Cr"
-                                                  : ""}
+                                            {entry.balance < 0
+                                                ? " Dr (Due)"
+                                                : entry.balance > 0
+                                                  ? " Cr (Adv)"
+                                                  : " (Settled)"}
                                         </span>
                                     </TableCell>
                                 </TableRow>
@@ -156,14 +156,14 @@ export function LedgerTable({ entries, loading }: LedgerTableProps) {
                                         </span>
                                     </div>
                                     {entry.credit > 0 ? (
-                                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-tight">
+                                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase tracking-tight">
                                             <ArrowDownLeft className="h-3 w-3" />
-                                            Credit
+                                            Received / വരവ്
                                         </div>
                                     ) : entry.debit > 0 ? (
-                                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold uppercase tracking-tight">
+                                        <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-[10px] font-bold uppercase tracking-tight">
                                             <ArrowUpRight className="h-3 w-3" />
-                                            Debit
+                                            Given / കടം
                                         </div>
                                     ) : null}
                                 </div>
@@ -195,23 +195,23 @@ export function LedgerTable({ entries, loading }: LedgerTableProps) {
                                         <p
                                             className={cn(
                                                 "font-bold text-sm",
-                                                entry.balance > 0
-                                                    ? "text-emerald-400"
-                                                    : entry.balance < 0
-                                                      ? "text-rose-400"
-                                                      : "",
+                                                entry.balance < 0
+                                                    ? "text-rose-400"
+                                                    : entry.balance > 0
+                                                      ? "text-emerald-400"
+                                                      : "text-muted-foreground",
                                             )}
                                         >
                                             ₹
                                             {Math.abs(
                                                 entry.balance,
                                             ).toLocaleString("en-IN")}
-                                            <span className="text-[10px] ml-0.5 uppercase">
-                                                {entry.balance > 0
-                                                    ? "Dr"
-                                                    : entry.balance < 0
-                                                      ? "Cr"
-                                                      : ""}
+                                            <span className="text-[10px] ml-1 uppercase font-bold">
+                                                {entry.balance < 0
+                                                    ? "Dr (Due)"
+                                                    : entry.balance > 0
+                                                      ? "Cr (Adv)"
+                                                      : "Settled"}
                                             </span>
                                         </p>
                                     </div>

@@ -60,9 +60,20 @@ export async function updateCustomer(
 
 export async function deleteCustomer(id: string, userId: string): Promise<void> {
   try {
+    // 1. Delete customer document
     await deleteDoc(doc(db, COLLECTION_NAME, id))
+
+    // 2. Cascade delete all transactions for this customer
+    const q = query(
+      collection(db, 'transactions'),
+      where('userId', '==', userId),
+      where('customerId', '==', id)
+    )
+    const snapshot = await getDocs(q)
+    const deletePromises = snapshot.docs.map((docSnap) => deleteDoc(docSnap.ref))
+    await Promise.all(deletePromises)
   } catch (error) {
-    console.error('Error deleting customer:', error)
+    console.error('Error deleting customer and transactions:', error)
     throw error
   }
 }

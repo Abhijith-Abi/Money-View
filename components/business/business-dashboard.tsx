@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { getCustomerStats } from "@/lib/customer-service";
+import { getCustomerStats, getAllCustomers } from "@/lib/customer-service";
 import { getRecentTransactions } from "@/lib/ledger-service";
 import { getBusinessProfile } from "@/lib/business-service";
 import { CustomerStats, Transaction, BusinessProfile } from "@/types/customer";
+import { doc, deleteDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     Users,
@@ -34,14 +36,31 @@ export function BusinessDashboard() {
         async function fetchData() {
             if (!user) return;
             try {
-                const [statsData, transactions, profileData] = await Promise.all([
+                const [statsData, allCustomers, transactions, profileData] = await Promise.all([
                     getCustomerStats(user.uid),
-                    getRecentTransactions(user.uid, 6),
+                    getAllCustomers(user.uid),
+                    getRecentTransactions(user.uid, 50),
                     getBusinessProfile(user.uid),
                 ]);
                 setStats(statsData);
-                setRecentTransactions(transactions);
+
+                // Filter transactions to only active, non-deleted customers
+                const activeCustomerIds = new Set(allCustomers.map((c) => c.id));
+                const activeTransactions = transactions.filter((t) =>
+                    activeCustomerIds.has(t.customerId)
+                );
+                setRecentTransactions(activeTransactions.slice(0, 6));
                 setProfile(profileData);
+
+                // Asynchronously purge orphaned transactions of deleted customers from Firestore
+                const orphanTransactions = transactions.filter(
+                    (t) => !activeCustomerIds.has(t.customerId)
+                );
+                if (orphanTransactions.length > 0) {
+                    orphanTransactions.forEach((t) => {
+                        deleteDoc(doc(db, "transactions", t.id)).catch(() => {});
+                    });
+                }
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
             } finally {
@@ -233,7 +252,7 @@ export function BusinessDashboard() {
                                                     {t.customerName}
                                                 </p>
                                                 <p className="text-[10px] text-slate-400">
-                                                    {t.description || (isCredit ? "Payment Received" : "Goods / Service Due")}
+                                                    {t.description || (isCredit ? "Money Received / പണം ലഭിച്ചത്" : "Money Given / കടം കൊടുത്തത്")}
                                                 </p>
                                             </div>
                                         </div>

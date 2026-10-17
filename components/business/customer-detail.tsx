@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Customer, LedgerEntry } from "@/types/customer";
 import { getLedgerEntries } from "@/lib/ledger-service";
+import { getCustomer } from "@/lib/customer-service";
 import { LedgerTable } from "./ledger-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,20 +29,31 @@ interface CustomerDetailProps {
     onBack: () => void;
 }
 
-export function CustomerDetail({ customer, onBack }: CustomerDetailProps) {
+export function CustomerDetail({ customer: initialCustomer, onBack }: CustomerDetailProps) {
     const { user } = useAuth();
     const { toast } = useToast();
+    const [customer, setCustomer] = useState<Customer>(initialCustomer);
     const [entries, setEntries] = useState<LedgerEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [downloading, setDownloading] = useState(false);
     const [showTransactionForm, setShowTransactionForm] = useState(false);
 
+    useEffect(() => {
+        setCustomer(initialCustomer);
+    }, [initialCustomer]);
+
     async function fetchLedger() {
         if (!user) return;
         setLoading(true);
         try {
-            const data = await getLedgerEntries(customer.id, user.uid);
+            const [data, updatedCustomer] = await Promise.all([
+                getLedgerEntries(customer.id, user.uid),
+                getCustomer(customer.id, user.uid),
+            ]);
             setEntries(data);
+            if (updatedCustomer) {
+                setCustomer(updatedCustomer);
+            }
         } catch (error) {
             console.error("Error fetching ledger:", error);
         } finally {
@@ -110,15 +122,13 @@ export function CustomerDetail({ customer, onBack }: CustomerDetailProps) {
                 variant: "destructive",
             });
         } finally {
-            setDownloading(true);
-            // Simulate short delay for UI feedback
-            setTimeout(() => setDownloading(false), 500);
+            setDownloading(false);
         }
     };
 
     useEffect(() => {
         fetchLedger();
-    }, [customer, user]);
+    }, [user]);
 
     return (
         <motion.div
@@ -216,20 +226,20 @@ export function CustomerDetail({ customer, onBack }: CustomerDetailProps) {
                                 {Math.abs(
                                     customer.currentBalance,
                                 ).toLocaleString("en-IN")}
-                                <span className="text-xs ml-1 uppercase font-bold text-muted-foreground">
+                                <span className="text-xs ml-1.5 uppercase font-bold text-muted-foreground">
                                     {customer.currentBalance < 0
-                                        ? "Due (Dr)"
+                                        ? "Due (Dr / കടം)"
                                         : customer.currentBalance > 0
-                                          ? "Adv (Cr)"
-                                          : ""}
+                                          ? "Adv (Cr / നൽകാനുള്ളത്)"
+                                          : "(Settled)"}
                                 </span>
                             </p>
                             <p className="text-[10px] text-muted-foreground font-medium mt-1 italic">
                                 {customer.currentBalance < 0
-                                    ? "Customer owes you this amount"
+                                    ? "Customer owes you this amount (തരാനുള്ളത്)"
                                     : customer.currentBalance > 0
-                                      ? "You owe this amount to customer"
-                                      : "Accounts are currently settled"}
+                                      ? "You owe this amount to customer (അഡ്വാൻസ്)"
+                                      : "Accounts are currently settled (പൂർണ്ണമായി തീർത്തു)"}
                             </p>
                         </div>
                     </CardContent>
