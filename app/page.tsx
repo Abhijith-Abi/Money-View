@@ -38,14 +38,17 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { MoneyLoader } from "@/components/ui/money-loader";
-import { Wallet, Briefcase, Plus, Building2 } from "lucide-react";
+import { Wallet, Briefcase, Plus, Building2, Download, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
+import { exportYearlyLedgerPDF } from "@/lib/pdf-export-service";
 
 export default function Home() {
     const currentYear = new Date().getFullYear();
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
+    const { toast } = useToast();
     const [selectedYear, setSelectedYear] = useState<number | "all">(currentYear);
     const [entries, setEntries] = useState<IncomeEntry[]>([]);
     const [monthlyStats, setMonthlyStats] = useState<MonthlyStats[]>([]);
@@ -54,6 +57,45 @@ export default function Home() {
     const [allTimeStats, setAllTimeStats] = useState<AllTimeStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [showSplash, setShowSplash] = useState(true);
+    const [downloadingPDF, setDownloadingPDF] = useState(false);
+
+    const handleTopExportPDF = () => {
+        if (!user) return;
+        setDownloadingPDF(true);
+        try {
+            if (entries.length === 0) {
+                toast({
+                    title: "No records to export",
+                    description: "There are no transactions found for the selected year.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            exportYearlyLedgerPDF({
+                year: selectedYear,
+                userName: user.displayName || "Account Holder",
+                userEmail: user.email || "",
+                entries,
+                monthlyStats,
+                filterDescription: `Complete Ledger for ${selectedYear === "all" ? "All Years" : `Year ${selectedYear}`}`,
+            });
+
+            toast({
+                title: "Ledger Exported",
+                description: "Your PDF statement has been generated and downloaded.",
+            });
+        } catch (e) {
+            console.error("Error exporting PDF:", e);
+            toast({
+                title: "Export Failed",
+                description: "Failed to generate PDF statement.",
+                variant: "destructive",
+            });
+        } finally {
+            setDownloadingPDF(false);
+        }
+    };
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -333,6 +375,23 @@ export default function Home() {
                                         </Button>
                                     </Link>
 
+                                    {/* Download Yearly Ledger PDF Button */}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleTopExportPDF}
+                                        disabled={downloadingPDF || entries.length === 0}
+                                        className="glass border-border/80 hover:bg-primary/10 text-foreground font-semibold text-xs h-9 gap-1.5"
+                                        title="Download Yearly Ledger as PDF"
+                                    >
+                                        {downloadingPDF ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                        ) : (
+                                            <Download className="h-3.5 w-3.5 text-primary" />
+                                        )}
+                                        <span className="hidden md:inline">Download PDF</span>
+                                    </Button>
+
                                     {/* Add Entry Header Button */}
                                     <IncomeForm
                                         onSuccess={() => fetchData(true)}
@@ -367,6 +426,7 @@ export default function Home() {
                             {/* Transactions Table - Full Shadcn Table with Filtering & Totals */}
                             <IncomeTable
                                 entries={entries}
+                                monthlyStats={monthlyStats}
                                 loading={loading}
                                 onDelete={() => fetchData(true)}
                                 selectedYear={selectedYear}

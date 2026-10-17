@@ -4,7 +4,6 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NotificationProvider } from "@/components/notification-provider";
-import { AIAssistantWidget } from "@/components/ai-assistant-widget";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -82,7 +81,6 @@ export default function RootLayout({
                     <AuthProvider>
                         <NotificationProvider>
                             {children}
-                            <AIAssistantWidget />
                         </NotificationProvider>
                     </AuthProvider>
                 </ThemeProvider>

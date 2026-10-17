@@ -41,7 +41,16 @@ import {
     ArrowUpRight,
     Wallet,
     Building2,
+    Download,
+    FileText,
+    Loader2,
 } from "lucide-react";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
     AnimatedTrendUpIcon,
     AnimatedTrendDownIcon,
@@ -52,9 +61,12 @@ import {
 } from "@/components/ui/animated-icons";
 import { IncomeForm } from "./income-form";
 import { motion, AnimatePresence } from "framer-motion";
+import { exportYearlyLedgerPDF } from "@/lib/pdf-export-service";
+import { MonthlyStats } from "@/types/income";
 
 interface IncomeTableProps {
     entries: IncomeEntry[];
+    monthlyStats?: MonthlyStats[];
     loading: boolean;
     onDelete: () => void;
     selectedYear?: number | "all";
@@ -66,6 +78,7 @@ type CategoryFilter = "all" | "primary" | "secondary";
 
 export function IncomeTable({
     entries,
+    monthlyStats,
     loading,
     onDelete,
     selectedYear,
@@ -73,12 +86,61 @@ export function IncomeTable({
 }: IncomeTableProps) {
     const { user } = useAuth();
     const { toast } = useToast();
+    const [downloading, setDownloading] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
     const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
     const [companies, setCompanies] = useState<Company[]>([]);
     const [companyFilter, setCompanyFilter] = useState<string>("all");
+
+    const handleDownloadPDF = (scope: "complete" | "filtered" = "complete") => {
+        if (!user) return;
+        setDownloading(true);
+        try {
+            const targetEntries =
+                scope === "complete" ? entries : filteredAndSortedEntries;
+            if (targetEntries.length === 0) {
+                toast({
+                    title: "No records found",
+                    description:
+                        "There are no transactions to export for the selected criteria.",
+                    variant: "destructive",
+                });
+                return;
+            }
+
+            const effectiveYr =
+                selectedYear || (targetEntries[0]?.year ?? new Date().getFullYear());
+
+            exportYearlyLedgerPDF({
+                year: effectiveYr,
+                userName: user.displayName || "Account Holder",
+                userEmail: user.email || "",
+                entries: targetEntries,
+                monthlyStats,
+                companies,
+                filterDescription:
+                    scope === "filtered"
+                        ? `Filtered View: Company (${companyFilter === "all" ? "All" : companyFilter}), Status (${statusFilter.toUpperCase()}), Category (${categoryFilter.toUpperCase()})`
+                        : undefined,
+            });
+
+            toast({
+                title: "Statement Downloaded",
+                description: `Yearly financial ledger PDF statement exported successfully.`,
+            });
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            toast({
+                title: "Download Failed",
+                description: "Failed to generate PDF. Please try again.",
+                variant: "destructive",
+            });
+        } finally {
+            setDownloading(false);
+        }
+    };
 
     useEffect(() => {
         if (!user) return;
@@ -422,6 +484,59 @@ export function IncomeTable({
                                     ))}
                             </span>
                         </Button>
+
+                        {/* Export Yearly Ledger as Modern PDF */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    disabled={downloading || filteredAndSortedEntries.length === 0}
+                                    className="h-8 rounded-xl text-xs font-bold glass border-border/80 hover:bg-primary/10 text-foreground transition-all gap-1.5 shadow-sm"
+                                    title="Download Yearly Ledger as PDF"
+                                >
+                                    {downloading ? (
+                                        <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                    ) : (
+                                        <Download className="h-3.5 w-3.5 text-primary" />
+                                    )}
+                                    <span>Download PDF</span>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="end"
+                                className="glass bg-popover/95 text-popover-foreground border-border w-64 p-1.5 rounded-2xl shadow-2xl backdrop-blur-2xl"
+                            >
+                                <DropdownMenuItem
+                                    onClick={() => handleDownloadPDF("complete")}
+                                    className="cursor-pointer text-xs font-semibold rounded-xl flex items-center gap-2.5 p-2.5 hover:bg-muted/60"
+                                >
+                                    <div className="p-2 rounded-lg bg-violet-500/10 text-violet-500 shrink-0">
+                                        <FileText className="h-4 w-4" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-foreground">Complete Yearly Ledger</p>
+                                        <p className="text-[10px] text-muted-foreground">
+                                            All {entries.length} records for {selectedYear === "all" ? "All Years" : selectedYear}
+                                        </p>
+                                    </div>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => handleDownloadPDF("filtered")}
+                                    className="cursor-pointer text-xs font-semibold rounded-xl flex items-center gap-2.5 p-2.5 hover:bg-muted/60"
+                                >
+                                    <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 shrink-0">
+                                        <Download className="h-4 w-4" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-foreground">Filtered View Only</p>
+                                        <p className="text-[10px] text-muted-foreground">
+                                            Export {filteredAndSortedEntries.length} currently visible records
+                                        </p>
+                                    </div>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 </div>
 
